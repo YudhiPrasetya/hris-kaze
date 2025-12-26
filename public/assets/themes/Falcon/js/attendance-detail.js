@@ -1,0 +1,1 @@
+(self.webpackChunk=self.webpackChunk||[]).push([[245],{4625:(e,n,c)=>{c(9755)((function(){window.rowStyle=function(e,n){return e.event||e.weekend?{css:{"background-color":e.event?"#fce9ec":"#e8f1fc",color:e.event?"#E63757":"#2C7BE5"}}:{}}}))}},e=>{"use strict";e.O(void 0,[974],(()=>{return n=4625,e(e.s=n);var n}))}]);

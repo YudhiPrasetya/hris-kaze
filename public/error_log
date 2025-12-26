@@ -1,0 +1,395 @@
+[09-Apr-2021 15:30:59 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[09-Apr-2021 15:31:04 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[09-Apr-2021 15:38:21 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[09-Apr-2021 15:39:54 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[09-Apr-2021 15:44:29 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[09-Apr-2021 16:06:16 UTC] PHP Fatal error:  Trait "Spatie\ModelStatus\HasStatuses" not found in /home/k7380702/kaze2/app/Models/Assignment.php on line 15
+[09-Apr-2021 16:06:57 UTC] PHP Fatal error:  Trait "Spatie\ModelStatus\HasStatuses" not found in /home/k7380702/kaze2/app/Models/Task.php on line 27
+[09-Apr-2021 16:07:56 UTC] PHP Fatal error:  Trait "Spatie\ModelStatus\HasStatuses" not found in /home/k7380702/kaze2/app/Models/Assignment.php on line 15
+[09-Apr-2021 16:08:01 UTC] PHP Fatal error:  Trait "Spatie\ModelStatus\HasStatuses" not found in /home/k7380702/kaze2/app/Models/Assignment.php on line 15
+[09-Apr-2021 16:22:20 UTC] PHP Fatal error:  Trait "Spatie\ModelStatus\HasStatuses" not found in /home/k7380702/kaze2/app/Models/Assignment.php on line 15
+[09-Apr-2021 16:22:23 UTC] PHP Fatal error:  Trait "Spatie\ModelStatus\HasStatuses" not found in /home/k7380702/kaze2/app/Models/Assignment.php on line 15
+[09-Apr-2021 16:22:48 UTC] PHP Fatal error:  Trait "Spatie\ModelStatus\HasStatuses" not found in /home/k7380702/kaze2/app/Models/Task.php on line 27
+[09-Apr-2021 16:22:57 UTC] PHP Fatal error:  Trait "Spatie\ModelStatus\HasStatuses" not found in /home/k7380702/kaze2/app/Models/Assignment.php on line 15
+[09-Apr-2021 16:26:50 UTC] PHP Fatal error:  Trait "Spatie\ModelStatus\HasStatuses" not found in /home/k7380702/kaze2/app/Models/Assignment.php on line 15
+[31-May-2021 18:31:55 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:31:58 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:00 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:02 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:04 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:07 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:09 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:11 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:13 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:15 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:17 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:20 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:23 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:26 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:29 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:32 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:35 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:38 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:41 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:44 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:47 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:53 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:32:59 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:33:05 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4096 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:33:11 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:33:17 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:33:23 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:33:31 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:33:38 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:33:44 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:33:54 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:00 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:06 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:08 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:14 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:19 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:25 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:31 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:37 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:43 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:49 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:34:55 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4096 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:35:01 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4096 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:35:07 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4096 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:35:13 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4096 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:35:19 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4096 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:35:25 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4096 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:35:31 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4096 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:35:37 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4096 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:35:43 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4096 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:35:49 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:35:55 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:36:01 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:36:07 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:36:18 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:36:24 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:36:30 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:36:36 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:36:42 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:36:50 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:36:57 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:37:01 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:37:06 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 1011712 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 133
+[31-May-2021 18:37:07 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[31-May-2021 18:37:12 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 135
+[01-Jun-2021 06:05:52 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:07:36 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:07:42 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:08:08 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:09:16 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 6295552 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:20:11 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:20:11 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 14684160 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:21:27 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 10489856 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:22:04 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Helpers/Serializer.php on line 52
+[01-Jun-2021 06:22:17 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Helpers/Serializer.php on line 52
+[01-Jun-2021 06:23:05 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Helpers/Serializer.php on line 57
+[01-Jun-2021 06:23:13 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:23:14 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 31461376 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:23:29 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:25:05 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:25:38 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:26:08 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:29:08 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 208896 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:42:10 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 978944 bytes) in /home/k7380702/kaze2/vendor/laravel/framework/src/Illuminate/Cache/FileStore.php on line 77
+[01-Jun-2021 06:42:50 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 8392704 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:42:51 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:43:04 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:45:42 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:45:43 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:46:30 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 6295552 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 06:53:05 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Helpers/Serializer.php on line 57
+[01-Jun-2021 07:11:34 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 07:11:36 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 14684160 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:15:31 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 10489856 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:15:37 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 16781312 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:16:39 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:16:40 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 14684160 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:17:04 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Helpers/Serializer.php on line 89
+[01-Jun-2021 11:17:34 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Helpers/Serializer.php on line 89
+[01-Jun-2021 11:17:44 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20975616 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:17:51 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 16781312 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:17:52 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 16781312 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:17:54 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 14684160 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:19:00 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 29364224 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:35:41 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 14684160 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:35:41 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 14684160 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:36:12 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:36:28 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:36:43 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:36:43 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 11:41:21 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Helpers/Serializer.php on line 89
+[01-Jun-2021 14:15:48 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 16781312 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 14:15:58 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 14:20:34 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Helpers/Serializer.php on line 102
+[01-Jun-2021 15:32:30 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 15:35:15 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 20480 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Helpers/Serializer.php on line 92
+[01-Jun-2021 20:09:02 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 20:15:22 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 16781312 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 20:16:01 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 10489856 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 20:20:01 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 94208 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 20:20:01 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 16781312 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 20:20:02 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 12587008 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[01-Jun-2021 20:22:18 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4198400 bytes) in /home/k7380702/kaze2/vendor/itsgoingd/clockwork/Clockwork/Storage/FileStorage.php on line 84
+[31-Aug-2021 23:59:40 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:00:04 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:00:06 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:00:06 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:00:06 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:00:12 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:00:30 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:01:22 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:01:23 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:01:23 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:01:23 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:01:24 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:01:24 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:01:24 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:01:24 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:01:26 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:01:50 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[01-Sep-2021 00:02:00 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[13-Oct-2022 01:33:30 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:34:00 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:34:32 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:35:01 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:35:32 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:01 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:01 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:04 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:04 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:05 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:05 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:06 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:06 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:06 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:06 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:07 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:21 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:21 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:21 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:22 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:22 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:22 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:22 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:22 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:23 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:23 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:23 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:23 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:24 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:24 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:24 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:36:34 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:37:03 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:37:34 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:38:04 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:38:04 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:38:05 UTC] PHP Fatal error:  Uncaught Error: Class "Composer\Autoload\ComposerStaticInit119c01fd37f5c5a1a0f10b0eceeb37be" not found in /home/k7380702/kaze2/vendor/composer/autoload_real.php:35
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/autoload.php(7): ComposerAutoloaderInit119c01fd37f5c5a1a0f10b0eceeb37be::getLoader()
+#1 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#2 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 35
+[13-Oct-2022 01:38:18 UTC] PHP Fatal error:  Uncaught Error: Class "ComposerAutoloaderInit5f66754f08df6ecccb1114f2dd793e80" not found in /home/k7380702/kaze2/vendor/autoload.php:12
+Stack trace:
+#0 /home/k7380702/kaze2/public/index.php(34): require()
+#1 {main}
+  thrown in /home/k7380702/kaze2/vendor/autoload.php on line 12
+[13-Oct-2022 01:38:33 UTC] PHP Warning:  require(/home/k7380702/kaze2/vendor/composer/../laminas/laminas-code/polyfill/ReflectionEnumPolyfill.php): Failed to open stream: No such file or directory in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 55
+[13-Oct-2022 01:38:33 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/k7380702/kaze2/vendor/composer/../laminas/laminas-code/polyfill/ReflectionEnumPolyfill.php' (include_path='.:/opt/cpanel/ea-php80/root/usr/share/pear') in /home/k7380702/kaze2/vendor/composer/autoload_real.php:55
+Stack trace:
+#0 /home/k7380702/kaze2/vendor/composer/autoload_real.php(38): composerRequire5f66754f08df6ecccb1114f2dd793e80('c2aad8997a98dfc...', '/home/k7380702/...')
+#1 /home/k7380702/kaze2/vendor/autoload.php(12): ComposerAutoloaderInit5f66754f08df6ecccb1114f2dd793e80::getLoader()
+#2 /home/k7380702/kaze2/public/index.php(34): require('/home/k7380702/...')
+#3 {main}
+  thrown in /home/k7380702/kaze2/vendor/composer/autoload_real.php on line 55
+[13-Oct-2022 01:38:48 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 8.0.20. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[13-Oct-2022 01:38:55 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[13-Oct-2022 01:38:59 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[13-Oct-2022 01:39:09 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.2.34. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24
+[13-Oct-2022 03:16:58 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 8.0.20. in /home/k7380702/kaze2/vendor/composer/platform_check.php on line 24

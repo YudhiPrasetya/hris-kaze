@@ -1,0 +1,7 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Repositories\EloquentRepositoryInterface;
+
+interface LeaveRepositoryInterface extends EloquentRepositoryInterface{}

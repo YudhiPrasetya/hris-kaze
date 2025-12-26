@@ -1,0 +1,4 @@
+versions:
+    "v1.0.0":
+        changed:
+            - Initial release

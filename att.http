@@ -1,0 +1,8 @@
+POST https://kazebeta.cleanvyasalta.co.id/iclock/cdata?SN=BWXP211360117&table=ATTLOG&Stamp=9999
+User-Agent: iClock Proxy/1.09
+Connection: close
+Accept: */*
+Content-Type: text/plain
+Content-Length: 32
+
+2	2022-01-17 17:55:00	0	1	0	0	0

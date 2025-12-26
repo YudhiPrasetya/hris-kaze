@@ -1,0 +1,31 @@
+<?php
+/**
+ * This file is part of the Laravel project.
+ *
+ * Copyright (c) 2020 Eki Prathama Ramdhani <eq.petrucci@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @author Eki Prathama Ramdhani <eq.petrucci@gmail.com>
+ * @file   CountryRepository
+ * @date   03/09/2020 09:02
+ */
+
+namespace App\Repositories\Eloquent\World;
+
+use App\Models\World\Country;
+use App\Repositories\World\CountryRepositoryInterface;
+use App\Repositories\Eloquent\RepositoryBase;
+
+
+/**
+ * Class CountryRepository
+ *
+ * @package App\Repositories\Eloquent\World
+ */
+class CountryRepository extends RepositoryBase implements CountryRepositoryInterface {
+	public function __construct(Country $model) {
+		parent::__construct($model);
+	}
+}

@@ -1,0 +1,12 @@
+<?php
+
+namespace DummyNamespace;
+
+use App\Http\ViewModels\ViewModel;
+
+class DummyClass extends ViewModel {
+    public function __construct()
+    {
+        //
+    }
+}

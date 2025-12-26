@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Models;
+
+use App\Casts\DateTimeCasts;
+use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class FingerPrintDevice extends ModelBase{
+    use HasFactory;
+    use SoftDeletes;
+    use HasTimestamps;
+
+    // protected $connection = 'mysql';
+
+    // protected $table = 'finger_print_devices';
+
+    protected $fillable = [
+        'no',
+        'ip_address',
+        'port',
+        'description'
+    ];
+
+    protected $casts = [
+        'created_at' => DateTimeCasts::class,
+        'updated_at' => DateTimeCasts::class,
+        'deleted_at' => DateTimeCasts::class,
+    ];
+
+    /**
+     * @throws \App\Exceptions\SchemaNotFoundexception
+     */
+    public function __construct(array $attributes = []){
+        $this->setConnection(connection('master'));
+        $this->setTable(table('master.finger_print_devices', onlyName: true));
+
+        parent::__construct($attributes);
+    }
+}
