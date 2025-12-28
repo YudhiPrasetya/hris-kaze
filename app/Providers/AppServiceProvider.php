@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
-
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -48,6 +48,14 @@ class AppServiceProvider extends ServiceProvider
 	 * @return void
 	 */
 	public function boot() {
+        // if(!$this->app->environment('production')){
+        //     URL::forceScheme('http');
+        // }
+
+        // if(config('app.env') === 'local'){
+        //     URL::forceScheme('http');
+        // }
+
 		$this->addMacros();
 		$this->addSocialiteProviders();
 	}
