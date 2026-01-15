@@ -8,8 +8,8 @@
 @section('api_list_url', route('api.employee'))
 
 @section('columns')
+	<th scope="col" data-class="va-baseline" data-field="nik" data-sortable="true">N I K</th>
 	<th scope="col" data-class="va-baseline" data-field="name" data-sortable="true">Name</th>
-	<th scope="col" data-class="va-baseline" data-field="position.name" data-sortable="true">Position</th>
-	<th scope="col" data-class="va-baseline" data-field="age" data-sortable="true">Age</th>
+	<th scope="col" data-class="va-baseline" data-field="gender" data-sortable="true">Gender</th>
 	<th scope="col" data-class="va-baseline" data-field="effective_since" data-sortable="true">Effective Since</th>
 @endsection

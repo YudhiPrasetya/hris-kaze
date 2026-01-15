@@ -80,10 +80,11 @@ class EmployeeViewModel extends ViewModelBase {
 		return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
 			if ($key == 'rows') {
 				return collect($item)->map(function ($result, $i) use ($self) {
-					$result['profile_photo_path'] =
-						'<div class="avatar avatar-2xl"><img class="rounded-circle w-100" src="' . $result['profile_photo_path'] . '" /></div>';
-					$result['age'] = (new DateTime())->diff($result['birth_date'])->y;
-					$result['effective_since'] = $result['effective_since']->format('Y-m-d');
+					// $result['profile_photo_path'] =
+					// 	'<div class="avatar avatar-2xl"><img class="rounded-circle w-100" src="' . $result['profile_photo_path'] . '" /></div>';
+					// $result['age'] = (new DateTime())->diff($result['birth_date'])->y;
+                    $result['gender'] = $result['gender_id'] != null ? ($result['gender_id'] == 1 ? "Male" : "Female") : "No data";
+					$result['effective_since'] = $result['effective_since'] != null ? $result['effective_since']->format('Y-m-d') : "No data";
 
 					return $self->addDefaultListActions($result);
 				});
@@ -254,7 +255,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$payrollCalculator->method = PayrollCalculator::GROSS_CALCULATION;
 		$payrollCalculator->taxNumber = PayrollCalculator::PPH21;
 		$payrollCalculator->employee->permanentStatus = $employee->permanent_status;
-		$payrollCalculator->employee->employeeGuarantee = $employee->employee_guarantee;
+		// $payrollCalculator->employee->employeeGuarantee = $employee->employee_guarantee;
 		$payrollCalculator->employee->maritalStatus = $employee->marital_status;
 		$payrollCalculator->employee->hasNPWP = $employee->has_npwp;
 		$payrollCalculator->employee->numOfDependentsFamily = $employee->num_of_dependents_family;
@@ -329,8 +330,11 @@ class EmployeeViewModel extends ViewModelBase {
 
 		$payrollCalculator->getCalculation();
 		$this->payroll = $payrollCalculator;
-
+        // $data = [$this->payroll, $attDetail];
+        // $data = $this->payroll->result->deductions->JIP;
 		return [$this->payroll, $attDetail];
+        // print_r($data[0]->result->deductions->JIP);
+		// return $data;
 	}
 
 	private function workDays(Employee $employee, SettingsRepository $settingsRepository, AttendanceRepository $attendanceRepository) {

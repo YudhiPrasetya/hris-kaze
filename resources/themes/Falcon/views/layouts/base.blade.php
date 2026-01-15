@@ -8,7 +8,7 @@
 	<meta name="author" content="Omnity">
 	<meta name="keyword" content="Admin,Dashboard,Credit,Debit,QR,Code,Payment,Digital,Secure">
 	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-	{{--<meta name="turbolinks-visit-control" content="reload">--}}
+	<meta name="turbolinks-visit-control" content="reload">
 	{{--<meta name="turbolinks-root" content="/">--}}
 
 	<!-- CSRF Token -->

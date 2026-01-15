@@ -1,5 +1,5 @@
-@extends('falcon::layouts.base')
 
+@extends('falcon::layouts.base')
 @section('content')
 	<x-bootstrap::row>
 		<x-bootstrap::column>
@@ -124,34 +124,45 @@
 													</label>
 													<div class="col-sm-7 col-form-label">{!! $moneyFormat($payroll->result->deductions->BPJSKesehatan, $model->currencyCode()) !!}</div>
 												</div>
+
 												<div class="form-group row mb-0">
 													<label for="serial_number" class="col-sm-5 col-form-label">JHT <small class="text-600">(Jaminan Hari Tua)</small></label>
-													<div class="col-sm-7 col-form-label">{!! $moneyFormat($payroll->result->deductions->JHT, $model->currencyCode()) !!}</div>
+													<div class="col-sm-7 col-form-label">
+                                                        {{-- {!! $moneyFormat($payroll->result->deductions->JHT ?? 0, $model->currencyCode()) !!} --}}
+                                                    </div>
 												</div>
-												<div class="form-group row mb-0">
-													<label for="serial_number" class="col-sm-5 col-form-label">JIP <small class="text-600">(Jaminan Pensiun)</small></label>
-                                                    {{dump($payroll->result->deductions->JIP)}}
-													<div class="col-sm-7 col-form-label">{!! $moneyFormat($payroll->result->deductions->JIP, $model->currencyCode()) !!}</div>
-												</div>
-												{{--
+
+												{{-- <div class="form-group row mb-0"> --}}
+													{{-- <label for="serial_number" class="col-sm-5 col-form-label">JIP <small class="text-600">(Jaminan Pensiun)</small></label> --}}
+													{{-- <div class="col-sm-7 col-form-label"> --}}
+                                                        {{-- {!! $moneyFormat($payroll->result->deductions->JIP ?? 0, $model->currencyCode()) !!} --}}
+                                                    {{-- </div> --}}
+												{{-- </div> --}}
+
 												<div class="form-group row mb-0">
 													<label for="serial_number" class="col-sm-5 col-form-label">Pajak Jabatan</label>
-													<div class="col-sm-7 col-form-label">{!! $moneyFormat($payroll->result->deductions->positionTax, $model->currencyCode()) !!}</div>
+													<div class="col-sm-7 col-form-label">
+                                                        {!! $moneyFormat($payroll->result->deductions->positionTax ?? 0, $model->currencyCode()) !!}
+                                                    </div>
 												</div>
-												--}}
+
 												<div class="form-group row mb-0">
-													<label for="serial_number" class="col-sm-5 col-form-label">PPH 21 {{--<small class="text-600">({{ $payroll->result->taxable->rate }})</small>--}}</label>
-													<div class="col-sm-7 col-form-label">{!! $moneyFormat($payroll->result->deductions->pph21Tax, $model->currencyCode()) !!}</div>
+													<label for="serial_number" class="col-sm-5 col-form-label">PPH 21 <small class="text-600">({{ $payroll->result->taxable->rate }})</small></label>
+													<div class="col-sm-7 col-form-label">
+                                                        {!! $moneyFormat($payroll->result->deductions->pph21Tax ?? 0, $model->currencyCode()) !!}
+                                                    </div>
 												</div>
-												{{--
+
 												<div class="form-group row mb-0">
 													<label for="serial_number" class="col-sm-5 col-form-label">
 														Presences<br />
 														<small class="text-600">Total {{ $payroll->employee->presences->workDays }} days from {{ $payroll->provisions->company->numOfWorkingDays }} total work days</small>
 													</label>
-													<div class="col-sm-7 col-form-label">{!! $moneyFormat($payroll->result->deductions->presence, $model->currencyCode()) !!}</div>
+													<div class="col-sm-7 col-form-label">
+                                                        {!! $moneyFormat($payroll->result->deductions->presence ?? 0, $model->currencyCode()) !!}
+                                                    </div>
 												</div>
-												--}}
+
 												<x-bootstrap::column class="px-0">
 													<x-bootstrap::media variant="primary" class="mt-4" title="<small>NETT</small>" />
 												</x-bootstrap::column>

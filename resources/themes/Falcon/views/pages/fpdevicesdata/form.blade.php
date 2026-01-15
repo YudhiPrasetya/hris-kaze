@@ -39,7 +39,7 @@
 
     {!! form_start($form, ['attr' => ['autocomplete' => "off"]]) !!}
     <x-bootstrap::row class="justify-content-center">
-        <x-bootstrap::column breakpoint="EXTRA_SMALL|12;MEDIUM|6">
+        <x-bootstrap::column breakpoint="EXTRA_SMALL|10;MEDIUM|5">
             <x-bootstrap::card>
 				<x-bootstrap::card.header>
 					<x-bootstrap::row class="align-items-baseline justify-content-between">
@@ -59,10 +59,10 @@
                         </x-bootstrap::column>
                     </x-bootstrap::row>
                     <x-bootstrap::row>
-                        <x-bootstrap::column breakpoint="EXTRA_SMALL|6;SMALL|auto;MEDIUM|6">
+                        <x-bootstrap::column breakpoint="EXTRA_SMALL|10;SMALL|auto;MEDIUM|6">
                             {!! form_row($form->from) !!}
                         </x-bootstrap::column>
-                        <x-bootstrap::column>
+                        <x-bootstrap::column breakpoint="EXTRA_SMALL|10;SMALL|auto;MEDIUM|6">
                             {!! form_row($form->to) !!}
                         </x-bootstrap::column>
                     </x-bootstrap::row>

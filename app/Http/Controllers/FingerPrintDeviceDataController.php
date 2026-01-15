@@ -9,7 +9,6 @@ use App\Http\ViewModels\ViewModel;
 use App\Http\ViewModels\ViewModel as HttpViewModel;
 use App\Managers\Form\FormBuilder;
 use App\Models\FingerPrintDeviceData;
-use App\Models\Vehicle;
 use App\Repositories\Eloquent\FingerPrintDeviceDataRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;

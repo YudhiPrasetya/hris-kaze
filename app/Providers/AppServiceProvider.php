@@ -48,9 +48,9 @@ class AppServiceProvider extends ServiceProvider
 	 * @return void
 	 */
 	public function boot() {
-        // if(!$this->app->environment('production')){
-        //     URL::forceScheme('http');
-        // }
+        if(!$this->app->environment('production')){
+            URL::forceScheme('https');
+        }
 
         // if(config('app.env') === 'local'){
         //     URL::forceScheme('http');

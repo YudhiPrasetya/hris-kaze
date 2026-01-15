@@ -23,8 +23,8 @@ class FingerPrintDeviceDataForm extends Form{
                     }
                 ]
             )
-            ->add('from', Field::DATE, ['label' => 'From', 'attr' => ['class_append' => 'col-5']])
-            ->add('to', Field::DATE, ['label' => 'To', 'attr' => ['class_append' => 'col-5']])
+            ->add('from', Field::DATE, ['label' => 'From', 'attr' => ['class_append' => 'col-10']])
+            ->add('to', Field::DATE, ['label' => 'To', 'attr' => ['class_append' => 'col-10']])
             ->add('submit', Field::BUTTON_SUBMIT, [
                 'label' => '<i class="fad fa-download mr-1"></i> Pull Data',
                 'attr' => ['class' => 'btn-falcon-success', 'id' => 'submit_pulldata']
