@@ -136,44 +136,47 @@ class FingerPrintDeviceDataViewModel extends ViewModelBase{
                 $nik = $r['id'];
                 $dateTime = Carbon::parse($r['timestamp']);
                 $employee = Employee::where('nik', '=', $nik)->first();
-                $att = $employee->attendance()->whereDate('at', '=', $dateTime->format('Y-m-d'))->first();
+                if($employee){
 
-                $time = Carbon::parse($dateTime);
-                $shift = $employee->getWorkingShift()->first();
-                $start = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->start));
-                $end = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->end));
-                $end2 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->end))->addHour();
-                $end3 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->end))->addHour();
-                $end4 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), '23:59:59'))->addHour();
-                $key = 'start';
+                    $att = $employee->attendance()->whereDate('at', '=', $dateTime->format('Y-m-d'))->first();
 
-                if($time->lessThan($end) || $time->between($start, $end)) $key = 'start';
-                else if ($time->between($end, $end2)) $key = 'end';
-                else if($time->between($end3->addSecond(), $end4)) $key = 'overtime';
+                    $time = Carbon::parse($dateTime);
+                    $shift = $employee->getWorkingShift()->first();
+                    $start = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->start));
+                    $end = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->end));
+                    $end2 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->end))->addHour();
+                    $end3 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->end))->addHour();
+                    $end4 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), '23:59:59'))->addHour();
+                    $key = 'start';
 
-                if($att === null){
-                    $att = new Attendance([
-                        'employee_id' => $employee->id,
-                        'attendance_reason_id' => 1,
-                        'at' => $dateTime->format('Y-m-d'),
-                        $key => $dateTime->format('H:i:s')
-                    ]);
-                }else{
-                    $att->{$key} = $dateTime->format('H:i:s');
-                    if ($key === 'overtime' && $att->end === null) {
-                        $att->end = $shift?->end;
+                    if($time->lessThan($end) || $time->between($start, $end)) $key = 'start';
+                    else if ($time->between($end, $end2)) $key = 'end';
+                    else if($time->between($end3->addSecond(), $end4)) $key = 'overtime';
+
+                    if($att === null){
+                        $att = new Attendance([
+                            'employee_id' => $employee->id,
+                            'attendance_reason_id' => 1,
+                            'at' => $dateTime->format('Y-m-d'),
+                            $key => $dateTime->format('H:i:s')
+                        ]);
+                    }else{
+                        $att->{$key} = $dateTime->format('H:i:s');
+                        if ($key === 'overtime' && $att->end === null) {
+                            $att->end = $shift?->end;
+                        }
                     }
+                    $att->save();
+
+                    $arrFpDeviceData = [
+                        'finger_print_device_id' => 1,
+                        'nik' => $nik,
+                        'timestamps' => $dateTime
+                    ];
+
+                    $fpDeviceData = new FingerPrintDeviceData($arrFpDeviceData);
+                    $fpDeviceData->save();
                 }
-                $att->save();
-
-                $arrFpDeviceData = [
-                    'finger_print_device_id' => 1,
-                    'nik' => $nik,
-                    'timestamps' => $dateTime
-                ];
-
-                $fpDeviceData = new FingerPrintDeviceData($arrFpDeviceData);
-                $fpDeviceData->save();
             }
             $this->sendNotification();
 
