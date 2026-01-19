@@ -332,6 +332,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$this->payroll = $payrollCalculator;
         // $data = [$this->payroll, $attDetail];
         // $data = $this->payroll->result->deductions->JIP;
+        // dd($this->payroll->result->deductions->JIP);
 		return [$this->payroll, $attDetail];
         // print_r($data[0]->result->deductions->JIP);
 		// return $data;

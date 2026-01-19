@@ -294,7 +294,8 @@ return [
 	'storage_sql_table'      => env('CLOCKWORK_STORAGE_SQL_TABLE', 'clockwork'),
 
 	// Maximum lifetime of collected metadata in minutes, older requests will automatically be deleted, false to disable
-	'storage_expiration'     => env('CLOCKWORK_STORAGE_EXPIRATION', 60 * 24 * 7),
+	// 'storage_expiration'     => env('CLOCKWORK_STORAGE_EXPIRATION', 60 * 24 * 7),
+	'storage_expiration'     => env('CLOCKWORK_STORAGE_EXPIRATION', 300),
 
 	/*
 	|------------------------------------------------------------------------------------------------------------------

@@ -24,7 +24,7 @@ class ImagePlaceholderController extends Controller {
 		// $this->middleware('placeholder');
 	}
 
-	public function placeholder(Request $request, $size = null, string $bgColor = null, string $textColor = null, string $ext = null) {
+	public function placeholder(Request $request, $size = null, ?string $bgColor = null, ?string $textColor = null, ?string $ext = null) {
 		$size = explode('x', $size);
 		$bgColor = (Str::startsWith($bgColor, '#') ? '' : '#') . $bgColor;
 		$textColor = (Str::startsWith($bgColor, '#') ? '' : '#') . $textColor;
@@ -60,7 +60,7 @@ class ImagePlaceholderController extends Controller {
 			return $placeholder->output($image);
 	}
 
-	public function icon(Request $request, $size = null, string $bgColor = null, string $textColor = null, string $ext = null) {
+	public function icon(Request $request, $size = null, ?string $bgColor = null, ?string $textColor = null, ?string $ext = null) {
 		$size = explode('x', $size);
 		$bgColor = (Str::startsWith($bgColor, '#') ? '' : '#') . $bgColor;
 		$textColor = (Str::startsWith($bgColor, '#') ? '' : '#') . $textColor;

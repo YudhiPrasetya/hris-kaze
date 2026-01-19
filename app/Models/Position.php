@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use App\Casts\DateTimeCasts;
-use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 
 
 class Position extends ModelBase {
@@ -56,4 +57,8 @@ class Position extends ModelBase {
 
 		parent::__construct($attributes);
 	}
+
+    public function employees(): HasMany{
+        return $this->hasMany(Employee::class, 'position_id', 'id');
+    }
 }

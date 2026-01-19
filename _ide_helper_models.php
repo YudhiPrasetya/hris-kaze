@@ -505,6 +505,7 @@ namespace App\Models{
  * @property mixed|string $effective_since
  * @property int $gender_id
  * @property int|null $position_id
+ * @property int|null $job_title_id
  * @property int|null $user_id
  * @property string $country_id
  * @property int $state_id
@@ -575,6 +576,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Employee wherePersonalEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Employee wherePin($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Employee wherePositionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Employee whereJobTitleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Employee wherePostalCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Employee whereProfilePhotoPath($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Employee whereStateId($value)
