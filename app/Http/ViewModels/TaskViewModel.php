@@ -14,7 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
-
+use Illuminate\Support\Facades\Auth;
 
 class TaskViewModel extends ViewModelBase {
 	public function __construct(EloquentRepositoryInterface $repository, ?FormBuilder $formBuilder = null) {
@@ -78,7 +78,35 @@ class TaskViewModel extends ViewModelBase {
 					$result['dateline'] = $result['dateline']->format('l, d F Y');
 					$result['priority']['name'] = $self->getPriorityColor($result['priority'], true);
 					$result['assign_to'] = $self->createLink($result['employee']['name'], route('employee.show', ['employee' => $result['employee']['id']]));
-					return $self->addDefaultListActions($result);
+
+                    $user = Auth::user();
+                    // dd($user->roles->pluck('name')->first());
+                    $userRole = $user->roles->pluck('name')->first();
+                    if($userRole == 'super-admin' || $userRole == 'admin' || $userRole == 'manager') {
+                        $result = $self->addDefaultListActions($result);
+                    } elseif($userRole == 'operator') {
+                        // Employees can only confirm or mark tasks as done
+                        $actions = $self->getButton($result['current_status'], $result['id']);
+                        $result['actions'] = $actions;
+                    } else {
+                        // Other roles have no actions
+                        $result['actions'] = collect([]);
+                    }
+                    return $result;
+                    // switch($userRole) {
+                    //     case 'super-admin' || 'admin' || 'manager':
+                    //         $result = $self->addDefaultListActions($result);
+                    //         break;
+                    //     case 'operator':
+                    //         // Employees can only confirm or mark tasks as done
+                    //         $actions = $self->getButton($result['current_status'], $result['id']);
+                    //         $result['actions'] = $actions;
+                    //         break;
+                    //     default:
+                    //         // Other roles have no actions
+                    //         $result['actions'] = collect([]);
+                    // }
+					// return $self->addDefaultListActions($result);
 				});
 			}
 
