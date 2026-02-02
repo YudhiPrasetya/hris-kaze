@@ -19,7 +19,7 @@
 							</h5>
 						</x-bootstrap::column>
 						<x-bootstrap::column breakpoint="EXTRA_SMALL|6;SMALL|auto;MEDIUM|4" class="d-flex align-items-baseline justify-content-end">
-							<a href="{{ route('report.attendance.employee.download', ['employee' => $model->id]) }}" role="button" data-toggle="tooltip" title="Download" class="btn btn-falcon-primary ml-2">
+							<a href="{{ route('report.attendance.employee.download', ['employee' => $model->id, 'start' => $data['start']]) }}" role="button" data-toggle="tooltip" title="Download" class="btn btn-falcon-primary ml-2">
 								<span class="fad fa-download mr-1"></span>
 								<span>Download</span>
 							</a>

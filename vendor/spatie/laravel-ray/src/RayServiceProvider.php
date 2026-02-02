@@ -174,7 +174,6 @@ class RayServiceProvider extends ServiceProvider
     {
         $watchers = [
             ExceptionWatcher::class,
-            MailWatcher::class,
             ApplicationLogWatcher::class,
             JobWatcher::class,
             EventWatcher::class,
@@ -221,7 +220,6 @@ class RayServiceProvider extends ServiceProvider
             return $this;
         });
 
-
         Stringable::macro('ray', function (string $description = '') {
             $description === ''
                 ? ray($this->value)
@@ -229,7 +227,6 @@ class RayServiceProvider extends ServiceProvider
 
             return $this;
         });
-
 
         Builder::macro('ray', function () {
             $payload = new QueryPayload($this);

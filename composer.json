@@ -26,7 +26,6 @@
         "fruitcake/laravel-cors": "^2.0",
         "geoip2/geoip2": "^2.11",
         "guzzlehttp/guzzle": "^7.0.1",
-        "itsgoingd/clockwork": "^5.0",
         "jmrashed/zkteco": "^1.2",
         "laravel/framework": "^8.12",
         "laravel/jetstream": "^2.2",

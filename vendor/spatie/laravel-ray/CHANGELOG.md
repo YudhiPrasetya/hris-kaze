@@ -2,6 +2,55 @@
 
 All notable changes to `laravel-ray` will be documented in this file
 
+## 1.43.5 - 2026-01-26
+
+### What's Changed
+
+* Update skill description
+
+**Full Changelog**: https://github.com/spatie/laravel-ray/compare/1.43.4...1.43.5
+
+## 1.43.4 - 2026-01-26
+
+### What's Changed
+
+* Bump spatie/ray dependency to ^1.45.0
+
+**Full Changelog**: https://github.com/spatie/laravel-ray/compare/1.43.3...1.43.4
+
+## 1.43.3 - 2026-01-13
+
+### What's Changed
+
+* Bump dependabot/fetch-metadata from 2.4.0 to 2.5.0 by @dependabot[bot] in https://github.com/spatie/laravel-ray/pull/401
+* Bump actions/checkout from 5 to 6 by @dependabot[bot] in https://github.com/spatie/laravel-ray/pull/397
+
+**Full Changelog**: https://github.com/spatie/laravel-ray/compare/1.43.1...1.43.3
+
+## 1.43.2 - 2025-12-15
+
+**Full Changelog**: https://github.com/spatie/laravel-ray/compare/1.43.1...1.43.2
+
+## 1.43.1 - 2025-11-24
+
+**Full Changelog**: https://github.com/spatie/laravel-ray/compare/1.43.0...1.43.1
+
+## 1.43.0 - 2025-11-24
+
+### What's Changed
+
+* Add more context to exceptions by @freekmurze in https://github.com/spatie/laravel-ray/pull/396
+
+**Full Changelog**: https://github.com/spatie/laravel-ray/compare/1.42.0...1.43.0
+
+## 1.42.0 - 2025-11-20
+
+### What's Changed
+
+* Bump stefanzweifel/git-auto-commit-action from 6 to 7 by @dependabot[bot] in https://github.com/spatie/laravel-ray/pull/392
+
+**Full Changelog**: https://github.com/spatie/laravel-ray/compare/1.41.0...1.42.0
+
 ## 1.41.0 - 2025-10-16
 
 ### What's Changed

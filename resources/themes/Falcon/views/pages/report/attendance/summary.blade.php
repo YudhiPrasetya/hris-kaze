@@ -25,12 +25,12 @@
 					</x-bootstrap::row>
 				</x-bootstrap::card.header>
 				<x-bootstrap::card.body class="bg-light">
-					<div class="form-group row">
+					{{-- <div class="form-group row">
 						{!! form_label($form->employee, ['label_attr' => ['class' => 'col-sm-3 col-form-label']]) !!}
 						<div class="col-sm-9">
 							{!! form_widget($form->employee, ['attr' => ['class_append' => 'select2', 'data-value' => $request->input('employee')]]) !!}
 						</div>
-					</div>
+					</div> --}}
 					<div class="form-group row">
 						{!! form_label($form->month, ['label_attr' => ['class' => 'col-sm-3 col-form-label']]) !!}
 						<div class="col-sm-6">

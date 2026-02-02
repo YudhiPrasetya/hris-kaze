@@ -34,4 +34,4 @@ if [ -n "$bashSource" ]; then
     fi
 fi
 
-exec "${dir}/remove-ray.sh" "$@"
+"${dir}/remove-ray.sh" "$@"

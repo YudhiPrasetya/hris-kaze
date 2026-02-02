@@ -1,28 +1,14 @@
 {
     "name": "league/uri-interfaces",
-    "type": "library",
-    "description" : "Common tools for parsing and resolving RFC3987/RFC3986 URI",
+    "description" : "Common interface for URI representation",
     "keywords": [
         "url",
         "uri",
         "rfc3986",
-        "rfc3987",
-        "rfc6570",
-        "psr-7",
-        "parse_url",
-        "http",
-        "https",
-        "ws",
-        "ftp",
-        "data-uri",
-        "file-uri",
-        "parse_str",
-        "query-string",
-        "querystring",
-        "hostname"
+        "rfc3987"
     ],
     "license": "MIT",
-    "homepage": "https://uri.thephpleague.com",
+    "homepage": "http://github.com/thephpleague/uri-interfaces",
     "authors": [
         {
             "name" : "Ignace Nyamagana Butera",
@@ -37,34 +23,46 @@
         }
     ],
     "require": {
-        "php" : "^8.1",
-        "ext-filter": "*",
-        "psr/http-message": "^1.1 || ^2.0"
+        "php" : "^7.2 || ^8.0",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.19",
+        "phpstan/phpstan": "^0.12.90",
+        "phpstan/phpstan-strict-rules": "^0.12.9",
+        "phpstan/phpstan-phpunit": "^0.12.19",
+        "phpunit/phpunit": "^8.5.15 || ^9.5"
     },
     "autoload": {
         "psr-4": {
-            "League\\Uri\\": ""
+            "League\\Uri\\": "src/"
         }
     },
-    "suggest": {
-        "ext-bcmath": "to improve IPV4 host parsing",
-        "ext-gmp": "to improve IPV4 host parsing",
-        "ext-intl": "to handle IDN host with the best performance",
-        "php-64bit": "to improve IPV4 host parsing",
-        "symfony/polyfill-intl-idn": "to handle IDN host via the Symfony polyfill if ext-intl is not present",
-        "rowbot/url": "to handle WHATWG URL"
+    "scripts": {
+        "phpunit": "phpunit --coverage-text",
+        "phpcs": "php-cs-fixer fix --dry-run --diff -vvv --allow-risky=yes --ansi",
+        "phpcs:fix": "php-cs-fixer fix -vvv --allow-risky=yes --ansi",
+        "phpstan": "phpstan analyse -l max -c phpstan.neon src --ansi --memory-limit 192M",
+        "test": [
+            "@phpunit",
+            "@phpstan",
+            "@phpcs:fix"
+        ]
+    },
+    "scripts-descriptions": {
+        "phpunit": "Runs package test suite",
+        "phpstan": "Runs complete codebase static analysis",
+        "phpcs": "Runs coding style testing",
+        "phpcs:fix": "Fix coding style issues",
+        "test": "Runs all tests"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.x-dev"
+            "dev-master": "2.x-dev"
         }
     },
-    "support": {
-        "forum": "https://thephpleague.slack.com",
-        "docs": "https://uri.thephpleague.com",
-        "issues": "https://github.com/thephpleague/uri-src/issues"
-    },
-    "config": {
-        "sort-packages": true
+    "suggest": {
+        "ext-intl": "to use the IDNA feature",
+        "symfony/intl": "to use the IDNA feature via Symfony Polyfill"
     }
 }
