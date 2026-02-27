@@ -22,6 +22,8 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 
+use App\Libraries\Payroll\PayrollCalculator;
+use PDF;
 
 class EmployeeController extends Controller {
 	private EmployeeViewModel $viewModel;
@@ -118,6 +120,66 @@ class EmployeeController extends Controller {
 	public function getpayroll(Request $request, Employee $employee) {
 		$this->viewModel->setModel($employee);
 		return $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+	}
+
+	public function showPayroll(Request $request, Employee $employee){
+		// Employee $employee = Employee::find($id);
+		$this->viewModel->setModel($employee);
+		$employeePayroll = $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+		$payrollCalc = new PayrollCalculator();
+		$payrollCalc = $employeePayroll[0];
+
+		// dd($moneyFormat($employee->basic_salary, $employee->currencyCode()));
+
+		// $employeePayroll = $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+
+		$data = [
+			'nik' => $employee->nik, 
+			'name' => $employee->name,
+			'jobTitle' => $employee->jobTitle()->first()->name,
+			'position' => $employee->position()->first()->name,
+			'basicSalary' => $employee->basic_salary,
+			'functionalAllowance' => $employee->functional_allowance,
+			'transportAllowance' => $employee->transport_allowance,
+			'mealAllowance' => $employee->meal_allowances,
+			'otherAllowance' => $employee->other_allowance,
+			'overtimeDays' => $payrollCalc->employee->presences->overtimeDays,
+			'overtimeEarnings' => $payrollCalc->result->earnings->overtime,
+			'attendancePremium' => $payrollCalc->result->earnings->attendance_premium,
+			'totalDependents' => $payrollCalc->employee->numOfDependentsFamily,
+			'BPJSKes' => $payrollCalc->result->deductions->BPJSKesehatan,
+			'JHT' => $payrollCalc->result->deductions->JHT,
+			'JIP' => $payrollCalc->result->deductions->JIP,
+			'PPH21' => $payrollCalc->result->deductions->pph21Tax,
+			'taxableRate' => $payrollCalc->result->taxable->rate,
+			'presences' => $payrollCalc->employee->presences->workDays,
+			'workingDays' => $payrollCalc->provisions->company->numOfWorkingDays,
+			'presencesDeduction' => $payrollCalc->result->deductions->presence,
+			'present' => $payrollCalc->employee->presences->workDays,
+			'sick' => $payrollCalc->employee->presences->sick,
+			'businessTrip' => $payrollCalc->employee->presences->business_trip,
+			'permit' => $payrollCalc->employee->presences->permit,
+			'absent' => $payrollCalc->employee->presences->absent,
+			'totalEarnings' => $payrollCalc->result->earnings->baseTotal,
+			'totalDeductions' => $payrollCalc->result->deductions->getSum() - $payrollCalc->result->deductions->positionTax,
+			'takeHomePay' => $payrollCalc->result->takeHomePay
+		];
+
+		// $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+		// $payrollCalc = new PayrollCalculator();
+		// $payrollCalc = $employeePayroll[0];
+		// $data = [
+		// 	'model' => $employeeModel,
+
+		// ];
+
+		// dump($payrollCalc->employee, $payrollCalc->result->takeHomePay);
+		// return $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+		set_time_limit(300);
+		$pdf = PDF::loadView('pages.employee.payroll', $data);
+		// $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+
+		return $pdf->download('Payroll-' . $data['name'] . '.pdf');
 	}
 
 	/**

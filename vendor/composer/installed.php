@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'f4f2a6213588a0a584a85c4335a5a9ac870a8a95',
+        'reference' => 'f5fbb79153d073a38e4a140bc510a8841ed7c5fe',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -36,6 +36,15 @@
             'install_path' => __DIR__ . '/../barryvdh/laravel-debugbar',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'barryvdh/laravel-dompdf' => array(
+            'pretty_version' => 'v1.0.2',
+            'version' => '1.0.2.0',
+            'reference' => 'de83130d029289e1b59f28b41c314ce1d157b4a0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../barryvdh/laravel-dompdf',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'barryvdh/laravel-ide-helper' => array(
             'pretty_version' => 'v2.14.0',
@@ -655,7 +664,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'f4f2a6213588a0a584a85c4335a5a9ac870a8a95',
+            'reference' => 'f5fbb79153d073a38e4a140bc510a8841ed7c5fe',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

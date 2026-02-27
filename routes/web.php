@@ -198,6 +198,9 @@ Route::domain(config('app.domain'))->group(function () {
          ->setDefaults(['country' => 'ID'])
          ->name('country.flag');
 
+      // Employee payroll
+      Route::get('/employee/{employee}/payroll', [EmployeeController::class, 'showPayroll'])->name('employee.payroll');
+
       // API that used for web only.
       // You have to access from web to be able to access this API
       // Route::middleware(['auth', 'api'])->group(function () {

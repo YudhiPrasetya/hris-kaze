@@ -235,12 +235,6 @@
 													<label class="col-sm-5 col-form-label">Take Home Pay</label>
 													<div class="col-sm-7 col-form-label">{!! $moneyFormat($payroll->result->takeHomePay, $model->currencyCode()) !!}</div>
 												</div>
-
-                                                <div class="row">
-                                                    <button class="btn-falcon-warning btn" type="button" onclick="event.preventDefault(); document.getElementById('delete-form-{{ $model->id }}').submit();">
-                                                        <i class="fad fa-print mr-2"></i>Cetak Slip Gaji
-                                                    </button>
-                                                </div>
 											</x-bootstrap::column>
 											<x-bootstrap::column>
 												<x-bootstrap::media variant="primary" class="my-4" icon="fad fa-money-check-alt" title="AnnualLeave " subtitle="Annual Leave." />

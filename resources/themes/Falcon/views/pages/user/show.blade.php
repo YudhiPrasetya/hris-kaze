@@ -95,7 +95,7 @@
 												//$group = Str::beforeLast($group, '.');
 												if (!$tmp->has($group)) $tmp->offsetSet($group, collect([]));
 												$g = $tmp->get($group);
-												clock($group, $g, $sub);
+												// clock($group, $g, $sub);
 
 												$desc = str_replace('destroy', '<span class="text-danger" data-toggle="tooltip" data-html="true" data-placement="auto" title="<i class=\'fad fa-exclamation-triangle text-warning mr-1\'></i>Careful">delete</span>', $desc);
 												$desc = str_replace('index', 'view list of', $desc);

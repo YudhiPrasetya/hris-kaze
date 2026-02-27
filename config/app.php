@@ -180,6 +180,7 @@ return [
       OwenIt\Auditing\AuditingServiceProvider::class,
       Tightenco\Ziggy\ZiggyServiceProvider::class,
       Laravel\Socialite\SocialiteServiceProvider::class,
+      Barryvdh\DomPDF\ServiceProvider::class,
 
       /*
 		 * Application Service Providers...
@@ -250,5 +251,6 @@ return [
       'View'         => Illuminate\Support\Facades\View::class,
       'Debugbar'     => Barryvdh\Debugbar\Facade::class,
       // 'Clockwork'    => Clockwork\Support\Laravel\Facade::class,
+      'PDF'          => Barryvdh\DomPDF\Facade::class
    ],
 ];

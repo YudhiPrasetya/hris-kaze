@@ -86,7 +86,24 @@ class EmployeeViewModel extends ViewModelBase {
                     $result['gender'] = $result['gender_id'] != null ? ($result['gender_id'] == 1 ? "Male" : "Female") : "No data";
 					$result['effective_since'] = $result['effective_since'] != null ? $result['effective_since']->format('Y-m-d') : "No data";
 
-					return $self->addDefaultListActions($result);
+					$action = [
+						'payroll' => [
+							'icon'    => 'fad fa-credit-card',
+							'attr'    => [
+								'class' => 'btn btn-sm btn-falcon-warning',
+								'href'  => route('employee.payroll', ['employee' => $result['id']]),
+								// 'href' => '#',
+								'target' => '_blank'
+							],
+							'type'    => 'a',
+							'tooltip' => 'Show Payroll',
+						],
+					];
+					$result = $self->addDefaultListActions($result);
+					$actions = $result->get('actions')->merge($action);
+					$result['actions'] = $actions;
+					// return $self->addDefaultListActions($result);
+					return $result;
 				});
 			}
 

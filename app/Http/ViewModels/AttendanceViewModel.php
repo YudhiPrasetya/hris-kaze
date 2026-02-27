@@ -209,6 +209,8 @@ class AttendanceViewModel extends ViewModelBase
       $current = clone($start);
       [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = self::getWorkingMonth($settingsRepository, $current);
 
+      // dd($prev->format('d-m-Y'), $next->format('d-m-Y'));
+
       if ($cutoff->value !== 'end_of_month') {
          if ((int) date('d') < (int)$cutoff->value)
             $start = $start->sub(new \DateInterval('P1M'));
@@ -241,7 +243,7 @@ class AttendanceViewModel extends ViewModelBase
       $results = $query->with(['employee:id,name'/*, 'reason:id,name', 'annualLeave:id,no,year,used_at'*/])
          ->paginate($limit, self::ALL_FIELDS, 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
          ->toArray();
-
+      // dd($results);
       $workingDays = count($this->workingDays($settingsRepository));
 
       return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self, $current, $workingDays) {
