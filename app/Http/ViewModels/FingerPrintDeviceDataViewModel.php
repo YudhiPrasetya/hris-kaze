@@ -145,13 +145,13 @@ class FingerPrintDeviceDataViewModel extends ViewModelBase{
                     $start = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->start));
                     $end = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->end));
                     $end2 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->end))->addHour();
-                    $end3 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->end))->addHour();
-                    $end4 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), '23:59:59'))->addHour();
+                    // $end3 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), $shift?->end))->addHour();
+                    // $end4 = Carbon::parse(sprintf("%s %s", $dateTime->format('Y-m-d'), '23:59:59'))->addHour();
                     $key = 'start';
 
                     if($time->lessThan($end) || $time->between($start, $end)) $key = 'start';
                     else if ($time->between($end, $end2)) $key = 'end';
-                    else if($time->between($end3->addSecond(), $end4)) $key = 'overtime';
+                    // else if($time->between($end3->addSecond(), $end4)) $key = 'overtime';
 
                     if($att === null){
                         $att = new Attendance([

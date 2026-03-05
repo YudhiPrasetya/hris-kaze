@@ -79,6 +79,13 @@ class PayrollCalculator {
 	public int $taxNumber = 21;
 
 	/**
+	 * PayrollCalculator::$remainingLeaveQuota
+	 * 
+	 * @var string|int
+	 */
+	public string|int $remainingLeaveQuota;
+
+	/**
 	 * PayrollCalculator::$method
 	 *
 	 * @var string

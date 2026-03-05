@@ -6,12 +6,14 @@ use App\Http\Forms\LeaveForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Managers\Form\FormBuilder;
 use App\Models\Leave;
+use App\Models\Employee;
 use App\Models\ModelInterface;
 use App\Repositories\EloquentRepositoryInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
+use App\Models\Attendance;
 
 class LeaveViewModel extends ViewModelBase{
 	/**
@@ -94,7 +96,7 @@ class LeaveViewModel extends ViewModelBase{
                     $result['start'] = $result['start']->format('Y-m-d');
                     $result['end'] = $result['end']->format('Y-m-d');
 
-					return $self->addDefaultListActions($result);
+					return $self->addDefaultListActions($result, 'edit', 'destroy');
 				});
 			}
 
@@ -110,14 +112,38 @@ class LeaveViewModel extends ViewModelBase{
 		$this->form->redirectIfNotValid();
 
 		$fields = $this->getFormFields();
-		if ($fields->has('attachment_path'))
-			$fields->offsetSet('attachment_path', $this->convertImage($request, 'attachment_path'));
-
-        $p = $fields->toArray();
-		$leave = new Leave($p);
-		$ret = $leave->save();
-
-		return $ret ? $leave : false;
+		// dd($fields);
+		$employeeId = $fields->get('id_employee');
+		$employee = Employee::find($employeeId);
+		if($employee){
+			$years = (new \DateTime())->diff($employee->effective_since)->y;
+			if($years >=1){
+				if ($fields->has('attachment_path'))
+					$fields->offsetSet('attachment_path', $this->convertImage($request, 'attachment_path'));
+		
+				$p = $fields->toArray();
+				$leave = new Leave($p);
+				
+				$ret = $leave->save();
+				
+				// Add leave attendaces
+				$dateStartLeave = $fields->get('start');
+				$dateEndLeave = $fields->get('end');
+				$leaveDays = (new \DateTime($dateStartLeave))->diff(new \DateTime($dateEndLeave))->d + 1;
+				for($x = 0; $x < $leaveDays; $x++){
+					$dateLeave = new \DateTime($dateStartLeave);
+					$attLeave = new Attendance([
+						'employee_id' => $employeeId,
+						'attendance_reason_id' => 6,
+						'at' => $dateLeave->modify('+'.$x.' day')
+					]);
+					$attLeave->save();
+				}
+				return $ret;
+			}
+			return false;
+		}
+		return false;
 	}
 
 }

@@ -11,9 +11,9 @@ class PermitForm extends Form{
     public function buildForm()
     {
         $permitTypes = [
-            "Izin" => "Izin",
-            "Sakit" => "Sakit",
-            "Alpha" => "Alpha"
+            "2" => "Sick (Sakit)",
+            "3" => "Business Trip (Perjalanan Bisnis)",
+            "4" => "Permit (Izin)"
         ];
 
         $this

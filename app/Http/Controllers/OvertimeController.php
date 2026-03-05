@@ -65,7 +65,8 @@ class OvertimeController extends Controller{
 		$model = $this->overtimeViewModel->new($request);
 
 		if ($model !== false) {
-			return redirect(route('ot.show', ['ot' => $model->id]));
+			// return redirect(route('ot.show', ['ot' => $model->id]));
+			return redirect(route('ot.index'));
 		}
 
 		return $this->create();

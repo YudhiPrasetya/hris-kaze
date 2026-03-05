@@ -67,7 +67,8 @@ class PermitController extends Controller{
 		$model = $this->permitViewModel->new($request);
 
 		if ($model !== false) {
-			return redirect(route('permit.show', ['permit' => $model->id]));
+			// return redirect(route('permit.show', ['permit' => $model->id]));
+			return redirect(route('permit.index'));
 		}
 
 		return $this->create();

@@ -33,7 +33,7 @@ class EmployeeForm extends Form {
 				],
 			])
 			->add('effective_since', Field::DATE)
-            ->add('leave_allowance', Field::NUMBER)
+            // ->add('leave_allowance', Field::NUMBER)
 			->add('marital_status', Field::SWITCH)
 			->add('has_npwp', Field::SWITCH)
 			->add('num_of_dependents_family', Field::NUMBER, [

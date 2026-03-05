@@ -7,7 +7,7 @@ use App\Managers\Form\Form;
 use App\Models\Customer;
 use App\Models\Machine;
 use App\Models\Vehicle;
-
+use App\Models\AssignmentDestination;
 
 class AssignmentForm extends Form {
 	public function buildForm() {
@@ -24,11 +24,25 @@ class AssignmentForm extends Form {
 					'property' => 'name',
 					'label'    => 'Customer',
 					'attr' => ['data-placeholder' => "Select a customer"]
-				])
+				]
+			)
 			->add('service_no', Field::TEXT, ['label' => 'Service Report No.', 'attr' => ['class_append' => 'col-12']])
-            ->add('destination', Field::TEXT, ['label' => 'Destination', 'attr' => ['class_append' => 'col-12']])
+            ->add('destination', Field::ENTITY, [
+					'class' => AssignmentDestination::class,
+					'property' => 'name',
+					'label' => 'Destination', 
+					'attr' => ['data-class' => 'col-3']
+				]
+			)
 			->add('purchase_order_no', Field::TEXT, ['label' => 'Purchase Order No.'])
-			->add('is_chargeable', Field::SWITCH, ['label' => 'Chargeable'])
+			->add('is_chargeable', Field::SWITCH)
+			->add('charge_price',
+				Field::INPUT_GROUP,
+				[
+					'label'   => 'Charge Price',
+					'prepend' => '<span class="input-group-text charge_price_currency_symbol">Rp</span>',
+					'attr'    => ['class_append' => 'text-right'],
+				])			
 			->add('product_code', Field::TEXT, ['label' => 'Product Code'])
 			//->add('machine_id',
 			//	Field::ENTITY,

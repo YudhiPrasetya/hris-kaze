@@ -43,8 +43,12 @@ class AssignmentViewModel extends ViewModelBase {
 		$this->form->setModel($model);
 		$this->form->setRequest($request);
 		$this->form->redirectIfNotValid();
-
+		
 		$fields = $this->getFormFields();
+		// dd($model, $request);
+		// $fields->offset('is_chargeable', $this->toBool($fields->get('is_chargeable')));
+		// dd($fields);
+		// dump($fields);
 		$ret = $model->update($fields->toArray());
 
 		AssignmentPart::where('assignment_id', '=', $model->id)->forceDelete();
@@ -63,7 +67,7 @@ class AssignmentViewModel extends ViewModelBase {
 
 			return $model->technicians()->updateOrCreate($technician, ['assignment_id', 'employee_id']);
 		});
-
+		
 		return $ret;
 	}
 
@@ -95,7 +99,7 @@ class AssignmentViewModel extends ViewModelBase {
 		list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
 		$query = $this->getBaseQuery($request, ...$columns);
 		$columns = $this->getDefaultColumns(...$columns);
-		$results = $query->with(['customer:id,name', 'technicians:assignment_id', 'currentStatus:id,name,reason,model_id'])
+		$results = $query->with(['customer:id,name', 'destination:id,name', 'technicians:assignment_id', 'currentStatus:id,name,reason,model_id'])
 		                 ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
 		                 ->toArray();
 

@@ -40,7 +40,7 @@ class Employee extends ModelBase {
 		'street',
 		'birth_date',
 		'effective_since',
-        'leave_allowance',
+        // 'leave_allowance',
 		'basic_salary',
 		'functional_allowance',
 		'transport_allowance',

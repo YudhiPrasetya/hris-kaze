@@ -5,6 +5,7 @@ namespace App\Http\ViewModels;
 use App\Http\Forms\OvertimeForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Managers\Form\FormBuilder;
+use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\ModelInterface;
 use App\Repositories\EloquentRepositoryInterface;
@@ -92,7 +93,7 @@ class OvertimeViewModel extends ViewModelBase{
 
                     // $result['end'] = $result['end']->format('H:i:s');
 
-					return $self->addDefaultListActions($result);
+					return $self->addDefaultListActions($result, 'edit', 'destroy');
 				});
 			}
 			return $item;
@@ -104,13 +105,26 @@ class OvertimeViewModel extends ViewModelBase{
 		$this->form->redirectIfNotValid();
 
 		$fields = $this->getFormFields();
-		if ($fields->has('status'))
-			$fields->offsetSet('status', 0);
+		$idEmployee = $fields->get('id_employee');
+		$otDate = $fields->get('overtime_date');
+		$overtime = $fields->get('overtime');
 
-        $o = $fields->toArray();
-		$overtime = new Overtime($o);
-		$ret = $overtime->save();
+		$att = Attendance::where('employee_id', $idEmployee)->where('at', $otDate)->first();
+		// dd($att);
+		if($att->count() > 0){
+			// if ($fields->has('status'))
+			// 	$fields->offsetSet('status', 0);
+	
+			$o = $fields->toArray();
+			$ot = new Overtime($o);
+			$ret = $ot->save();
 
-		return $ret ? $overtime : false;
+			$att->overtime = $overtime;
+			$att->save();
+
+			return $ret;
+		}
+		// return redirect('overtime.create');
+		return false;
 	}
 }

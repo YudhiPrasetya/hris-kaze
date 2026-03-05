@@ -64,7 +64,8 @@ class LeaveController extends Controller{
 		$model = $this->leaveViewModel->new($request);
 
 		if ($model !== false) {
-			return redirect(route('leave.show', ['leave' => $model->id]));
+			// return redirect(route('leave.show', ['leave' => $model->id]));
+			return redirect(route('leave.index'));
 		}
 
 		return $this->create();

@@ -40,6 +40,7 @@ use Illuminate\Support\Facades\DB;
 
 class EmployeeViewModel extends ViewModelBase {
 	public $payroll;
+	// public $remainingLeaveQuota;
 
 	/**
 	 * EmployeeViewModel constructor.
@@ -168,14 +169,14 @@ class EmployeeViewModel extends ViewModelBase {
 		$employee = new Employee($emp);
 		$ret = $employee->save();
 
-		$annuals = [];
-		for ($i = 0; $i < 14; $i++) {
-			$annuals[] = [
-				'no'   => sprintf('val-%02d-%s', $i + 1, date('Y')),
-				'year' => date('Y'),
-			];
-		}
-		$employee->annualLeaves()->createMany($annuals);
+		// $annuals = [];
+		// for ($i = 0; $i < 14; $i++) {
+		// 	$annuals[] = [
+		// 		'no'   => sprintf('val-%02d-%s', $i + 1, date('Y')),
+		// 		'year' => date('Y'),
+		// 	];
+		// }
+		// $employee->annualLeaves()->createMany($annuals);
 
 		// $finger = Fingerprint::where('pin', '=', $fields->get('pin'))->first();
 		// if ($finger === null) {
@@ -271,6 +272,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$payrollCalculator = new PayrollCalculator();
 		$payrollCalculator->method = PayrollCalculator::GROSS_CALCULATION;
 		$payrollCalculator->taxNumber = PayrollCalculator::PPH21;
+		$payrollCalculator->remainingLeaveQuota = $this->countRemainLeaveQuota($employee);
 		$payrollCalculator->employee->permanentStatus = $employee->permanent_status;
 		// $payrollCalculator->employee->employeeGuarantee = $employee->employee_guarantee;
 		$payrollCalculator->employee->maritalStatus = $employee->marital_status;
@@ -350,10 +352,26 @@ class EmployeeViewModel extends ViewModelBase {
         // $data = [$this->payroll, $attDetail];
         // $data = $this->payroll->result->deductions->JIP;
         // dd($this->payroll->result->deductions->JIP);
+		// $remainingQuota = $this->countRemainLeaveQuota($this->model->id);
+
 		return [$this->payroll, $attDetail];
         // print_r($data[0]->result->deductions->JIP);
 		// return $data;
 	}
+	private function countRemainLeaveQuota($emp): string|int{
+			$years = (new DateTime())->diff($emp->effective_since)->y;
+			if($years >=1){
+				$year = date('Y');
+				$count = Attendance::where('employee_id', $emp->id)
+									 ->where('attendance_reason_id', 6)
+									 ->whereYear('at', '=', (int)$year)->get()->count();
+		
+				return 12-$count;
+			}		
+			return "Haven't received leave quota yet (belum mendapat jatah kuota cuti).";
+		// return $remainingLeaveQuota;
+		// return ['remainingLeaveQuota' => $remainingLeaveQuota];
+	}	
 
 	private function workDays(Employee $employee, SettingsRepository $settingsRepository, AttendanceRepository $attendanceRepository) {
 		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new \DateTime());
@@ -462,7 +480,8 @@ class EmployeeViewModel extends ViewModelBase {
 		                 ->whereDate('at', '<=', $next)
 		                 ->paginate($limit, self::ALL_FIELDS, 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
 		                 ->toArray();
-		$reasons = ['present' => 1, 'sick' => 2, 'business_trip' => 3, 'permit' => 4, 'absent' => 5, 'annual_leave' => 6];
+		// $reasons = ['present' => 1, 'sick' => 2, 'business_trip' => 3, 'permit' => 4, 'absent' => 5, 'annual_leave' => 6];
+		$reasons = ['1' => 'present', '2' => 'sick', '3' => 'business_trip', '4' => 'permit', '5' => 'absent', '6' => 'annual_leave'];
 
 		///
 		$events = CalendarEvent::whereMonth('start_date', '=', $imonthprev)
@@ -591,4 +610,6 @@ class EmployeeViewModel extends ViewModelBase {
 
 		return ['hours' => (int)$hours, 'minutes' => (int)$finalMinutes];
 	}
+
+
 }

@@ -27,6 +27,8 @@ class Assignment extends ModelBase {
 		'service_no',
 		'purchase_order_no',
 		'is_chargeable',
+		'charge_price',
+		'destination',
 		'product_code',
 		'machine_type',
 		'work_detail',
@@ -93,5 +95,9 @@ class Assignment extends ModelBase {
 	public function currentStatus(): MorphOne {
 		return $this->morphOne($this->getStatusModelClassName(), 'model', 'model_type', $this->getModelKeyColumnName())
 		            ->latest('id');
+	}
+
+	public function destination(): HasOne{
+		return $this->hasOne(AssignmentDestination::class, 'id', 'destination');
 	}
 }

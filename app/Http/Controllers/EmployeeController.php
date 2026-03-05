@@ -191,6 +191,7 @@ class EmployeeController extends Controller {
 	 */
 	public function show(Request $request, Employee $employee): HttpViewModel|Response|EmployeeViewModel {
 		$this->viewModel->setModel($employee);
+		// $this->viewModel->countRemainLeaveQuota($employee->id);
 		$this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
 
 		return $this->viewModel->view('pages.employee.show');

@@ -6,6 +6,7 @@ use App\Http\Forms\PermitForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Managers\Form\FormBuilder;
 use App\Models\Permit;
+use App\Models\Attendance;
 use App\Models\ReasonForLeave;
 use App\Models\ModelInterface;
 use App\Repositories\Eloquent\PermitRepository;
@@ -95,13 +96,26 @@ class PermitViewModel extends ViewModelBase{
 		return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
 			if ($key == 'rows') {
 				return collect($item)->map(function ($result, $i) use ($self) {
-					$result['attachment_path'] =
-						'<div class="avatar avatar-2xl"><img class="rounded-circle w-100" src="' . $result['attachment_path'] . '" /></div>';
+					$result['attachment_path'] = '<div class="avatar avatar-2xl"><img class="rounded-circle w-100" src="' . $result['attachment_path'] . '" /></div>';
+
+					$permitType = $result['permit_type'];
+					switch($permitType){
+						case "2":
+							$result['permit_type'] = "Sick (Sakit)";
+							break;
+						case "3":
+							$result['permit_type'] = "Business Trip (Perjalanan Bisnis)";
+							break;
+						case "4":
+							$result['permit_type'] = "Permit (Izin)";
+							break;
+					}
+
                     $result['permit_date'] = $result['permit_date']->format('Y-m-d');
                     $result['start'] = $result['start']->format('Y-m-d');
                     $result['end'] = $result['end']->format('Y-m-d');
 
-					return $self->addDefaultListActions($result);
+					return $self->addDefaultListActions($result, 'edit', 'destroy');
 				});
 			}
 
@@ -119,10 +133,27 @@ class PermitViewModel extends ViewModelBase{
 		$fields = $this->getFormFields();
 		if ($fields->has('attachment_path'))
 			$fields->offsetSet('attachment_path', $this->convertImage($request, 'attachment_path'));
-
-        $p = $fields->toArray();
+		
+		$p = $fields->toArray();
 		$permit = new Permit($p);
 		$ret = $permit->save();
+		
+		// Add sick, businnes trip or permit attendaces
+		$employeeId = $fields->get('id_employee');
+		$permitType = $fields->get('permit_type');
+		$dateStartPermit = $fields->get('start');
+		$dateEndPermit = $fields->get('end');
+		$permitDays = (new DateTime($dateStartPermit))->diff(new DateTime($dateEndPermit))->d + 1;
+
+		for($x = 0; $x < $permitDays; $x++){
+			$datePermit = new DateTime($dateStartPermit);
+			$attPermit = new Attendance([
+				'employee_id' => $employeeId,
+				'attendance_reason_id' => $permitType,
+				'at' => $datePermit->modify('+'.$x.' day')
+			]);
+			$attPermit->save();
+		}		
 
 		return $ret ? $permit : false;
 	}

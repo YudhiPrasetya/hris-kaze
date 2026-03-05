@@ -20,8 +20,8 @@ class Overtime extends ModelBase{
      */
     protected $fillable = [
         'overtime_date', 'id_employee',
-        'start', 'end',
-        'necessity', 'status'
+        'end', 'overtime',
+        'necessity'
     ];
 
     /**
@@ -44,7 +44,7 @@ class Overtime extends ModelBase{
 
     protected $dates = ['overtime_date'];
 
-    protected $time = ['start', 'end'];
+    protected $time = ['end', 'overtime'];
 
     /**
      * @throws \App\Exeptions\SchemaNotFoundException

@@ -88,12 +88,12 @@ class AssignmentController extends Controller {
 	/**
 	 * Update the specified resource in storage.
 	 *
-	 * @param \Illuminate\Http\Request $request
-	 * @param \App\Models\Assignment   $assignment
+	 * @param AssignmentFormRequest $request
+	 * @param \App\Models\Assignment $assignment
 	 *
 	 * @return Application|RedirectResponse|Redirector
 	 */
-	public function update(AssignmentFormRequest $request, Assignment $assignment) {
+	public function update(AssignmentFormRequest $request, Assignment $assignment):Application|RedirectResponse|Redirector {
 		if (!$this->viewModel->update($request, $assignment)) {
 			return redirect(route('assignment.edit', ['assignment' => $assignment->id]));
 		}
