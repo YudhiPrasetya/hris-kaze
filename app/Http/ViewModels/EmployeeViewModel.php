@@ -282,6 +282,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$payrollCalculator->employee->earnings->fixedAllowance = (int)($employee->functional_allowance + $employee->transport_allowance + $employee->meal_allowances + $employee->other_allowance);
 
 		$att = $this->workDays($employee, $settingsRepository, $attendanceRepository);
+		// dd($att);
 		$workingDays = $this->workingDays($settingsRepository);
 		$attDetail = $this->attendanceDetail($request, $employee, $attendanceRepository, $settingsRepository, $calendarEventRepository);
 		$overtime = [];
@@ -295,7 +296,7 @@ class EmployeeViewModel extends ViewModelBase {
 
 			if (!empty($detail['total'])) {
 				$overtime[] = [
-					'at'       => \DateTime::createFromFormat('l, d F Y', $detail['date'])->format('Y-m-d'),
+					'at'       => DateTime::createFromFormat('l, d F Y', $detail['date'])->format('Y-m-d'),
 					'start'    => $detail['start'],
 					'end'      => $detail['end'],
 					'overtime' => $detail['overtime'],
@@ -306,6 +307,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$totalovertime = $this->totalHours($overtime);
 		// dd($attDetail);
 
+		// dd($payrollCalculator->employee->presences);
 		//$payrollCalculator->employee->presences->workDays = $totalPresence;                         // jumlah hari masuk kerja
 		$payrollCalculator->employee->presences->workDays = $att->present ?? 0;                    // jumlah hari masuk kerja
 		$payrollCalculator->employee->presences->overtimeDays = $overtimes ?? 0;           // perhitungan jumlah lembur dalam satuan jam
@@ -315,6 +317,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$payrollCalculator->employee->presences->latetime = 0;                                      // perhitungan jumlah keterlambatan dalam satuan jam
 		$payrollCalculator->employee->presences->travelDays = $att->business_trip ?? 0;             // perhitungan jumlah hari kepergian dinas
 		$payrollCalculator->employee->presences->indisposedDays = $att->sick ?? 0;                  // perhitungan jumlah hari sakit yang telah memiliki surat dokter
+		$payrollCalculator->employee->presences->permits = $att->permit ?? 0;                  // perhitungan jumlah hari sakit yang telah memiliki surat dokter
 		$payrollCalculator->employee->presences->absentDays =  (count($workingDays) - ($att->present ?? 0)) ?? 0;                    // perhitungan jumlah hari alpha
 		$payrollCalculator->employee->presences->splitShifts = 0;                                   // perhitungan jumlah split shift
 		$payrollCalculator->employee->presences->rate = $employee->attendance_premium ?? 0;

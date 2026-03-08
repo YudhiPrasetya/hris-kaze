@@ -108,14 +108,10 @@ class AttendanceController extends Controller
       return redirect(route('attendance.index'));
    }
 
-   /**
-    * @throws \Exception
-    */
    public function report(Request $request)
    {
       $start = new \DateTime(sprintf("%d-%02d-%02d", $request->get('year'), $request->get('month'), date('d')));
       [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($this->settingsRepository, $start);
-      //clocK($prev, $now, $next, $cutoffDateStart, $cutoffDateEnd);
       $this->viewModel->addData('start', $now);
       $this->viewModel->addData('end', $next);
       $this->viewModel->addData('working_days', count($this->viewModel->workingDays($this->settingsRepository)));

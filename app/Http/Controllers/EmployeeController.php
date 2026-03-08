@@ -156,14 +156,22 @@ class EmployeeController extends Controller {
 			'workingDays' => $payrollCalc->provisions->company->numOfWorkingDays,
 			'presencesDeduction' => $payrollCalc->result->deductions->presence,
 			'present' => $payrollCalc->employee->presences->workDays,
-			'sick' => $payrollCalc->employee->presences->sick,
-			'businessTrip' => $payrollCalc->employee->presences->business_trip,
-			'permit' => $payrollCalc->employee->presences->permit,
-			'absent' => $payrollCalc->employee->presences->absent,
+			'sick' => $payrollCalc->employee->presences->indisposedDays,
+			'businessTrip' => $payrollCalc->employee->presences->travelDays,
+			'permit' => $payrollCalc->employee->presences->permits,
+			'absent' => $payrollCalc->employee->presences->absentDays,
+			'nett' => $payrollCalc->result->earnings->annually->nett,
+			'statusPTKP' => $payrollCalc->result->taxable->ptkp->status,
+			'amountPTKP' => $payrollCalc->result->taxable->ptkp->amount,
+			'PKP' => $payrollCalc->result->taxable->pkp,
+			'PPH21PerBulan' => $payrollCalc->result->taxable->liability->monthly,
+			'PPH21PerTahun' => $payrollCalc->result->taxable->liability->annual,
 			'totalEarnings' => $payrollCalc->result->earnings->baseTotal,
 			'totalDeductions' => $payrollCalc->result->deductions->getSum() - $payrollCalc->result->deductions->positionTax,
 			'takeHomePay' => $payrollCalc->result->takeHomePay
 		];
+
+		// dd($data);
 
 		// $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
 		// $payrollCalc = new PayrollCalculator();
@@ -175,6 +183,7 @@ class EmployeeController extends Controller {
 
 		// dump($payrollCalc->employee, $payrollCalc->result->takeHomePay);
 		// return $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+
 		set_time_limit(300);
 		$pdf = PDF::loadView('pages.employee.payroll', $data);
 		// $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);

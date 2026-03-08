@@ -48,11 +48,18 @@ class AttendanceReportForm extends Form
                'selected' => sprintf("%02d", intval(date('n'))),
                'attr' => [
                   'data-value' => sprintf("%02d", intval(date('n'))),
-                  'style' => "width: 100%"
+                  'style' => "width: 100%",
                ]
             ]
          )
-         ->add('year', Field::NUMBER, ['value' => date('Y')])
+         ->add(
+            'year', 
+            Field::NUMBER, 
+            [
+               'value' => date('Y'), 
+               'attr' => ['readonly' => true]
+            ]
+         )
          // ->add(
          //    'employee',
          //    Field::ENTITY,

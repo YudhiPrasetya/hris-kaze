@@ -88,10 +88,9 @@ class OvertimeViewModel extends ViewModelBase{
 			if ($key == 'rows') {
 				return collect($item)->map(function ($result, $i) use ($self) {
                     $result['overtime_date'] = $result['overtime_date']->format('Y-m-d');
-
                     // $result['start'] = $result['start']->format('H:i:s');
-
                     // $result['end'] = $result['end']->format('H:i:s');
+                    // $result['overtime'] = $result['end']->format('H:i:s');
 
 					return $self->addDefaultListActions($result, 'edit', 'destroy');
 				});
@@ -107,11 +106,13 @@ class OvertimeViewModel extends ViewModelBase{
 		$fields = $this->getFormFields();
 		$idEmployee = $fields->get('id_employee');
 		$otDate = $fields->get('overtime_date');
+		$start = $fields->get('start');
+		$end = $fields->get('end');
 		$overtime = $fields->get('overtime');
 
-		$att = Attendance::where('employee_id', $idEmployee)->where('at', $otDate)->first();
+		// $att = Attendance::where('employee_id', $idEmployee)->where('at', $otDate)->first();
 		// dd($att);
-		if($att->count() > 0){
+		// if($att->count() > 0){
 			// if ($fields->has('status'))
 			// 	$fields->offsetSet('status', 0);
 	
@@ -119,11 +120,19 @@ class OvertimeViewModel extends ViewModelBase{
 			$ot = new Overtime($o);
 			$ret = $ot->save();
 
-			$att->overtime = $overtime;
+			$att = new Attendance([
+				'employee_id' => $idEmployee,
+				'at' => $otDate,
+				'attendance_reason_id' => 1,
+				'start' => $start,
+				'end' => $end,
+				'overtime' => $overtime
+
+			]);
 			$att->save();
 
 			return $ret;
-		}
+		// }
 		// return redirect('overtime.create');
 		return false;
 	}

@@ -11,7 +11,7 @@
     {!! form_start($form, ['attr' => ['autocomplete' => 'off']]) !!}
 
     <x-bootstrap::row class="justify-content-center">
-        <x-bootstrap::column breakpoint="EXTRA_SMALL|12;MEDIUM|9">
+        <x-bootstrap::column breakpoint="EXTRA_SMALL|10;MEDIUM|9">
             <x-bootstrap::card>
                 <x-bootstrap::card.header>
                     <x-bootstrap::row class="align-items-baseline justify-content-between">
@@ -37,11 +37,12 @@
                     <x-bootstrap::row>
                         <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
                             {!! form_row($form->overtime_date) !!}
-                            {!! form_row($form->id_employee) !!}
+                            {!! form_row($form->start) !!}
+                            {!! form_row($form->overtime) !!}
                         </x-bootstrap::column>
                         <x-bootstrap::column>
+                            {!! form_row($form->id_employee) !!}
                             {!! form_row($form->end) !!}
-                            {!! form_row($form->overtime) !!}
                             {!! form_row($form->necessity) !!}
                             {{-- {!! form_row($form->status) !!} --}}
                         </x-bootstrap::column>

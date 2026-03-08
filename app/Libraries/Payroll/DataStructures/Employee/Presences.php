@@ -82,6 +82,13 @@ class Presences {
 	public int $absentDays = 0;
 
 	/**
+	 * Presences::$permits
+	 * 
+	 * @var int
+	 */
+	public int $permits = 0;
+
+	/**
 	 * Presences::__get
 	 *
 	 * @param string $name

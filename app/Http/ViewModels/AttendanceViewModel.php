@@ -223,6 +223,8 @@ class AttendanceViewModel extends ViewModelBase
       $next = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateEnd))))->add(new \DateInterval('P1M'));
       if ($cutoff->value === 'end_of_month') $next = $next->sub(new \DateInterval('P1D'));
 
+      // dd($prev,  $next);
+
 		// @formatter:off
 		$query = $query->groupBy('employee_id')
 		               ->select(
@@ -239,7 +241,7 @@ class AttendanceViewModel extends ViewModelBase
 		               );
       // @formatter:on
 
-      if ($request->get('employee')) $query->where('employee_id', '=', $request->get('employee'));
+      if ($request->get('employee')) $query->where('employee_id', $request->get('employee'));
       $results = $query->with(['employee:id,name'/*, 'reason:id,name', 'annualLeave:id,no,year,used_at'*/])
          ->paginate($limit, self::ALL_FIELDS, 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
          ->toArray();
@@ -313,7 +315,7 @@ class AttendanceViewModel extends ViewModelBase
          if ($d->format('N') < 6 && !in_array($d, $events)) $dates[] = clone($d);
          $d = $d->add(new \DateInterval('P1D'));
       }
-
+      // dd($dates);
       return $dates;
    }
 
