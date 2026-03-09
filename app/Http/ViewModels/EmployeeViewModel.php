@@ -21,6 +21,8 @@ use App\Managers\Form\FormBuilder;
 use App\Models\Attendance;
 use App\Models\CalendarEvent;
 use App\Models\Employee;
+use App\Models\Permit;
+use App\Models\Leave;
 use App\Models\Fingerprint;
 use App\Models\ModelInterface;
 use App\Repositories\Eloquent\AttendanceRepository;
@@ -320,7 +322,15 @@ class EmployeeViewModel extends ViewModelBase {
 		$payrollCalculator->employee->presences->permits = $att->permit ?? 0;                  // perhitungan jumlah hari sakit yang telah memiliki surat dokter
 		$payrollCalculator->employee->presences->absentDays =  (count($workingDays) - ($att->present ?? 0)) ?? 0;                    // perhitungan jumlah hari alpha
 		$payrollCalculator->employee->presences->splitShifts = 0;                                   // perhitungan jumlah split shift
-		$payrollCalculator->employee->presences->rate = $employee->attendance_premium ?? 0;
+
+
+		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new \DateTime());
+		
+		$permitCutAttPremium = Permit::where('id_employee',$employee->id)->where('start', '>=', $prev)->where('end', '<=', $next)->where('cut_att_premium',1)->count();
+		$leaveCutAttPremium = Leave::where('id_employee',$employee->id)->where('start', '>=', $prev)->where('end', '<=', $next)->where('cut_att_premium',1)->count();
+
+		// $payrollCalculator->employee->presences->rate = $employee->attendance_premium ?? 0;
+		$payrollCalculator->employee->presences->rate = ($permitCutAttPremium > 0 || $leaveCutAttPremium > 0) ? 0 : $employee->attendance_premium;
 		$payrollCalculator->employee->presences->overtimeRate = $employee->overtime ?? 0;
 		//$payrollCalculator->employee->presences->absentDays = count($workingDays) - $totalWorkDays; // perhitungan jumlah split shift
 		// Set data tunjangan karyawan di luar tunjangan BPJS Kesehatan dan Ketenagakerjaan

@@ -133,12 +133,15 @@ class PermitViewModel extends ViewModelBase{
 		$fields = $this->getFormFields();
 		if ($fields->has('attachment_path'))
 			$fields->offsetSet('attachment_path', $this->convertImage($request, 'attachment_path'));
+
+		$fields->offsetSet('cut_att_premium', $this->toBool($fields->get('cut_att_premium')));
 		
 		$p = $fields->toArray();
+		// dd($p);
 		$permit = new Permit($p);
 		$ret = $permit->save();
 		
-		// Add sick, businnes trip or permit attendaces
+		// Add sick, businnes trip or permit attendances
 		$employeeId = $fields->get('id_employee');
 		$permitType = $fields->get('permit_type');
 		$dateStartPermit = $fields->get('start');

@@ -120,7 +120,8 @@ class LeaveViewModel extends ViewModelBase{
 			if($years >=1){
 				if ($fields->has('attachment_path'))
 					$fields->offsetSet('attachment_path', $this->convertImage($request, 'attachment_path'));
-		
+
+				$fields->offsetSet('cut_att_premium', $this->toBool($fields->get('cut_att_premium')));
 				$p = $fields->toArray();
 				$leave = new Leave($p);
 				

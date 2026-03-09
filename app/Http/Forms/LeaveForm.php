@@ -48,7 +48,7 @@ class LeaveForm extends Form{
 						'onchange'    => 'javascript: previewImage(event);',
 					],
             ])
-            ->add('cut_att_allowance', Field::SWITCH, ['label' => 'Potong Premi'])
+            ->add('cut_att_premium', Field::SWITCH, ['label' => 'Potong Premi'])
             ->add('submit', Field::BUTTON_SUBMIT, [
 					'label' => '<i class="fad fa-save mr-1"></i> Submit',
 					'attr'  => ['class' => 'btn-falcon-success', 'id' => 'leave-permit'],

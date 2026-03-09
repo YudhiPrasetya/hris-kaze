@@ -22,7 +22,7 @@ class Permit extends ModelBase{
         'permit_date', 'id_employee',
         'permit_type',
         'id_reason_for_leave', 'start', 'end', 'note',
-        'attachment_path', 'cut_att_allowance'
+        'attachment_path', 'cut_att_premium'
     ];
 
     /**

@@ -152,7 +152,10 @@
 													<label class="col-sm-5 col-form-label">Attendance
 														Premium<br /><small>Premi kehadiran</small></label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->earnings->attendance_premium, $model->currencyCode()) !!}
+														{{-- {!!
+														$moneyFormat($payroll->result->earnings->attendance_premium,
+														$model->currencyCode()) !!} --}}
+														{!! $moneyFormat($payroll->employee->presences->rate, $model->currencyCode()) !!}
 													</div>
 												</div>
 												<x-bootstrap::column class="px-0">
@@ -399,151 +402,151 @@
 												],
 											],
 										])
-																																		</div>
-																																		<div class="fancy-tab-content">
-																																			@include('themes::Falcon.views.layouts.table', [
-																																				'method' => 'get',
-																																				'hasActions' => true,
-																																				'hasToolbar' => true,
-																																				'data' => [
-																																					'url' => route('api.task.employee', ['employee' => $model->id]),
-																																					'page-size' => 25,
-																																					'show-refresh' => 'true',
+																																			</div>
+																																			<div class="fancy-tab-content">
+																																				@include('themes::Falcon.views.layouts.table', [
 																																					'method' => 'get',
-																																					'search' => 'true',
-																																				],
-																																				'columns' => [
-																																					[
-																																						'title' => '',
-																																						'attrs' => [
-																																							'field' => 'priority.name',
-																																							'class' => 'va-baseline text-nowrap text-center',
-																																							'sortable' => 'true',
+																																					'hasActions' => true,
+																																					'hasToolbar' => true,
+																																					'data' => [
+																																						'url' => route('api.task.employee', ['employee' => $model->id]),
+																																						'page-size' => 25,
+																																						'show-refresh' => 'true',
+																																						'method' => 'get',
+																																						'search' => 'true',
+																																					],
+																																					'columns' => [
+																																						[
+																																							'title' => '',
+																																							'attrs' => [
+																																								'field' => 'priority.name',
+																																								'class' => 'va-baseline text-nowrap text-center',
+																																								'sortable' => 'true',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Title',
+																																							'attrs' => [
+																																								'field' => 'title',
+																																								'class' => 'va-baseline text-nowrap',
+																																								'sortable' => 'true',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Dateline',
+																																							'attrs' => [
+																																								'field' => 'dateline',
+																																								'class' => 'va-baseline text-nowrap',
+																																								'sortable' => 'true',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Assign At',
+																																							'attrs' => [
+																																								'field' => 'at',
+																																								'class' => 'va-baseline text-nowrap',
+																																								'sortable' => 'true',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Status',
+																																							'attrs' => [
+																																								'field' => 'current_status.reason',
+																																								'class' => 'va-baseline text-nowrap',
+																																								'sortable' => 'true',
+																																							],
 																																						],
 																																					],
-																																					[
-																																						'title' => 'Title',
-																																						'attrs' => [
-																																							'field' => 'title',
-																																							'class' => 'va-baseline text-nowrap',
-																																							'sortable' => 'true',
-																																						],
-																																					],
-																																					[
-																																						'title' => 'Dateline',
-																																						'attrs' => [
-																																							'field' => 'dateline',
-																																							'class' => 'va-baseline text-nowrap',
-																																							'sortable' => 'true',
-																																						],
-																																					],
-																																					[
-																																						'title' => 'Assign At',
-																																						'attrs' => [
-																																							'field' => 'at',
-																																							'class' => 'va-baseline text-nowrap',
-																																							'sortable' => 'true',
-																																						],
-																																					],
-																																					[
-																																						'title' => 'Status',
-																																						'attrs' => [
-																																							'field' => 'current_status.reason',
-																																							'class' => 'va-baseline text-nowrap',
-																																							'sortable' => 'true',
-																																						],
-																																					],
-																																				],
-																																			])
-																																		</div>
-																																		<div class="fancy-tab-content">
-																																			@include('themes::Falcon.views.layouts.table', [
-																																				'method' => 'get',
-																																				'hasActions' => false,
-																																				'hasToolbar' => true,
-																																				'data' => [
-																																					'url' => route('api.attendance.employee', ['employee' => $model->id]),
-																																					'page-size' => 25,
-																																					'show-refresh' => 'true',
+																																				])
+																																			</div>
+																																			<div class="fancy-tab-content">
+																																				@include('themes::Falcon.views.layouts.table', [
 																																					'method' => 'get',
-																																					'search' => 'false',
-																																					'sort-name' => "at",
-																																					'sort-order' => "desc"
-																																				],
-																																				'columns' => [
-																																					[
-																																						'title' => 'Date',
-																																						'attrs' => [
-																																							'field' => 'at',
-																																							'class' => 'va-baseline text-nowrap',
-																																							'sortable' => 'true',
+																																					'hasActions' => false,
+																																					'hasToolbar' => true,
+																																					'data' => [
+																																						'url' => route('api.attendance.employee', ['employee' => $model->id]),
+																																						'page-size' => 25,
+																																						'show-refresh' => 'true',
+																																						'method' => 'get',
+																																						'search' => 'false',
+																																						'sort-name' => "at",
+																																						'sort-order' => "desc"
+																																					],
+																																					'columns' => [
+																																						[
+																																							'title' => 'Date',
+																																							'attrs' => [
+																																								'field' => 'at',
+																																								'class' => 'va-baseline text-nowrap',
+																																								'sortable' => 'true',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Check-In',
+																																							'attrs' => [
+																																								'field' => 'start',
+																																								'class' => 'va-baseline text-center text-nowrap',
+																																								'sortable' => 'true',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Check-Out',
+																																							'attrs' => [
+																																								'field' => 'end',
+																																								'class' => 'va-baseline text-center text-nowrap',
+																																								'sortable' => 'true',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Overtime',
+																																							'attrs' => [
+																																								'field' => 'overtime',
+																																								'class' => 'va-baseline text-center text-nowrap',
+																																								'sortable' => 'true',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Total Hours',
+																																							'attrs' => [
+																																								'field' => 'total_hours',
+																																								'class' => 'va-baseline text-center text-nowrap',
+																																								'sortable' => 'false',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Total Overtime',
+																																							'attrs' => [
+																																								'field' => 'total_overtime',
+																																								'class' => 'va-baseline text-center text-nowrap',
+																																								'sortable' => 'false',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Presence',
+																																							'attrs' => [
+																																								'field' => 'reason.name',
+																																								'class' => 'va-baseline text-nowrap',
+																																								'sortable' => 'true',
+																																							],
+																																						],
+																																						[
+																																							'title' => 'Attachment',
+																																							'attrs' => [
+																																								'field' => 'attactment',
+																																								'class' => 'va-baseline text-nowrap',
+																																								'sortable' => 'true',
+																																							],
 																																						],
 																																					],
-																																					[
-																																						'title' => 'Check-In',
-																																						'attrs' => [
-																																							'field' => 'start',
-																																							'class' => 'va-baseline text-center text-nowrap',
-																																							'sortable' => 'true',
-																																						],
-																																					],
-																																					[
-																																						'title' => 'Check-Out',
-																																						'attrs' => [
-																																							'field' => 'end',
-																																							'class' => 'va-baseline text-center text-nowrap',
-																																							'sortable' => 'true',
-																																						],
-																																					],
-																																					[
-																																						'title' => 'Overtime',
-																																						'attrs' => [
-																																							'field' => 'overtime',
-																																							'class' => 'va-baseline text-center text-nowrap',
-																																							'sortable' => 'true',
-																																						],
-																																					],
-																																					[
-																																						'title' => 'Total Hours',
-																																						'attrs' => [
-																																							'field' => 'total_hours',
-																																							'class' => 'va-baseline text-center text-nowrap',
-																																							'sortable' => 'false',
-																																						],
-																																					],
-																																					[
-																																						'title' => 'Total Overtime',
-																																						'attrs' => [
-																																							'field' => 'total_overtime',
-																																							'class' => 'va-baseline text-center text-nowrap',
-																																							'sortable' => 'false',
-																																						],
-																																					],
-																																					[
-																																						'title' => 'Presence',
-																																						'attrs' => [
-																																							'field' => 'reason.name',
-																																							'class' => 'va-baseline text-nowrap',
-																																							'sortable' => 'true',
-																																						],
-																																					],
-																																					[
-																																						'title' => 'Attachment',
-																																						'attrs' => [
-																																							'field' => 'attactment',
-																																							'class' => 'va-baseline text-nowrap',
-																																							'sortable' => 'true',
-																																						],
-																																					],
-																																				],
-																																			])
+																																				])
+																																			</div>
 																																		</div>
 																																	</div>
-																																</div>
-																															</x-bootstrap::column>
-																														</x-bootstrap::row>
-																													</x-bootstrap::card.body>
-																												</x-bootstrap::card>
-																											</x-bootstrap::column>
-																										</x-bootstrap::row>
+																																</x-bootstrap::column>
+																															</x-bootstrap::row>
+																														</x-bootstrap::card.body>
+																													</x-bootstrap::card>
+																												</x-bootstrap::column>
+																											</x-bootstrap::row>
 @endsection

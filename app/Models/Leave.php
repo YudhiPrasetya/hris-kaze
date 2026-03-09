@@ -20,7 +20,7 @@ class Leave extends ModelBase{
         'id_employee',
         'id_reason_for_leave',
         'start', 'end', 'note',
-        'attachment_path', 'cut_att_allowance'
+        'attachment_path', 'cut_att_premium'
     ];
 
     protected $casts = [

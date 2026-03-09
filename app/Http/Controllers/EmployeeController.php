@@ -132,7 +132,8 @@ class EmployeeController extends Controller {
 		// dd($moneyFormat($employee->basic_salary, $employee->currencyCode()));
 
 		// $employeePayroll = $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
-
+		$totalEarnings = $payrollCalc->result->earnings->baseTotal + $payrollCalc->employee->presences->rate + $payrollCalc->result->earnings->overtime;
+		$takeHomePay = $payrollCalc->result->takeHomePay + $payrollCalc->employee->presences->rate + $payrollCalc->result->earnings->overtime;
 		$data = [
 			'nik' => $employee->nik, 
 			'name' => $employee->name,
@@ -145,7 +146,8 @@ class EmployeeController extends Controller {
 			'otherAllowance' => $employee->other_allowance,
 			'overtimeDays' => $payrollCalc->employee->presences->overtimeDays,
 			'overtimeEarnings' => $payrollCalc->result->earnings->overtime,
-			'attendancePremium' => $payrollCalc->result->earnings->attendance_premium,
+			// 'attendancePremium' => $payrollCalc->result->earnings->attendance_premium,
+			'attendancePremium' => $payrollCalc->employee->presences->rate,
 			'totalDependents' => $payrollCalc->employee->numOfDependentsFamily,
 			'BPJSKes' => $payrollCalc->result->deductions->BPJSKesehatan,
 			'JHT' => $payrollCalc->result->deductions->JHT,
@@ -166,9 +168,11 @@ class EmployeeController extends Controller {
 			'PKP' => $payrollCalc->result->taxable->pkp,
 			'PPH21PerBulan' => $payrollCalc->result->taxable->liability->monthly,
 			'PPH21PerTahun' => $payrollCalc->result->taxable->liability->annual,
-			'totalEarnings' => $payrollCalc->result->earnings->baseTotal,
+			// 'totalEarnings' => $payrollCalc->result->earnings->baseTotal,
+			'totalEarnings' => $totalEarnings,
 			'totalDeductions' => $payrollCalc->result->deductions->getSum() - $payrollCalc->result->deductions->positionTax,
-			'takeHomePay' => $payrollCalc->result->takeHomePay
+			// 'takeHomePay' => $payrollCalc->result->takeHomePay
+			'takeHomePay' => $takeHomePay
 		];
 
 		// dd($data);
