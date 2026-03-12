@@ -6,6 +6,7 @@
 @endsection
 @section('content')
     @php
+        // dd($data);
         $fields = collect($form->getFieldValues())
     @endphp
     {!! form_start($form, ['attr' => ['autocomplete' => 'off']]) !!}
@@ -19,13 +20,8 @@
                             class="d-flex flex-column align-items-baseline">
                             <h5
                                 class="fs-2 font-weight-semi-bold mb-0 text-nunito py-2 py-xl-0 text-truncate w-100 text-truncate">
-                                @if(!$model->id)
-                                    Leave (Cuti)
-                                    <small class="fs-0 text-muted d-block">Add new leave (cuti)</small>
-                                @else
-                                    {{ $model->id }}
-                                    <small class="fs-0 text-muted d-block">Leave (Cuti)</small>
-                                @endif
+                                Leave (Cuti)
+                                <small class="fs-0 text-muted d-block">Add new leave (cuti)</small>
                             </h5>
                         </x-bootstrap::column>
                         <x-bootstrap::column breakpoint="EXTRA_SMALL|6;SMALL|auto" class="d-flex align-items-baseline">
@@ -36,12 +32,27 @@
                 <x-bootstrap::card.body class="bg-light">
                     <x-bootstrap::row>
                         <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
+                            {{-- <input type="hidden" name="id_employee" value="{{ $data['employee_id'] }}" /> --}}
+                            {!! form_row($form->id_employee, ['value' => $data['employee_id']]) !!}
+                            <div class="mb-2">
+                                <h6 class="text-600 control-label mb-0">Employee Name</h6>
+                                <span id="leaveAllowance" class="form-control-plaintext text-1000 fs-0 pt-0">
+                                    <strong>{{ $data['employee_name'] }}</strong>
+                                </span>
+                            </div>
+
                             {!! form_row($form->leave_date) !!}
-                            {!! form_row($form->id_employee) !!}
                             {!! form_row($form->id_reason_for_leave) !!}
                             {!! form_row($form->cut_att_premium) !!}
                         </x-bootstrap::column>
                         <x-bootstrap::column>
+                            <div class="mb-2">
+                                <h6 class="text-600 control-label mb-0">Remaining leave quota (sisa jatah cuti)</h6>
+                                <span id="leaveAllowance" class="form-control-plaintext text-1000 fs-0 pt-0">
+                                    <strong>{{ $data['LeaveQuota'] }}</strong>
+                                </span>
+
+                            </div>
                             {!! form_row($form->start) !!}
                             {!! form_row($form->end) !!}
                             {!! form_row($form->note) !!}

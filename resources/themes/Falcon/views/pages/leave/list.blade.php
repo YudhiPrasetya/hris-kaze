@@ -1,11 +1,10 @@
-
 @extends('falcon::layouts.list')
 
 @section('title', 'Leaves (Cuti)')
 @section('subtitle')
 	<small class="fs-0 text-muted d-block">List leaves (cuti)</small>
 @endsection
-@section('new_url', route('leave.create'))
+{{-- @section('new_url', route('leave.create')) --}}
 @section('api_list_url', route('api.leave'))
 
 @section('columns')

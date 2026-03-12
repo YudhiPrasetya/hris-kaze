@@ -38,7 +38,8 @@ class LeaveViewModel extends ViewModelBase{
 	public function createForm(string $method, string $route, ?ModelInterface $model = null, ?string $formClass = null, array $options = []): ViewModelBase {
 		$this->setModel($model);
 		$this->form->setMethod($method);
-		$this->form->setUrl(route($route, ['leave' => $model->id]));
+		// $this->form->setUrl(route($route, ['leave' => $model->id]));
+		$this->form->setUrl(route($route, ['employee' => $model->id]));
 
 		return $this;
 	}
@@ -112,39 +113,30 @@ class LeaveViewModel extends ViewModelBase{
 		$this->form->redirectIfNotValid();
 
 		$fields = $this->getFormFields();
-		// dd($fields);
 		$employeeId = $fields->get('id_employee');
-		$employee = Employee::find($employeeId);
-		if($employee){
-			$years = (new \DateTime())->diff($employee->effective_since)->y;
-			if($years >=1){
-				if ($fields->has('attachment_path'))
-					$fields->offsetSet('attachment_path', $this->convertImage($request, 'attachment_path'));
+		if ($fields->has('attachment_path'))
+			$fields->offsetSet('attachment_path', $this->convertImage($request, 'attachment_path'));
 
-				$fields->offsetSet('cut_att_premium', $this->toBool($fields->get('cut_att_premium')));
-				$p = $fields->toArray();
-				$leave = new Leave($p);
-				
-				$ret = $leave->save();
-				
-				// Add leave attendaces
-				$dateStartLeave = $fields->get('start');
-				$dateEndLeave = $fields->get('end');
-				$leaveDays = (new \DateTime($dateStartLeave))->diff(new \DateTime($dateEndLeave))->d + 1;
-				for($x = 0; $x < $leaveDays; $x++){
-					$dateLeave = new \DateTime($dateStartLeave);
-					$attLeave = new Attendance([
-						'employee_id' => $employeeId,
-						'attendance_reason_id' => 6,
-						'at' => $dateLeave->modify('+'.$x.' day')
-					]);
-					$attLeave->save();
-				}
-				return $ret;
-			}
-			return false;
+		$fields->offsetSet('cut_att_premium', $this->toBool($fields->get('cut_att_premium')));
+		$p = $fields->toArray();
+		$leave = new Leave($p);
+		
+		$ret = $leave->save();
+		
+		// Add leave attendaces
+		$dateStartLeave = $fields->get('start');
+		$dateEndLeave = $fields->get('end');
+		$leaveDays = (new \DateTime($dateStartLeave))->diff(new \DateTime($dateEndLeave))->d + 1;
+		for($x = 0; $x < $leaveDays; $x++){
+			$dateLeave = new \DateTime($dateStartLeave);
+			$attLeave = new Attendance([
+				'employee_id' => $employeeId,
+				'attendance_reason_id' => 6,
+				'at' => $dateLeave->modify('+'.$x.' day')
+			]);
+			$attLeave->save();
 		}
-		return false;
+		return $ret;
 	}
 
 }

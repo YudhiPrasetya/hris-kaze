@@ -201,6 +201,9 @@ Route::domain(config('app.domain'))->group(function () {
       // Employee payroll
       Route::get('/employee/{employee}/payroll', [EmployeeController::class, 'showPayroll'])->name('employee.payroll');
 
+      // Employee leave
+      Route::match(['GET', 'POST'], '/employee/{employee}/leave', [EmployeeController::class, 'addLeave'])->name('employee.leave');
+
       // API that used for web only.
       // You have to access from web to be able to access this API
       // Route::middleware(['auth', 'api'])->group(function () {

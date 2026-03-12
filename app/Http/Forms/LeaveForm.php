@@ -12,14 +12,16 @@ class LeaveForm extends Form{
     {
         $this
             ->add('leave_date', Field::DATE, ['label' => 'Submission Date (Tgl Pengajuan)', 'attr' => ['class_append' => 'col-5']])
-            ->add('id_employee', Field::ENTITY, [
-                'class' => Employee::class,
-                'property' => 'name',
-                'label' => 'Employee',
-                'query_builder' => function(Employee $employee){
-                    return $employee->select(['id', 'name'])->selectRaw('CONCAT("{\"key\":\"", id, "\",\"labelWithKey\": false, \"value\":\"", name, "\"}") as name');
-                }
-            ])
+            // ->add('id_employee', Field::ENTITY, [
+            //     'attr' => ['class_append' => 'col-5'],
+            //     'class' => Employee::class,
+            //     'property' => 'name',
+            //     'label' => 'Employee',
+            //     'query_builder' => function(Employee $employee){
+            //         return $employee->select(['id', 'name'])->selectRaw('CONCAT("{\"key\":\"", id, "\",\"labelWithKey\": false, \"value\":\"", name, "\"}") as name');
+            //     }
+            // ])
+            ->add('id_employee', Field::HIDDEN)
             ->add('id_reason_for_leave', Field::ENTITY, [
                 'class' => ReasonForLeave::class,
                 'property' => 'name',

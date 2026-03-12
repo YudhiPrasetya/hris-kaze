@@ -22,6 +22,10 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 
+use App\Http\ViewModels\LeaveViewModel;
+use App\Repositories\Eloquent\LeaveRepository;
+use App\Models\Leave;
+
 use App\Libraries\Payroll\PayrollCalculator;
 use PDF;
 
@@ -31,6 +35,9 @@ class EmployeeController extends Controller {
 	private AttendanceRepository $attendanceRepository;
 	private CalendarEventRepository $calendarEventRepository;
 
+	private LeaveViewModel $leaveViewModel;
+	private LeaveRepository $leaveRepository;
+
 	/**
 	 * EmployeeController constructor.
 	 *
@@ -39,11 +46,13 @@ class EmployeeController extends Controller {
 	 *
 	 * @throws \Illuminate\Contracts\Container\BindingResolutionException
 	 */
-	public function __construct(EmployeeRepository $repository, SettingsRepository $settingsRepository, AttendanceRepository $attendanceRepository, CalendarEventRepository $calendarEventRepository, FormBuilder $builder) {
+	public function __construct(EmployeeRepository $repository, SettingsRepository $settingsRepository, AttendanceRepository $attendanceRepository, CalendarEventRepository $calendarEventRepository, LeaveRepository $leaveRepository, FormBuilder $builder) {
 		$this->viewModel = new EmployeeViewModel($repository, $builder);
 		$this->settingsRepository = $settingsRepository;
 		$this->attendanceRepository = $attendanceRepository;
 		$this->calendarEventRepository = $calendarEventRepository;
+		$this->leaveRepository = $leaveRepository;
+		$this->leaveViewModel = new LeaveViewModel($leaveRepository, $builder);
 	}
 
 	/**
@@ -193,6 +202,39 @@ class EmployeeController extends Controller {
 		// $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
 
 		return $pdf->download('Payroll-' . $data['name'] . '.pdf');
+	}
+
+	public function addLeave(Request $request){
+		$employee = Employee::find($request->employee);
+		$leaveQuota = $this->viewModel->countRemainLeaveQuota($employee);
+		if(gettype($leaveQuota) === 'integer' && $leaveQuota <= 0){
+			$request->session()->flash('message', "Employee <strong>{$employee->name}</strong> has no remaining leave quota.");
+			$request->session()->flash('alert', "danger");
+			return redirect(route('employee.show', ['employee' => $employee->id]));
+		}else if(gettype($leaveQuota) === 'string'){
+			$request->session()->flash('message', $leaveQuota);
+			$request->session()->flash('alert', "danger");
+			return redirect(route('employee.show', ['employee' => $employee->id]));
+		}else if(gettype($leaveQuota) === 'integer' && $leaveQuota > 0){
+			$data = [
+				'employee_id' => $employee->id,
+				'employee_name' => $employee->name,
+				'LeaveQuota' => $leaveQuota,
+			];
+			// $leaveModel = new Leave();
+	
+			// $this->leaveViewModel->setModel($leaveModel);
+			$this->leaveViewModel->setData($data);
+	
+			// return $this->leaveViewModel->createForm('POST', 'employee.leave', $employee, null, ['employee' => $employee->id])->view('pages.leave.form');
+			return $this->leaveViewModel->createForm('POST', 'leave.store', new Leave())->view('pages.leave.form');
+
+		}
+
+		// return $this->viewModel->createForm('POST', 'employee.leave.store', null, ['employee' => $employee->id])
+		//                        ->view('pages.employee.leave_form');
+
+		// return $this->viewModel->view('pages.leave.form');
 	}
 
 	/**

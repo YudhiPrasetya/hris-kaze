@@ -90,6 +90,16 @@ class EmployeeViewModel extends ViewModelBase {
 					$result['effective_since'] = $result['effective_since'] != null ? $result['effective_since']->format('Y-m-d') : "No data";
 
 					$action = [
+						'leave' => [
+							'icon'    => 'fad fa-plane',
+							'attr'    => [
+								'class' => 'btn btn-sm btn-falcon-info',
+								'href'  => route('employee.leave', ['employee' => $result['id']]),
+								// 'href' => '#',
+							],
+							'type'    => 'a',
+							'tooltip' => 'Add Leave',							
+						],
 						'payroll' => [
 							'icon'    => 'fad fa-credit-card',
 							'attr'    => [
@@ -371,7 +381,7 @@ class EmployeeViewModel extends ViewModelBase {
         // print_r($data[0]->result->deductions->JIP);
 		// return $data;
 	}
-	private function countRemainLeaveQuota($emp): string|int{
+	public function countRemainLeaveQuota($emp): string|int{
 			$years = (new DateTime())->diff($emp->effective_since)->y;
 			if($years >=1){
 				$year = date('Y');

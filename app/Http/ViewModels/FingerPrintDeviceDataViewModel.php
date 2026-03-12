@@ -135,10 +135,10 @@ class FingerPrintDeviceDataViewModel extends ViewModelBase{
                 // var_dump($r['id']);
                 $nik = $r['id'];
                 $dateTime = Carbon::parse($r['timestamp']);
-                $employee = Employee::where('nik', '=', $nik)->first();
+                $employee = Employee::where('nik', $nik)->first();
                 if($employee){
 
-                    $att = $employee->attendance()->whereDate('at', '=', $dateTime->format('Y-m-d'))->first();
+                    $att = $employee->attendance()->whereDate('at', $dateTime->format('Y-m-d'))->first();
 
                     $time = Carbon::parse($dateTime);
                     $shift = $employee->getWorkingShift()->first();
