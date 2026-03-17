@@ -88,6 +88,7 @@ class Presences {
 	 */
 	public int $permits = 0;
 
+	
 	/**
 	 * Presences::__get
 	 *

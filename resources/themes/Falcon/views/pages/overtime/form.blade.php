@@ -6,8 +6,11 @@
 @endsection
 @section('content')
     @php
-        $fields = collect($form->getFieldValues())
+        use App\Models\Employee;
+        $fields = collect($form->getFieldValues());
+        $employee = Employee::find($model->employee_id);
     @endphp
+
     {!! form_start($form, ['attr' => ['autocomplete' => 'off']]) !!}
 
     <x-bootstrap::row class="justify-content-center">
@@ -19,13 +22,8 @@
                             class="d-flex flex-column align-items-baseline">
                             <h5
                                 class="fs-2 font-weight-semi-bold mb-0 text-nunito py-2 py-xl-0 text-truncate w-100 text-truncate">
-                                @if(!$model->id)
-                                    Overtime
-                                    <small class="fs-0 text-muted d-block">Add new overtime</small>
-                                @else
-                                    {{ $model->id }}
-                                    <small class="fs-0 text-muted d-block">Overtime</small>
-                                @endif
+                                {{ $employee->name }}
+                                <small class="fs-0 text-muted d-block">Overtime</small>
                             </h5>
                         </x-bootstrap::column>
                         <x-bootstrap::column breakpoint="EXTRA_SMALL|6;SMALL|auto" class="d-flex align-items-baseline">
@@ -36,13 +34,25 @@
                 <x-bootstrap::card.body class="bg-light">
                     <x-bootstrap::row>
                         <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
-                            {!! form_row($form->overtime_date) !!}
-                            {!! form_row($form->start) !!}
-                            {!! form_row($form->overtime) !!}
+                            {!! form_row($form->id_attendance, ['value' => $model->id]) !!}
+                            {!! form_row($form->overtime_date, ['value' => $model->at, 'attr' => ['readonly' => true]]) !!}
+                            {!! form_row($form->start, ['value' => $model->start, 'attr' => ['readonly' => true]]) !!}
+                            {!! form_row($form->overtime, ['value' => $model->overtime, 'attr' => ['readonly' => true]]) !!}
+                            @php
+                                $start = new DateTime($model->at->format('Y-m-d') . " " . $model->start);
+                                $end = new DateTime($model->at->format('Y-m-d') . " " . $model->end);
+                                $overtimeDuration = $start->diff($end);
+                                $overtimeDurationHour = $overtimeDuration->h;
+                                if ($overtimeDurationHour > 8) {
+                                    $overtimeDurationHour = 8;
+                                }
+                            @endphp
                         </x-bootstrap::column>
                         <x-bootstrap::column>
-                            {!! form_row($form->id_employee) !!}
-                            {!! form_row($form->end) !!}
+                            {!! form_row($form->id_employee, ['value' => $model->employee_id, 'attr' => ['readonly' => true]]) !!}
+                            {!! form_row($form->employee, ['value' => $employee->name, 'attr' => ['readonly' => true]]) !!}
+                            {!! form_row($form->end, ['value' => $model->end, 'attr' => ['readonly' => true]]) !!}
+                            {!! form_row($form->overtime_duration, ['value' => $overtimeDurationHour, 'attr' => ['readonly' => true]]) !!}
                             {!! form_row($form->necessity) !!}
                             {{-- {!! form_row($form->status) !!} --}}
                         </x-bootstrap::column>

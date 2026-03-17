@@ -25,7 +25,7 @@ use Illuminate\Support\Collection;
 use App\Http\ViewModels\LeaveViewModel;
 use App\Repositories\Eloquent\LeaveRepository;
 use App\Models\Leave;
-
+use App\Http\ViewModels\AttendanceViewModel;
 use App\Libraries\Payroll\PayrollCalculator;
 use PDF;
 
@@ -36,8 +36,11 @@ class EmployeeController extends Controller {
 	private CalendarEventRepository $calendarEventRepository;
 
 	private LeaveViewModel $leaveViewModel;
+
+	private AttendanceViewModel $attendanceViewModel;
 	private LeaveRepository $leaveRepository;
 
+   	
 	/**
 	 * EmployeeController constructor.
 	 *
@@ -46,13 +49,17 @@ class EmployeeController extends Controller {
 	 *
 	 * @throws \Illuminate\Contracts\Container\BindingResolutionException
 	 */
-	public function __construct(EmployeeRepository $repository, SettingsRepository $settingsRepository, AttendanceRepository $attendanceRepository, CalendarEventRepository $calendarEventRepository, LeaveRepository $leaveRepository, FormBuilder $builder) {
+	public function __construct(EmployeeRepository $repository, SettingsRepository $settingsRepository, 
+								AttendanceRepository $attendanceRepository, CalendarEventRepository $calendarEventRepository, 
+								LeaveRepository $leaveRepository, FormBuilder $builder) 
+	{
 		$this->viewModel = new EmployeeViewModel($repository, $builder);
 		$this->settingsRepository = $settingsRepository;
 		$this->attendanceRepository = $attendanceRepository;
 		$this->calendarEventRepository = $calendarEventRepository;
 		$this->leaveRepository = $leaveRepository;
 		$this->leaveViewModel = new LeaveViewModel($leaveRepository, $builder);
+		$this->attendanceViewModel = new AttendanceViewModel($attendanceRepository, $builder);
 	}
 
 	/**
@@ -131,19 +138,41 @@ class EmployeeController extends Controller {
 		return $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
 	}
 
-	public function showPayroll(Request $request, Employee $employee){
-		// Employee $employee = Employee::find($id);
+
+	public function showPayroll(Request $request){
+		// dd($request);
+		$months = [
+			"01" => "January",
+			"02" => "February",
+			"03" => "March",
+			"04" => "April",
+			"05" => "May",
+			"06" => "June",
+			"07" => "July",
+			"08" => "August",
+			"09" => "September",
+			"10" => "October",
+			"11" => "November",
+			"12" => "December",
+		];
+
+		$month = $request->month;
+		$year = $request->year;
+
+		$employee = Employee::find($request->employee);
 		$this->viewModel->setModel($employee);
+
 		$employeePayroll = $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
 		$payrollCalc = new PayrollCalculator();
 		$payrollCalc = $employeePayroll[0];
 
-		// dd($moneyFormat($employee->basic_salary, $employee->currencyCode()));
+		// // dd($moneyFormat($employee->basic_salary, $employee->currencyCode()));
 
-		// $employeePayroll = $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+		// // $employeePayroll = $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
 		$totalEarnings = $payrollCalc->result->earnings->baseTotal + $payrollCalc->employee->presences->rate + $payrollCalc->result->earnings->overtime;
 		$takeHomePay = $payrollCalc->result->takeHomePay + $payrollCalc->employee->presences->rate + $payrollCalc->result->earnings->overtime;
 		$data = [
+			'periode' => $months[$month] . "/" . $year,
 			'nik' => $employee->nik, 
 			'name' => $employee->name,
 			'jobTitle' => $employee->jobTitle()->first()->name,
@@ -201,7 +230,28 @@ class EmployeeController extends Controller {
 		$pdf = PDF::loadView('pages.employee.payroll', $data);
 		// $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
 
-		return $pdf->download('Payroll-' . $data['name'] . '.pdf');
+		return $pdf->download('Payroll-' . $data['name'] . '-' . $data['periode'] . '.pdf');
+
+		// 												 ->with('alert', 'success');
+
+		// return $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+	}
+
+	public function showPayrollForm(Request $request, Employee $employee){
+		// Employee $employee = Employee::find($id);
+		$start = new \DateTime(sprintf("%d-%02d-%02d", $request->get('year'), $request->get('month'), date('d')));
+		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = $this->attendanceViewModel->getWorkingMonth($this->settingsRepository, $start);
+		$this->viewModel->setModel($employee);
+      	$this->viewModel->addData('start', $now);
+      	$this->viewModel->addData('end', $next);
+      	$this->viewModel->addData('working_days', count($this->attendanceViewModel->workingDays($this->settingsRepository)));
+
+      	return $this->viewModel->setRequest($request)
+         ->createShowPayrollForm('POST', 'employee.payroll')
+         ->view('pages.employee.showPayroll');		
+
+
+
 	}
 
 	public function addLeave(Request $request){

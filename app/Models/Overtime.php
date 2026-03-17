@@ -20,7 +20,7 @@ class Overtime extends ModelBase{
      */
     protected $fillable = [
         'overtime_date', 'id_employee',
-        'start', 'end', 'overtime','necessity'
+        'start', 'end', 'overtime', 'overtime_duration', 'necessity'
     ];
 
     /**

@@ -21,6 +21,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\CalendarEvent;
 class PermitViewModel extends ViewModelBase{
 	/**
 	 * PermitViewModel constructor.
@@ -135,6 +136,7 @@ class PermitViewModel extends ViewModelBase{
 			$fields->offsetSet('attachment_path', $this->convertImage($request, 'attachment_path'));
 
 		$fields->offsetSet('cut_att_premium', $this->toBool($fields->get('cut_att_premium')));
+		$fields->offsetSet('cut_att_salary', $this->toBool($fields->get('cut_att_salary')));
 		
 		$p = $fields->toArray();
 		// dd($p);
@@ -144,19 +146,37 @@ class PermitViewModel extends ViewModelBase{
 		// Add sick, businnes trip or permit attendances
 		$employeeId = $fields->get('id_employee');
 		$permitType = $fields->get('permit_type');
-		$dateStartPermit = $fields->get('start');
-		$dateEndPermit = $fields->get('end');
-		$permitDays = (new DateTime($dateStartPermit))->diff(new DateTime($dateEndPermit))->d + 1;
+		$dateStartPermit = new DateTime($fields->get('start'));
+		$dateEndPermit = new DateTime($fields->get('end'));
 
-		for($x = 0; $x < $permitDays; $x++){
-			$datePermit = new DateTime($dateStartPermit);
-			$attPermit = new Attendance([
-				'employee_id' => $employeeId,
-				'attendance_reason_id' => $permitType,
-				'at' => $datePermit->modify('+'.$x.' day')
-			]);
-			$attPermit->save();
-		}		
+		$eventsCalendar = CalendarEvent::where('start_date', '>=', $dateStartPermit)
+			->where('start_date', '<=', $dateEndPermit)
+			->get()->pluck('start_date')->toArray();
+
+		while($dateStartPermit <= $dateEndPermit){
+			$dayOfWeek = $dateStartPermit->format('w');
+			$checkNotInEventCalendar = in_array($dateStartPermit->format('Y-m-d'), $eventsCalendar);
+			if($checkNotInEventCalendar === false && ($dayOfWeek != "0" && $dayOfWeek != "6")){
+				$attPermit = new Attendance([
+					'employee_id' => $employeeId,
+					'attendance_reason_id' => $permitType,
+					'at' => $dateStartPermit
+				]);
+				$attPermit->save();
+			}
+			$dateStartPermit->modify('+1 day');
+		}
+		// $permitDays = (new DateTime($dateStartPermit))->diff(new DateTime($dateEndPermit))->d + 1;
+
+		// for($x = 0; $x < $permitDays; $x++){
+		// 	$datePermit = new DateTime($dateStartPermit);
+		// 	$attPermit = new Attendance([
+		// 		'employee_id' => $employeeId,
+		// 		'attendance_reason_id' => $permitType,
+		// 		'at' => $datePermit->modify('+'.$x.' day')
+		// 	]);
+		// 	$attPermit->save();
+		// }		
 
 		return $ret ? $permit : false;
 	}

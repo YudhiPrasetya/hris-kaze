@@ -156,6 +156,68 @@ class AttendanceViewModel extends ViewModelBase
       });
    }
 
+   public function listOvertime(Request $request, ...$columns): Collection{
+      $self = $this;
+      list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
+      $query = $this->getBaseQuery($request, ...$columns);
+      $columns = $this->getDefaultColumns(...$columns);
+      $results = $query->with(['employee:id,name'])->whereNotNull('overtime')->whereYear('at', date('Y'))
+         ->whereRaw('DAYOFWEEK(at) = 1 OR DAYOFWEEK(at) = 7')
+         ->orderBy('at', 'DESC')
+         ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+         ->toArray();
+
+      return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
+         if ($key == 'rows') {
+            return collect($item)->map(function ($result, $i) use ($self) {
+               $result['employee']['name'] =
+                  $self->createLink($result['employee']['name'], route('employee.show', ['employee' => $result['employee']['id']]));
+               $result['overtime_date'] = $result['at']->format('Y-m-d');
+               $result['overtime_confirmed'] = $result['overtime_confirmed'] ? 'Confirmed' : 'Pending';
+
+					$action = [
+						'overtime_confirmation' => [
+							'icon'    => 'fad fa-business-time',
+							'attr'    => [
+								'class' => 'btn btn-md btn-falcon-success',
+								'href'  => route('ot.create', ['attendance' => $result['id']]),
+								// 'href' => '#',
+							],
+							'type'    => 'a',
+							'tooltip' => 'Overtime Confirmation',							
+						],
+
+					];
+
+               $result['actions'] = $result['overtime_confirmed']  == 'Pending' ? $action : '';
+               $result['overtime_confirmed'] = $self->getConfirmedColor($result['overtime_confirmed']); 
+
+               return $result;
+            });
+         }
+
+         return $item;
+      });
+   }
+
+	private function getConfirmedColor(string $isConfirmed) {
+		$color = '';
+		$icon = '';
+
+		switch ($isConfirmed) {
+			case 'Confirmed':
+				$color = 'text-blue';
+				$icon = 'fad fa-check-circle';
+				break;
+			case 'Pending':
+				$color = 'text-red-green';
+				$icon = 'fad fa-lightbulb-exclamation';
+				break;
+		}
+
+		return '<span class="'.$color.'"><i class="'.$icon.' mr-1"></i>' . $isConfirmed . '</span>';   
+   }
+
    public function byEmployee(Request $request, Employee $employee)
    {
       $self = $this;

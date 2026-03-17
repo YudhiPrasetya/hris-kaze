@@ -9,6 +9,7 @@ use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\ModelInterface;
 use App\Repositories\EloquentRepositoryInterface;
+use App\Repositories\Eloquent\SettingsRepository;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -104,36 +105,65 @@ class OvertimeViewModel extends ViewModelBase{
 		$this->form->redirectIfNotValid();
 
 		$fields = $this->getFormFields();
-		$idEmployee = $fields->get('id_employee');
-		$otDate = $fields->get('overtime_date');
-		$start = $fields->get('start');
-		$end = $fields->get('end');
-		$overtime = $fields->get('overtime');
+		// $idEmployee = $fields->get('id_employee');
+		// $otDate = $fields->get('overtime_date');
+		// $start = $fields->get('start');
+		// $end = $fields->get('end');
+		// $overtime = $fields->get('overtime');
+		// $overtimeDuration = $fields->get('overtime_duration');
+		// dd($fields);
 
 		// $att = Attendance::where('employee_id', $idEmployee)->where('at', $otDate)->first();
 		// dd($att);
 		// if($att->count() > 0){
 			// if ($fields->has('status'))
 			// 	$fields->offsetSet('status', 0);
+
+		// $att = new Attendance([
+		// 	'id' => $fields->get('id_attendance'),
+		// 	'overtime_confirmed' => 1
+		// ]);
+		// $att->update();
+
+		$att = Attendance::find($fields->get('id_attendance'));
+		$att->update([
+			'overtime_confirmed' => 1
+		]);
 	
-			$o = $fields->toArray();
-			$ot = new Overtime($o);
-			$ret = $ot->save();
+		$o = $fields->toArray();
+		$ot = new Overtime($o);
+		$ret = $ot->save();
+		if($ret){
+			return redirect()->route('ot.index')->with('message', 'Overtime request successfully created.')
+							 ->with('alert', 'success');
+		}
+		return false;
 
-			$att = new Attendance([
-				'employee_id' => $idEmployee,
-				'at' => $otDate,
-				'attendance_reason_id' => 1,
-				'start' => $start,
-				'end' => $end,
-				'overtime' => $overtime
 
-			]);
-			$att->save();
-
-			return $ret;
 		// }
 		// return redirect('overtime.create');
-		return false;
+		// return false;
+	}
+
+	public static function getOvertimeTotalHours(SettingsRepository $settingsRepository, \DateTime $start): int{
+      $cutoff = $settingsRepository->findOneBySectionAndKey('attendance', 'cutoff');
+      $now = clone($start);
+
+      if ($cutoff->value !== 'end_of_month') {
+         //if ((int)date('d') < (int)$cutoff->value)
+         $now = $now->sub(new \DateInterval('P1M'));
+      }
+
+      $year = $now->format('Y');
+      $month = $now->format('m');
+      $cutoffDateStart = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value + 1, 2, '0', STR_PAD_LEFT);
+      $cutoffDateEnd = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value, 2, '0', STR_PAD_LEFT);
+      $prev = new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateStart)));
+      $next = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateEnd))))->add(new \DateInterval('P1M'));
+      if ($cutoff->value === 'end_of_month') $next = $next->sub(new \DateInterval('P1D'));
+	  
+	  $overtimes = Overtime::whereBetween('overtime_date', [$prev, $next])->get()->sum('overtime_duration');
+
+	  return $overtimes;
 	}
 }

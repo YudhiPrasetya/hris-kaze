@@ -38,11 +38,13 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-
+use App\Http\Forms\ShowPayrollForm;
 
 class EmployeeViewModel extends ViewModelBase {
 	public $payroll;
 	// public $remainingLeaveQuota;
+	private ?Request $request;
+
 
 	/**
 	 * EmployeeViewModel constructor.
@@ -58,6 +60,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$this->routeBasename = 'employee';
 		$this->routeKey = 'employee';
 		$this->form = $this->formBuilder->create(EmployeeForm::class);
+		$this->request = null;
 	}
 
 	/**
@@ -106,7 +109,6 @@ class EmployeeViewModel extends ViewModelBase {
 								'class' => 'btn btn-sm btn-falcon-warning',
 								'href'  => route('employee.payroll', ['employee' => $result['id']]),
 								// 'href' => '#',
-								'target' => '_blank'
 							],
 							'type'    => 'a',
 							'tooltip' => 'Show Payroll',
@@ -334,8 +336,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$payrollCalculator->employee->presences->splitShifts = 0;                                   // perhitungan jumlah split shift
 
 
-		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new \DateTime());
-		
+		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new DateTime());
 		$permitCutAttPremium = Permit::where('id_employee',$employee->id)->where('start', '>=', $prev)->where('end', '<=', $next)->where('cut_att_premium',1)->count();
 		$leaveCutAttPremium = Leave::where('id_employee',$employee->id)->where('start', '>=', $prev)->where('end', '<=', $next)->where('cut_att_premium',1)->count();
 
@@ -370,6 +371,8 @@ class EmployeeViewModel extends ViewModelBase {
 		$payrollCalculator->provisions->company->absentPenalty = 0;                       // Perhitungan nilai potongan gaji/hari sebagai penalty.
 		$payrollCalculator->provisions->company->latetimePenalty = 0;                     // Perhitungan nilai keterlambatan sebagai penalty.
 
+		$payrollCalculator->employee->presences->overtimeHours = OvertimeViewModel::getOvertimeTotalHours($settingsRepository, new DateTime());
+		
 		$payrollCalculator->getCalculation();
 		$this->payroll = $payrollCalculator;
         // $data = [$this->payroll, $attDetail];
@@ -634,5 +637,24 @@ class EmployeeViewModel extends ViewModelBase {
 		return ['hours' => (int)$hours, 'minutes' => (int)$finalMinutes];
 	}
 
+   public function setRequest(Request $request)
+   {
+      $this->request = $request;
 
+      return $this;
+   }
+
+   public function request()
+   {
+      return $this->request;
+   }   
+
+   public function createShowPayrollForm(string $method, string $route, array $options = []): ViewModelBase
+   {
+	  $this->form = $this->formBuilder->create(ShowPayrollForm::class, $options);
+	  $this->form->setMethod($method);
+	  $this->form->setUrl(route($route, ['employee' => $this->model->id]));
+
+	  return $this;
+   }
 }

@@ -198,8 +198,11 @@ Route::domain(config('app.domain'))->group(function () {
          ->setDefaults(['country' => 'ID'])
          ->name('country.flag');
 
-      // Employee payroll
-      Route::get('/employee/{employee}/payroll', [EmployeeController::class, 'showPayroll'])->name('employee.payroll');
+      // Employee payroll - get payroll form
+      Route::get('/employee/{employee}/payroll', [EmployeeController::class, 'showPayrollForm'])->name('employee.payroll');
+
+      // Employee payroll - post payroll data
+      Route::post('/employee/{employee}/payroll', [EmployeeController::class, 'showPayroll'])->name('employee.payroll');
 
       // Employee leave
       Route::match(['GET', 'POST'], '/employee/{employee}/leave', [EmployeeController::class, 'addLeave'])->name('employee.leave');
@@ -236,6 +239,10 @@ Route::domain(config('app.domain'))->group(function () {
       Route::get('/api/v1/machine', [MachineController::class, 'list'])->name('api.machine');
 
       Route::get('/api/v1/attendance', [AttendanceController::class, 'list'])->name('api.attendance');
+
+      // Attendance overtime
+      Route::get('/api/v1/attendance/overtime', [AttendanceController::class, 'listOvertime'])->name('api.attendance.overtime');
+      
       Route::get('/api/v1/attendance/employee/{employee}', [AttendanceController::class, 'byEmployee'])->name('api.attendance.employee');
       Route::get('/api/v1/attendance/reports', [AttendanceController::class, 'reports'])->name('api.attendance.report');
       Route::get('/api/v1/attendance/reports/monthly', [AttendanceController::class, 'reportsMonthly'])->name('api.attendance.report.monthly');

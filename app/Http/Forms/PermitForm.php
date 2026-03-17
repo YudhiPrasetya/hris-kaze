@@ -60,6 +60,7 @@ class PermitForm extends Form{
 					],
             ])
             ->add('cut_att_premium', Field::SWITCH, ['label' => 'Potong Premi'])
+            ->add('cut_att_salary', Field::SWITCH, ['label' => 'Potong Gaji'])
             ->add('submit', Field::BUTTON_SUBMIT, [
 					'label' => '<i class="fad fa-save mr-1"></i> Submit',
 					'attr'  => ['class' => 'btn-falcon-success', 'id' => 'submit-permit'],

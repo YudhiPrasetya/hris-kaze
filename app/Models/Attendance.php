@@ -28,6 +28,7 @@ class Attendance extends ModelBase {
 		'end',
 		'start',
 		'overtime',
+		'overtime_confirmed',
 		'detail',
 	];
 

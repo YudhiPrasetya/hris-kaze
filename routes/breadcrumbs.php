@@ -47,7 +47,10 @@ $routes = [
     'position'                   => ['Positions', ['position:name']],
     'reasonforleave'             => ['Reason For Leave', ['reasonforleave:name']],
     'devicelog'                  => ['Pull Data', ['devicelog:name']],
-    'permit'                     => ['Permits', ['permit:name']]
+    'permit'                     => ['Permits', ['permit:name']],
+	'leave'                      => ['Leaves', ['leave:name']],
+	'ot'                   		 => ['Overtimes', ['ot:name']],
+	// 'employee.payroll'           => ['Employee Payroll', ['employee:name']],
 	//'tracker'                    => ['Trackers', ['tracker']],
 ];
 

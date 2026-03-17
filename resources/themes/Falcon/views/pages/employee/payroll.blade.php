@@ -21,10 +21,11 @@
 </head>
 
 <body>
+
     <div class="container">
         <div class="card pr-0">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Employee Payslip</h4>
+                <h4 class="mb-0">Employee Payroll</h4>
             </div>
             <div class="card-body">
 
@@ -45,13 +46,13 @@
                 <!-- Employee Details -->
                 {{-- <div class="row mb-2"> --}}
                     <div class="col-12 ml-0">
-                        <h6 class="text-info my-0 py-0">Employee Details</h6>
+                        <h6 class="text-info my-0 py-0">Employee Details&nbsp;&mdash;&nbsp; Periode {{ $periode }}</h6>
                         <table class="table table-bordered table-sm">
                             <tbody>
                                 <tr>
                                     <td class="col-6 mr-2 my-0 py-0"><strong>Name:</strong> <small>{{ $name }}</small>
                                     </td>
-                                    <td class="col-6 mr-2 my-0 py-0 text-right"><strong>NIK:</strong>
+                                    <td class="col-6 mr-2 my-0 py-0 text-right"><strong>ID Employee:</strong>
                                         <small>{{ $nik }}</small>
                                     </td>
                                 </tr>

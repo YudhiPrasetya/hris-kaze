@@ -153,6 +153,7 @@ class PayrollCalculator {
 	 * @return SplArrayObject
 	 */
 	private function calculateBaseOnPph21(): SplArrayObject {
+		// dd($this->employee->presences->overtimeHours, $this->provisions->company->calculateOvertime, $this->provisions->state->overtimeRegulationCalculation);
 		// Gaji + Penghasilan teratur
 		$this->result->earnings->base = $this->employee->earnings->base;
 		$this->result->earnings->baseTotal = $this->result->earnings->base + $this->employee->earnings->fixedAllowance;
@@ -166,32 +167,41 @@ class PayrollCalculator {
 		}
 
 		// Penghasilan tidak teratur overtime
-		if ($this->provisions->company->calculateOvertime === true) {
-			if ($this->provisions->state->overtimeRegulationCalculation) {
-				//  Berdasarkan Kepmenakertrans No. 102/MEN/VI/2004
-				if ($this->employee->presences->overtime > 1) {
-					$overtime1stHours = 1 * 1.5 * 1 / 173 * $this->result->earnings->gross;
-					$overtime2ndHours = ($this->employee->presences->overtime - 1) * 2 * 1 / 173 * $this->result->earnings->gross;
-					$this->result->earnings->overtime = $overtime1stHours + $overtime2ndHours;
-				}
-				else {
-					$this->result->earnings->overtime = $this->employee->presences->overtime * 1.5 * 1 / 173 * $this->result->earnings->gross;
-				}
-			}
-			else {
-				if ($this->provisions->company->overtimeRate > 0) {
-					$this->provisions->company->overtimeRate = floor($this->employee->presences->overtime / $this->provisions->company->numOfWorkingDays /
-					                                                 $this->provisions->company->numOfWorkingHours);
-				}
+		// if ($this->provisions->company->calculateOvertime === true) {
+		// 	if ($this->provisions->state->overtimeRegulationCalculation) {
+		// 		//  Berdasarkan Kepmenakertrans No. 102/MEN/VI/2004
+		// 		// if ($this->employee->presences->overtime > 1) {
+		// 		// 	$overtime1stHours = 1 * 1.5 * 1 / 173 * $this->result->earnings->gross;
+		// 		// 	$overtime2ndHours = ($this->employee->presences->overtime - 1) * 2 * 1 / 173 * $this->result->earnings->gross;
+		// 		// 	$this->result->earnings->overtime = $overtime1stHours + $overtime2ndHours;
+		// 		// }
+		// 		// else {
+		// 		// 	$this->result->earnings->overtime = $this->employee->presences->overtime * 1.5 * 1 / 173 * $this->result->earnings->gross;
+		// 		// }
 
-				$this->result->earnings->overtime = $this->employee->presences->overtime * $this->provisions->company->overtimeRate;
-			}
+		// 		$this->result->earnings->overtime = $this->employee->presences->overtimeHours * 2 * 1 / 173 * $this->result->earnings->gross;
+		// 	}
+		// 	// else {
+		// 	// 	if ($this->provisions->company->overtimeRate > 0) {
+		// 	// 		$this->provisions->company->overtimeRate = floor($this->employee->presences->overtime / $this->provisions->company->numOfWorkingDays /
+		// 	// 		                                                 $this->provisions->company->numOfWorkingHours);
+		// 	// 	}
 
-			$this->result->earnings->overtime = floor($this->result->earnings->overtime);
+		// 	// 	$this->result->earnings->overtime = $this->employee->presences->overtime * $this->provisions->company->overtimeRate;
+		// 	// }
 
-			// Lembur ditambahkan sebagai pendapatan bruto bulanan
-			$this->result->earnings->gross += $this->result->earnings->overtime;
-		}
+		// 	$this->result->earnings->overtime = floor($this->result->earnings->overtime);
+
+		// 	// Lembur ditambahkan sebagai pendapatan bruto bulanan
+		// 	$this->result->earnings->gross += $this->result->earnings->overtime;
+		// }
+
+		$this->result->earnings->overtime = $this->employee->presences->overtimeHours * 2 * 1 / 173 * $this->result->earnings->gross;
+
+		$this->result->earnings->overtime = floor($this->result->earnings->overtime);
+
+		// Lembur ditambahkan sebagai pendapatan bruto bulanan
+		$this->result->earnings->gross += $this->result->earnings->overtime;		
 
 		// split shifts
 		if ($this->provisions->company->calculateSplitShifts) {
@@ -372,7 +382,8 @@ class PayrollCalculator {
 
 			$overtime = $this->employee->presences->overtimeRate * $this->employee->presences->overtimeDays;
 
-			$this->result->earnings->overtime = $overtime;
+			// $this->result->earnings->overtime = $overtime;
+			
 			$this->result->earnings->attendance_premium = $premi;
 			// $this->employee->deductions->attendance_premium = $premi;
 			

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OvertimeFormRequest;
 
 use App\Http\ViewModels\OvertimeViewModel;
+use App\Models\Attendance;
 use App\Http\ViewModels\ViewModel as HttpViewModel;
 use App\Http\ViewModels\ViewModelBase;
 
@@ -69,7 +70,7 @@ class OvertimeController extends Controller{
 			return redirect(route('ot.index'));
 		}
 
-		return $this->create();
+		return $this->create($request);
 	}
 
     /**
@@ -91,9 +92,11 @@ class OvertimeController extends Controller{
      *
      * @return \App\Http\ViewModels\ViewModel|\App\Http\ViewModels\ViewModelBase
      */
-    public function create(): HttpViewModel|ViewModelBase{
+    public function create(Request $request): HttpViewModel|ViewModelBase{
+        $att = Attendance::find((int)$request->get('attendance'));
         // $ot = new Overtime();
-        return $this->overtimeViewModel->createForm('POST', 'ot.store', new Overtime())->view('pages.overtime.form');
+        // return $this->overtimeViewModel->createForm('POST', 'ot.store', new Overtime())->view('pages.overtime.form');
+        return $this->overtimeViewModel->createForm('POST', 'ot.store', $att)->view('pages.overtime.form');
     }
 
     /**

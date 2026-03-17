@@ -151,6 +151,11 @@ class AttendanceController extends Controller
       return $this->viewModel->list($request);
    }
 
+   public function listOvertime(Request $request)
+   {
+      return $this->viewModel->listOvertime($request);
+   }
+
    public function byEmployee(Request $request, Employee $employee)
    {
       return $this->viewModel->byEmployee($request, $employee);

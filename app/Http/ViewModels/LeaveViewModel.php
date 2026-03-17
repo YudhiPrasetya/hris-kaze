@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use App\Models\Attendance;
-
+use App\Models\CalendarEvent;
 class LeaveViewModel extends ViewModelBase{
 	/**
 	 * LeaveViewModel constructor.
@@ -114,28 +114,70 @@ class LeaveViewModel extends ViewModelBase{
 
 		$fields = $this->getFormFields();
 		$employeeId = $fields->get('id_employee');
+		$startDate = new \DateTime($fields->get('start'));
+		$endDate = new \DateTime($fields->get('end'));
+
+		$eventsCalendar = CalendarEvent::where('start_date', '>=', $startDate)
+			->where('start_date', '<=', $endDate)
+			->get()->pluck('start_date')->toArray();
+
+		// dd($eventCalendar['start_date']);
+
 		if ($fields->has('attachment_path'))
 			$fields->offsetSet('attachment_path', $this->convertImage($request, 'attachment_path'));
 
 		$fields->offsetSet('cut_att_premium', $this->toBool($fields->get('cut_att_premium')));
 		$p = $fields->toArray();
 		$leave = new Leave($p);
-		
 		$ret = $leave->save();
 		
 		// Add leave attendaces
-		$dateStartLeave = $fields->get('start');
-		$dateEndLeave = $fields->get('end');
-		$leaveDays = (new \DateTime($dateStartLeave))->diff(new \DateTime($dateEndLeave))->d + 1;
-		for($x = 0; $x < $leaveDays; $x++){
-			$dateLeave = new \DateTime($dateStartLeave);
-			$attLeave = new Attendance([
-				'employee_id' => $employeeId,
-				'attendance_reason_id' => 6,
-				'at' => $dateLeave->modify('+'.$x.' day')
-			]);
-			$attLeave->save();
+		$dateStartLeave = new \DateTime($fields->get('start'));
+		$dateEndLeave = new \DateTime($fields->get('end'));
+		// $eventCalendar = new \DateTime($eventsCalendar['start_date']);
+		while($dateStartLeave <= $dateEndLeave){
+			$dayOfWeek = $dateStartLeave->format('w');
+			$checkNotInEventCalendar = in_array($dateStartLeave->format('Y-m-d'), $eventsCalendar);
+			if($checkNotInEventCalendar === false && ($dayOfWeek != "0" && $dayOfWeek != "6")){
+				$attLeave = new Attendance([
+					'employee_id' => $employeeId,
+					'attendance_reason_id' => 6,
+					'at' => $dateStartLeave
+				]);
+
+				$attLeave->save();
+			}
+			$dateStartLeave->modify('+1 day');
 		}
+
+
+		// for($x = 0; $x < $leaveDays; $x++){
+		// 	$date = $dateLeave->modify('+'.$x.' day');
+		// 	dump($date);
+		// 	// $dayOfWeek = $date->format('w');
+		// 	// if($date != $eventCalendar && ($dayOfWeek != "0" && $dayOfWeek != "6")){
+		// 	// 	$attLeave = new Attendance([
+		// 	// 		'employee_id' => $employeeId,
+		// 	// 		'attendance_reason_id' => 6,
+		// 	// 		'at' => $date
+		// 	// 	]);
+
+		// 	// 	$attLeave->save();
+		// 	// }
+		// 	// $dayIndex = date('w', strtotime($dateLeave->modify('+'.$x.' day')->format('Y-m-d H:i:s')));
+
+		// 	// if($dateLeave->modify('+'.$x.' day') !== new \DateTime($eventCalendar['start_date']) && ($dayIndex !== "0" || $dayIndex !== "6")){
+		// 	// 	$attLeave = new Attendance([
+		// 	// 		'employee_id' => $employeeId,
+		// 	// 		'attendance_reason_id' => 6,
+		// 	// 		'at' => $dateLeave->modify('+'.$x.' day')
+		// 	// 	]);
+
+				
+		// 	// 	$attLeave->save();
+		// 	// }
+			
+		// }
 		return $ret;
 	}
 

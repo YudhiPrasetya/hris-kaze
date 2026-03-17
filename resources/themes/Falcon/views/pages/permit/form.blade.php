@@ -41,6 +41,7 @@
                             {!! form_row($form->id_employee) !!}
                             {!! form_row($form->permit_type) !!}
                             {!! form_row($form->cut_att_premium) !!}
+                            {!! form_row($form->cut_att_salary) !!}
                         </x-bootstrap::column>
                         <x-bootstrap::column>
                             {!! form_row($form->start) !!}

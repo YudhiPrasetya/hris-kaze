@@ -1,25 +1,11 @@
 <?php
 
-/**
- * This file is part of the Kaze project.
- *
- * Copyright (c) 2021 Eki Prathama Ramdhani <eq.petrucci@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- *
- * @author Eki Prathama Ramdhani <eq.petrucci@gmail.com>
- * @file   AttendanceReportForm.php
- * @date   2021-04-9 20:5:36
- */
-
 namespace App\Http\Forms;
 
 use App\Managers\Form\Field;
 use App\Managers\Form\Form;
 
-
-class AttendanceReportForm extends Form
+class ShowPayrollForm extends Form
 {
    public function buildForm()
    {
@@ -58,26 +44,12 @@ class AttendanceReportForm extends Form
                'value' => date('Y'), 
             ]
          )
-         // ->add(
-         //    'employee',
-         //    Field::ENTITY,
-         //    [
-         //       'class'      => Employee::class,
-         //       'property'   => 'name',
-         //       'attr' => [
-         //          'style' => "width: 100%"
-         //       ]
-         //    ]
-         // )
-         // ->add('rangeDateTime',
-         //     Field::RANGE,
-         // )
          ->add(
-            'submit',
-            Field::BUTTON_SUBMIT,
+            'submit', 
+            Field::BUTTON_SUBMIT, 
             [
-               'label' => '<i class="fad fa-eye mr-1"></i> Show',
-               'attr'  => ['class' => 'btn-falcon-success', 'data-toggle' => 'tooltip', 'title' => 'Display results'],
+               'label' => '<i class="fad fa-eye mr-1"></i> View Payroll',
+               'attr' => ['class' => 'btn-falcon-primary']
             ]
          );
    }
