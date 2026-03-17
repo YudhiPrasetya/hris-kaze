@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class WorkingShift extends ModelBase {
-	use HasFactory;
+	// use HasFactory;
 	use SoftDeletes;
 	use HasTimestamps;
 
@@ -35,7 +35,7 @@ class WorkingShift extends ModelBase {
 	 */
 	protected $fillable = [
 		'start',
-		'end',
+		'end'
 	];
 
 	/**

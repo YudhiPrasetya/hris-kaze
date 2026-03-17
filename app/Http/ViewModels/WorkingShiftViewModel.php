@@ -28,7 +28,7 @@ class WorkingShiftViewModel extends ViewModelBase {
 	public function createForm(string $method, string $route, ?ModelInterface $model = null, ?string $formClass = null, array $options = []): ViewModelBase {
 		$this->setModel($model);
 		$this->form->setMethod($method);
-		$this->form->setUrl(route($route, ['annual' => $model->id]));
+		$this->form->setUrl(route($route, ['workingshift' => $model->id]));
 
 		return $this;
 	}

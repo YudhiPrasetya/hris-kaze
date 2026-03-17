@@ -14,9 +14,8 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Models\AnnualLeave;
 use App\Models\WorkingShift;
-use App\Repositories\AnnualLeaveRepositoryInterface;
+use App\Repositories\WorkingShiftRepositoryInterface;
 use App\Repositories\Eloquent\RepositoryBase;
 
 
@@ -25,7 +24,7 @@ use App\Repositories\Eloquent\RepositoryBase;
  *
  * @package App\Repositories\Eloquent
  */
-class WorkingShiftRepository extends RepositoryBase implements AnnualLeaveRepositoryInterface {
+class WorkingShiftRepository extends RepositoryBase implements WorkingShiftRepositoryInterface {
 	public function __construct(WorkingShift $model) {
 		parent::__construct($model);
 	}

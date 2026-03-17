@@ -2116,3 +2116,35 @@ namespace App\Models{
 	class Overtime extends \Eloquent {}
 }
 
+namespace App\Models{
+/**
+ * App\Models\WorkingShift
+ *
+ * @property int $id
+ * @property string|null $start
+ * @property string|null $end
+ * @property mixed|string|null $created_at
+ * @property mixed|string|null $updated_at
+ * @property mixed|string|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\OwenIt\Auditing\Models\Audit[] $audits
+ * @property-read int|null $audits_count
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read int|null $notifications_count
+ * @method static \Illuminate\Database\Eloquent\Builder|WorkingShift newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|WorkingShift newQuery()
+ * @method static \Illuminate\Database\Query\Builder|WorkingShift onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|WorkingShift query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ModelBase startWith(array $columns, $search)
+ * @method static \Illuminate\Database\Eloquent\Builder|WorkingShift whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|WorkingShift whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|WorkingShift whereEnd($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|WorkingShift whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ModelBase whereLike(array $columns, $search)
+ * @method static \Illuminate\Database\Eloquent\Builder|WorkingShift whereStart($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|WorkingShift whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|WorkingShift withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|WorkingShift withoutTrashed()
+ */
+	class WorkingShift extends \Eloquent {}
+}
+

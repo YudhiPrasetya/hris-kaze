@@ -55,6 +55,7 @@ class Employee extends ModelBase {
 		'district_id',
 		'village_id',
 		'position_id',
+		'working_shift_id',
         'job_title_id',
 		'postal_code',
 		'gender_id',

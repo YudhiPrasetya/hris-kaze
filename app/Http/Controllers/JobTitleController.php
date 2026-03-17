@@ -29,7 +29,7 @@ class JobTitleController extends Controller {
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function index() {
+	public function index(): JobTitleViewModel {
 		return $this->viewModel->view('pages.jobtitle.list');
 	}
 
