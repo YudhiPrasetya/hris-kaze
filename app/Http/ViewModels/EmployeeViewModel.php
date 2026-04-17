@@ -474,8 +474,7 @@ class EmployeeViewModel extends ViewModelBase {
 			if($years >=1){
 				$year = date('Y');
 				$count = Attendance::where('employee_id', $emp->id)
-									 ->where('attendance_reason_id', 6)
-									 ->where('overtime_confirmed', '=', 1)
+									 ->where('attendance_reason_id', '=', 6)
 									 ->whereYear('at', '=', (int)$year)->get()->count();
 		
 				return 12-$count;
