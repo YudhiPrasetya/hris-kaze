@@ -39,6 +39,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Http\Forms\ShowPayrollForm;
+use Facade\Ignition\DumpRecorder\Dump;
 
 class EmployeeViewModel extends ViewModelBase {
 	public $payroll;
@@ -108,6 +109,7 @@ class EmployeeViewModel extends ViewModelBase {
 							'attr'    => [
 								'class' => 'btn btn-sm btn-falcon-warning',
 								'href'  => route('employee.payroll', ['employee' => $result['id']]),
+								'target' => '_blank'
 								// 'href' => '#',
 							],
 							'type'    => 'a',
@@ -283,106 +285,189 @@ class EmployeeViewModel extends ViewModelBase {
 		 * @var $employee Employee
 		 */
 		$employee = $this->model();
-		$payrollCalculator = new PayrollCalculator();
-		$payrollCalculator->method = PayrollCalculator::GROSS_CALCULATION;
-		$payrollCalculator->taxNumber = PayrollCalculator::PPH21;
-		$payrollCalculator->remainingLeaveQuota = $this->countRemainLeaveQuota($employee);
-		$payrollCalculator->employee->permanentStatus = $employee->permanent_status;
-		// $payrollCalculator->employee->employeeGuarantee = $employee->employee_guarantee;
-		$payrollCalculator->employee->maritalStatus = $employee->marital_status;
-		$payrollCalculator->employee->hasNPWP = $employee->has_npwp;
-		$payrollCalculator->employee->numOfDependentsFamily = $employee->num_of_dependents_family;
-		$payrollCalculator->employee->earnings->base = $employee->basic_salary;
-		$payrollCalculator->employee->earnings->fixedAllowance = (int)($employee->functional_allowance + $employee->transport_allowance + $employee->meal_allowances + $employee->other_allowance);
+		// dd($employee);
+		if(!($request->get('year') && $request->get('month'))){
+			$today = new DateTime();
+			$request['year'] = $today->format('Y');
+			$request['month'] = $today->format('m');
+		}	
+		
+		$months = [
+			"01" => "January",
+			"02" => "February",
+			"03" => "March",
+			"04" => "April",
+			"05" => "May",
+			"06" => "June",
+			"07" => "July",
+			"08" => "August",
+			"09" => "September",
+			"10" => "October",
+			"11" => "November",
+			"12" => "December",
+		];
 
-		$att = $this->workDays($employee, $settingsRepository, $attendanceRepository);
-		// dd($att);
-		$workingDays = $this->workingDays($settingsRepository);
+		$yearStart = $request['year'];
+		$monthStart = $request['month'];
+		$cutOffDateStart = $settingsRepository->findOneBySectionAndKey('attendance', 'cutoff');
+		$startDate = $yearStart . "-" . $monthStart . "-" . (string)$cutOffDateStart->value + 1;
+		$start = new DateTime($startDate);
+		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, $start);
+
+		// $att = $this->workDays($employee, $settingsRepository, $attendanceRepository, $start);
+		// dump($att);
+		// $workingDays = count($this->workingDays($settingsRepository, $request));
+		// dump($workingDays);
 		$attDetail = $this->attendanceDetail($request, $employee, $attendanceRepository, $settingsRepository, $calendarEventRepository);
+		// dump($attDetail);
+		$begin = clone($prev);
+		$end = clone($next);
+
+		$events = $this->nationalEvents($begin, $end);
+		$totalHolidays = 0;
+		while($begin <= $end){
+			$isWeekend = in_array($begin->format('w'), [0, 6]);
+			$event = collect($events)->filter(function ($item) use ($begin) {
+				// dump($item);
+				return $item == $begin;
+			})->first();
+			if($isWeekend || $event != null) $totalHolidays++;
+			$begin->modify('+1 day');
+		}
 		$overtime = [];
 		$overtimes = 0;
 		$totalPresence = 0;
+		$totalAbsent = 0;
 		$totalWorkDays = 0;
+		$totalSick = 0;
+		$totalLeave = 0;
+		// $totalHolidays = 0;
 		foreach ($attDetail as $detail) {
+			// if($detail['absent'] != null) dump($detail);
+			// dump($detail);
 			$totalPresence += !empty($detail['present']) ? 1 : 0;
 			$totalPresence += !empty($detail['business_trip']) ? 1 : 0;
 			$totalWorkDays += (int)($detail['present'] ?? 0) + (int)($detail['sick'] ?? 0) + (int)($detail['business_trip'] ?? 0) + (int)($detail['permit'] ?? 0) + (int)($detail['annual_leave'] ?? 0);
+			$totalSick += !empty($detail['sick']) ? 1 : 0;
+			$totalLeave += !empty($detail['annual_leave']) ? 1 : 0;
+			$totalAbsent += !empty($detail['absent']) ? 1 : 0;
+			// $totalHolidays += ($detail['weekend'] === true || $detail['total'] === 0 ? 1 : 0);
+			// if($detail['overtime'] != null) $overtimes++;
+			
+			// if (!empty($detail['total'])) {
+			if ($detail['total'] != 0) {
+				if($detail['overtime_confirmed'] == 1){
+					$overtime[] = [
+						'at'       => DateTime::createFromFormat('l, d F Y', $detail['date'])->format('Y-m-d'),
+						'start'    => $detail['start'],
+						'end'      => $detail['end'],
+						'overtime' => $detail['overtime'],
+					];
+					if (Carbon::parse($detail['date'])->isWeekend()) ++$overtimes;
 
-			if (!empty($detail['total'])) {
-				$overtime[] = [
-					'at'       => DateTime::createFromFormat('l, d F Y', $detail['date'])->format('Y-m-d'),
-					'start'    => $detail['start'],
-					'end'      => $detail['end'],
-					'overtime' => $detail['overtime'],
-				];
-				if (Carbon::parse($detail['date'])->isWeekend()) ++$overtimes;
+				}
 			}
 		}
-		$totalovertime = $this->totalHours($overtime);
-		// dd($attDetail);
+		$totalOvertime = $this->totalHours($overtime);
+		// dump($totalOvertime['hours']);
+		$payrollCalculator = new PayrollCalculator();
+		$payrollCalculator->method = PayrollCalculator::GROSS_CALCULATION;
+		$payrollCalculator->taxNumber = PayrollCalculator::PPH21;
+		$payrollCalculator->company->period = $months[$monthStart] . " " . $yearStart . ' (' . $prev->format('d F Y') . ' - ' . $next->format('d F Y') . ')';
+		$payrollCalculator->company->month = $months[$monthStart] . " " . $yearStart;
+		$payrollCalculator->employee->earnings->base = $employee->basic_salary ?? 0;
+		$payrollCalculator->employee->earnings->functionalAllowance = $employee->functional_allowance ?? 0;
+		$payrollCalculator->employee->allowances->transportAllowance = $employee->transport_allowance ?? 0;
+		$payrollCalculator->employee->allowances->mealAllowances = $employee->meal_allowances ?? 0;
+		$payrollCalculator->employee->earnings->eidEarnings = $employee->eid_allowance ?? 0;
+		$payrollCalculator->employee->allowances->otherAllowance = $employee->other_allowance ?? 0;
+		$payrollCalculator->employee->permanentStatus = $employee->permanent_status;
 
-		// dd($payrollCalculator->employee->presences);
-		//$payrollCalculator->employee->presences->workDays = $totalPresence;                         // jumlah hari masuk kerja
-		$payrollCalculator->employee->presences->workDays = $att->present ?? 0;                    // jumlah hari masuk kerja
-		$payrollCalculator->employee->presences->overtimeDays = $overtimes ?? 0;           // perhitungan jumlah lembur dalam satuan jam
-		$payrollCalculator->employee->presences->overtime = $totalovertime['hours'] ?? 0;           // perhitungan jumlah lembur dalam satuan jam
-		$payrollCalculator->employee->presences->overtimeHours = $totalovertime['hours'] ?? 0;
-		$payrollCalculator->employee->presences->overtimeMinutes = $totalovertime['minutes'] ?? 0;
-		$payrollCalculator->employee->presences->latetime = 0;                                      // perhitungan jumlah keterlambatan dalam satuan jam
-		$payrollCalculator->employee->presences->travelDays = $att->business_trip ?? 0;             // perhitungan jumlah hari kepergian dinas
-		$payrollCalculator->employee->presences->indisposedDays = $att->sick ?? 0;                  // perhitungan jumlah hari sakit yang telah memiliki surat dokter
-		$payrollCalculator->employee->presences->permits = $att->permit ?? 0;                  // perhitungan jumlah hari sakit yang telah memiliki surat dokter
-		$payrollCalculator->employee->presences->absentDays =  (count($workingDays) - ($att->present ?? 0)) ?? 0;                    // perhitungan jumlah hari alpha
-		$payrollCalculator->employee->presences->splitShifts = 0;                                   // perhitungan jumlah split shift
+		$payrollCalculator->remainingLeaveQuota = $this->countRemainLeaveQuota($employee);
+		$payrollCalculator->employee->presences->workDays = $totalPresence;                    // jumlah hari masuk kerja
+		$payrollCalculator->employee->presences->sickDays = $totalSick;
+		$payrollCalculator->employee->presences->leaveDays = $totalLeave;		
+		$payrollCalculator->employee->presences->holidayDays = $totalHolidays;
 
+		$payrollCalculator->employee->presences->overtimeHours = $totalOvertime['hours'] ?? 0;           // perhitungan jumlah lembur dalam jam
+		// dd($totalOvertime['hours']);
 
-		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new DateTime());
-		$permitCutAttPremium = Permit::where('id_employee',$employee->id)->where('start', '>=', $prev)->where('end', '<=', $next)->where('cut_att_premium',1)->count();
-		$leaveCutAttPremium = Leave::where('id_employee',$employee->id)->where('start', '>=', $prev)->where('end', '<=', $next)->where('cut_att_premium',1)->count();
+		// dd('workingDays: '. $workingDays . ' totalWorkDays: ' . $totalWorkDays);
 
-		// $payrollCalculator->employee->presences->rate = $employee->attendance_premium ?? 0;
-		$payrollCalculator->employee->presences->rate = ($permitCutAttPremium > 0 || $leaveCutAttPremium > 0) ? 0 : $employee->attendance_premium;
-		$payrollCalculator->employee->presences->overtimeRate = $employee->overtime ?? 0;
-		//$payrollCalculator->employee->presences->absentDays = count($workingDays) - $totalWorkDays; // perhitungan jumlah split shift
-		// Set data tunjangan karyawan di luar tunjangan BPJS Kesehatan dan Ketenagakerjaan
-		$payrollCalculator->employee->allowances->offsetSet('meal', $employee->meal_allowances ?? 0);
-		$payrollCalculator->employee->allowances->offsetSet('transport', $employee->transport_allowance ?? 0);
-		$payrollCalculator->employee->allowances->offsetSet('functional', $employee->functional_allowance ?? 0);
-		$payrollCalculator->employee->allowances->offsetSet('other', $employee->other_allowance ?? 0);
+		$payrollCalculator->employee->presences->absentDays = $totalAbsent; // perhitungan jumlah alpha
+		$payrollCalculator->employee->presences->rate = $employee->attendance_premium ?? 0;
 
-		$payrollCalculator->provisions->state->overtimeRegulationCalculation = false;     // Jika false maka akan dihitung sesuai kebijakan perusahaan
-		$payrollCalculator->provisions->state->provinceMinimumWage = 6000000;             // Ketentuan UMP sesuai propinsi lokasi perusahaan
-
-		// Set data ketentuan perusahaan
-		$payrollCalculator->provisions->company->numOfWorkingDays = count($workingDays);  // Jumlah hari kerja dalam satu bulan
-		$payrollCalculator->provisions->company->numOfWorkingHours = 8;                   // Jumlah jam kerja dalam satu hari
-		$payrollCalculator->provisions->company->overtimeRate = $employee->overtime ?? 0;      // Rate lembur perjam
-		$payrollCalculator->provisions->company->calculateOvertime = false;               // Apakah perusahaan menghitung lembur
-		$payrollCalculator->provisions->company->calculateSplitShifts = false;            // Apakah perusahan menghitung split shifts
-		$payrollCalculator->provisions->company->splitShiftsRate = 25000;                 // Rate Split Shift perusahaan
-		$payrollCalculator->provisions->company->calculateBPJSKesehatan = true;           // Apakah perusahaan menyediakan BPJS Kesehatan / tidak untuk orang
-		// tersebut
-		// Apakah perusahaan menyediakan BPJS Ketenagakerjaan / tidak untuk orang tersebut
-		$payrollCalculator->provisions->company->JKK = true;                             // Jaminan Kecelakaan Kerja
-		$payrollCalculator->provisions->company->JKM = true;                             // Jaminan Kematian
-		$payrollCalculator->provisions->company->JHT = true;                              // Jaminan Hari Tua
-		$payrollCalculator->provisions->company->JIP = true;                              // Jaminan Pensiun
-		$payrollCalculator->provisions->company->riskGrade = 1;                           // Golongan resiko ketenagakerjaan, umumnya 2
-		$payrollCalculator->provisions->company->absentPenalty = 0;                       // Perhitungan nilai potongan gaji/hari sebagai penalty.
-		$payrollCalculator->provisions->company->latetimePenalty = 0;                     // Perhitungan nilai keterlambatan sebagai penalty.
-
-		$payrollCalculator->employee->presences->overtimeHours = OvertimeViewModel::getOvertimeTotalHours($settingsRepository, new DateTime());
 		
+		
+		// $payrollCalculator->employee->permanentStatus = $employee->permanent_status;
+		// $payrollCalculator->employee->maritalStatus = $employee->marital_status;
+		// $payrollCalculator->employee->hasNPWP = $employee->has_npwp;
+		// $payrollCalculator->employee->numOfDependentsFamily = $employee->num_of_dependents_family;
+		// $payrollCalculator->employee->earnings->base = $employee->basic_salary;
+		// $payrollCalculator->employee->earnings->fixedAllowance = (int)($employee->functional_allowance + $employee->transport_allowance + $employee->meal_allowances + $employee->other_allowance);
+
+
+		// $payrollCalculator->employee->presences->workDays = $att->present ?? 0;                    // jumlah hari masuk kerja
+		// $payrollCalculator->employee->presences->overtimeDays = $overtimes ?? 0;           // perhitungan jumlah lembur dalam satuan jam
+		// $payrollCalculator->employee->presences->overtime = $totalovertime['hours'] ?? 0;           // perhitungan jumlah lembur dalam satuan jam
+		// $payrollCalculator->employee->presences->overtimeHours = $totalovertime['hours'] ?? 0;
+		// $payrollCalculator->employee->presences->overtimeMinutes = $totalovertime['minutes'] ?? 0;
+		// $payrollCalculator->employee->presences->latetime = 0;                                      // perhitungan jumlah keterlambatan dalam satuan jam
+		// $payrollCalculator->employee->presences->travelDays = $att->business_trip ?? 0;             // perhitungan jumlah hari kepergian dinas
+		// $payrollCalculator->employee->presences->indisposedDays = $att->sick ?? 0;                  // perhitungan jumlah hari sakit yang telah memiliki surat dokter
+		// $payrollCalculator->employee->presences->permits = $att->permit ?? 0;                  // perhitungan jumlah hari sakit yang telah memiliki surat dokter
+		// $payrollCalculator->employee->presences->absentDays =  (count($workingDays) - ($att->present+ $att->sick + $att->business_trip + $att->permit + $att->annual_leave ?? 0)) ?? 0;                    // perhitungan jumlah hari alpha
+		// $payrollCalculator->employee->presences->splitShifts = 0;                                   // perhitungan jumlah split shift
+
+		// [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, $start);
+
+		// $permitCutAttPremium = Permit::where('id_employee',$employee->id)->where('start', '>=', $prev)->where('end', '<=', $next)->where('cut_att_premium',1)->count();
+		// $permitCuttSalary = Permit::where('id_employee',$employee->id)->where('start', '>=', $prev)->where('end', '<=', $next)->where('cut_att_salary',1)->count();
+		// $leaveCutAttPremium = Leave::where('id_employee',$employee->id)->where('start', '>=', $prev)->where('end', '<=', $next)->where('cut_att_premium',1)->count();
+
+		// $daylySalary = $payrollCalculator->employee->earnings->base / count($workingDays);
+
+		// // Hitung total potongan gaji akibat cuti dan izin yang memotong gaji
+		// $permittCuttSalary = $permitCuttSalary * $daylySalary;
+
+		// // $payrollCalculator->employee->presences->rate = $employee->attendance_premium ?? 0;
+		// $payrollCalculator->employee->presences->rate = ($permitCutAttPremium > 0 || $leaveCutAttPremium > 0) ? 0 : $employee->attendance_premium;
+		// $payrollCalculator->employee->presences->overtimeRate = $employee->overtime ?? 0;
+		// $payrollCalculator->employee->employeeCuttSalary = $permittCuttSalary; // Set potongan gaji akibat cuti dan izin yang memotong gaji
+
+		// //$payrollCalculator->employee->presences->absentDays = count($workingDays) - $totalWorkDays; // perhitungan jumlah split shift
+		// // Set data tunjangan karyawan di luar tunjangan BPJS Kesehatan dan Ketenagakerjaan
+		// $payrollCalculator->employee->allowances->offsetSet('meal', $employee->meal_allowances ?? 0);
+		// $payrollCalculator->employee->allowances->offsetSet('transport', $employee->transport_allowance ?? 0);
+		// $payrollCalculator->employee->allowances->offsetSet('functional', $employee->functional_allowance ?? 0);
+		// $payrollCalculator->employee->allowances->offsetSet('other', $employee->other_allowance ?? 0);
+
+		// $payrollCalculator->provisions->state->overtimeRegulationCalculation = false;     // Jika false maka akan dihitung sesuai kebijakan perusahaan
+		// $payrollCalculator->provisions->state->provinceMinimumWage = 6000000;             // Ketentuan UMP sesuai propinsi lokasi perusahaan
+
+		// // Set data ketentuan perusahaan
+		// $payrollCalculator->provisions->company->numOfWorkingDays = count($workingDays);  // Jumlah hari kerja dalam satu bulan
+		// $payrollCalculator->provisions->company->numOfWorkingHours = 8;                   // Jumlah jam kerja dalam satu hari
+		// $payrollCalculator->provisions->company->overtimeRate = $employee->overtime ?? 0;      // Rate lembur perjam
+		// $payrollCalculator->provisions->company->calculateOvertime = false;               // Apakah perusahaan menghitung lembur
+		// $payrollCalculator->provisions->company->calculateSplitShifts = false;            // Apakah perusahan menghitung split shifts
+		// $payrollCalculator->provisions->company->splitShiftsRate = 25000;                 // Rate Split Shift perusahaan
+		// $payrollCalculator->provisions->company->calculateBPJSKesehatan = true;           // Apakah perusahaan menyediakan BPJS Kesehatan / tidak untuk orang tersebut
+
+		// // Apakah perusahaan menyediakan BPJS Ketenagakerjaan / tidak untuk orang tersebut
+		// $payrollCalculator->provisions->company->JKK = true;                             // Jaminan Kecelakaan Kerja
+		// $payrollCalculator->provisions->company->JKM = true;                             // Jaminan Kematian
+		// $payrollCalculator->provisions->company->JHT = true;                              // Jaminan Hari Tua
+		// $payrollCalculator->provisions->company->JIP = true;                              // Jaminan Pensiun
+		// $payrollCalculator->provisions->company->riskGrade = 1;                           // Golongan resiko ketenagakerjaan, umumnya 2
+		// $payrollCalculator->provisions->company->absentPenalty = 0;                       // Perhitungan nilai potongan gaji/hari sebagai penalty.
+		// $payrollCalculator->provisions->company->latetimePenalty = 0;                     // Perhitungan nilai keterlambatan sebagai penalty.
+
+		// $payrollCalculator->employee->presences->overtimeHours = OvertimeViewModel::getOvertimeTotalHours($settingsRepository, $request);
 		$payrollCalculator->getCalculation();
 		$this->payroll = $payrollCalculator;
-        // $data = [$this->payroll, $attDetail];
-        // $data = $this->payroll->result->deductions->JIP;
-        // dd($this->payroll->result->deductions->JIP);
-		// $remainingQuota = $this->countRemainLeaveQuota($this->model->id);
 
 		return [$this->payroll, $attDetail];
-        // print_r($data[0]->result->deductions->JIP);
-		// return $data;
 	}
 	public function countRemainLeaveQuota($emp): string|int{
 			$years = (new DateTime())->diff($emp->effective_since)->y;
@@ -390,6 +475,7 @@ class EmployeeViewModel extends ViewModelBase {
 				$year = date('Y');
 				$count = Attendance::where('employee_id', $emp->id)
 									 ->where('attendance_reason_id', 6)
+									 ->where('overtime_confirmed', '=', 1)
 									 ->whereYear('at', '=', (int)$year)->get()->count();
 		
 				return 12-$count;
@@ -399,8 +485,8 @@ class EmployeeViewModel extends ViewModelBase {
 		// return ['remainingLeaveQuota' => $remainingLeaveQuota];
 	}	
 
-	private function workDays(Employee $employee, SettingsRepository $settingsRepository, AttendanceRepository $attendanceRepository) {
-		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new \DateTime());
+	private function workDays(Employee $employee, SettingsRepository $settingsRepository, AttendanceRepository $attendanceRepository, DateTime $start) {
+		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, $start);
 
 		// @formatter:off
 		$query = Attendance::with(['employee:id,name', 'reason:id,name', 'annualLeave:id,no,year,used_at'])
@@ -422,8 +508,16 @@ class EmployeeViewModel extends ViewModelBase {
 		return $query->first();
 	}
 
-	private function workingDays(SettingsRepository $settingsRepository) {
-		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new \DateTime());
+	private function workingDays(SettingsRepository $settingsRepository, Request $request) {
+		$year = $request['year'];
+		// $monthStart = (int)$request['month']-1;
+		// $monthEnd = (int)$request['month'];
+
+		$startDate = $year . "-" . $request['month'] . "-" . "26";
+		$start = new DateTime($startDate);
+
+		// [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new \DateTime());
+		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, $start);
 
 		$d = clone($prev);
 		$events = $this->nationalEvents(clone($d), clone($next));
@@ -462,7 +556,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$map = function ($event) use ($start, $end, $years, $months) {
 			// Fix the year on recurring events
 			if ($event['recurring']) {
-				$d = new \DateTime($event['start_date']);
+				$d = new DateTime($event['start_date']);
 				$m = $d->format('n');
 				$index = array_search($m, $months);
 
@@ -489,115 +583,160 @@ class EmployeeViewModel extends ViewModelBase {
 		CalendarEventRepository $calendarEventRepository
 	) {
 		$self = $this;
-		list($offset, $limit, $sort, $order, $search, $date, $start, $end) = $this->getDefaultRequestParam($request);
+		list($offset, $limit, $sort, $order, $search, $date, $startDate, $end) = $this->getDefaultRequestParam($request);
 		$this->setRepository($attendanceRepository);
 		$query = $this->getBaseQuery($request);
 
-		$imonth = $start->format('n');
-		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, $start);
+		$imonth = $startDate->format('n');
+		// dump($imonth);
+		// dump('startDate: ' . $startDate->format('Y-m-d'));
+		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, $startDate);
+		// dump('prev: ' . $prev->format('Y-m-d') . ' next: ' . $next->format('Y-m-d'));
+
 		$year = $now->format('Y');
-		$month = $now->format('m');
-		$imonthprev = $now->format('n');
+		// $month = $now->format('m');
+		$month = $next->format('m');
+
+		// $imonthprev = $now->format('n');
+		// $imonthprev = $now->format('n');
+		$imonthprev = $prev->format('n');
+
 		$start = 1;
 		$days = [];
-		$results = $query->with(['employee:id,name', 'reason:id,name', 'annualLeave:id,no,year,used_at'])
+		$results = $query->with(['employee:id,name', 'reason:id,name'])
 		                 ->where('employee_id', '=', $employee->id)
 		                 ->whereDate('at', '>=', $prev)
 		                 ->whereDate('at', '<=', $next)
 		                 ->paginate($limit, self::ALL_FIELDS, 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
 		                 ->toArray();
-		// $reasons = ['present' => 1, 'sick' => 2, 'business_trip' => 3, 'permit' => 4, 'absent' => 5, 'annual_leave' => 6];
-		$reasons = ['1' => 'present', '2' => 'sick', '3' => 'business_trip', '4' => 'permit', '5' => 'absent', '6' => 'annual_leave'];
+		$reasons = ['present' => 1, 'sick' => 2, 'business_trip' => 3, 'permit' => 4, 'absent' => 5, 'annual_leave' => 6];
+
+		// foreach($results['data'] as $data){
+		// 	dump((new DateTime($data['at']))->format('Y-m-d'));
+		// 	// dump($data);
+		// 	// dump(count($data));
+		// }
+		// dump(count($results['data']));
+		
+		// $reasons = ['1' => 'present', '2' => 'sick', '3' => 'business_trip', '4' => 'permit', '5' => 'absent', '6' => 'annual_leave'];
 
 		///
-		$events = CalendarEvent::whereMonth('start_date', '=', $imonthprev)
-		                       ->where('recurring', '=', 1)
-		                       ->get()
-		                       ->map(function ($item) use ($year) {
-			                       $item['start_date'] = new \DateTime($year . '-' . (new \DateTime($item['start_date']))->format('m-d'));
+		// $events = CalendarEvent::whereMonth('start_date', '=', $imonthprev)
+		//                        ->where('recurring', '=', 1)
+		//                        ->get()
+		//                        ->map(function ($item) use ($year) {
+		// 	                       $item['start_date'] = new DateTime($year . '-' . (new DateTime($item['start_date']))->format('m-d'));
 
-			                       return $item;
-		                       });
-		$events = $events->merge(CalendarEvent::whereMonth('start_date', '=', $imonth)
-		                                      ->where('recurring', '=', 1)
-		                                      ->get()
-		                                      ->map(function ($item) use ($year) {
-			                                      $item['start_date'] = new \DateTime($year . '-' . (new \DateTime($item['start_date']))->format('m-d'));
+		// 	                       return $item;
+		//                        });
 
-			                                      return $item;
-		                                      }));
-		$events = $events->merge(CalendarEvent::whereYear('start_date', '=', $prev->format('Y'))
-		                                      ->whereMonth('start_date', '=', $prev->format('n'))
-		                                      ->whereDay('start_date', '=', $prev->format('j'))
-		                                      ->where('recurring', '=', 0)
-		                                      ->get());
-		if ($next->format('n') > $prev->format('n')) {
-			$events = $events->merge(CalendarEvent::whereYear('start_date', '=', $next->format('Y'))
-			                                      ->whereMonth('start_date', '=', $next->format('n'))
-			                                      ->whereDay('start_date', '=', $next->format('j'))
-			                                      ->where('recurring', '=', 0)
-			                                      ->get());
-		}
+		// $events = CalendarEvent::whereDate('start_date', '>=', $prev)
+		// 						->whereDate('start_date', '<=', $next)
+		//                        	->where('recurring', '=', 1)
+		// 						->orWhere('recurring', '=', 0)
+		//                        	->get()
+		//                        	->map(function ($item) use ($year) {
+		// 	                       $item['start_date'] = new DateTime($year . '-' . (new DateTime($item['start_date']))->format('m-d'));
+
+		// 						   dump($item['start_date']);
+
+		// 	                       return $item;
+		//                        	});
+
+		// dd($events);
+
+		// $events = $events->merge(CalendarEvent::whereMonth('start_date', '=', $imonth)
+		//                                       ->where('recurring', '=', 1)
+		//                                       ->get()
+		//                                       ->map(function ($item) use ($year) {
+		// 	                                      $item['start_date'] = new DateTime($year . '-' . (new DateTime($item['start_date']))->format('m-d'));
+
+		// 	                                      return $item;
+		//                                       }));
+
+
+		// $events = $events->merge(CalendarEvent::whereYear('start_date', '=', $prev->format('Y'))
+		//                                       ->whereMonth('start_date', '=', $prev->format('n'))
+		//                                       ->whereDay('start_date', '=', $prev->format('j'))
+		//                                       ->where('recurring', '=', 0)
+		//                                       ->get());
+
+		// if ($next->format('n') > $prev->format('n')) {
+		// 	$events = $events->merge(CalendarEvent::whereYear('start_date', '=', $next->format('Y'))
+		// 	                                      ->whereMonth('start_date', '=', $next->format('n'))
+		// 	                                      ->whereDay('start_date', '=', $next->format('j'))
+		// 	                                      ->where('recurring', '=', 0)
+		// 	                                      ->get());
+		// }
 		///
-
-		for ($day = $start; $prev <= $next; $day++) {
+		// for ($day = $start; $prev <= $next; $day++) {
+		$events = $this->nationalEvents(clone($prev), clone($next));
+		// $eventsCollection = collect($events);
+		// dd($eventsCollection);
+		while ($prev <= $next) {
 			$isWeekend = in_array($prev->format('w'), [0, 6]);
-			$event = $events->filter(function ($item) use ($prev) {
-				return $item['start_date'] == $prev;
+			$event = collect($events)->filter(function ($item) use ($prev) {
+				// dump($item);
+				return $item == $prev;
 			})->first();
 
 			$data = collect($results['data'])->filter(function ($item) use ($prev) {
-				return $prev->format('Y-m-d') == (new \DateTime($item['at']))->format('Y-m-d');
+				// dump($item);
+				// dump($prev->format('Y-m-d') == (new DateTime($item['at']))->format('Y-m-d'));
+				return $prev->format('Y-m-d') == (new DateTime($item['at']))->format('Y-m-d');
 			})->first();
-
 			if (empty($data) && !($event || $isWeekend)) {
+			// if (empty($data)) {
 				$data = [];
 				$data['start'] = null;
 				$data['end'] = null;
 				$data['overtime'] = null;
 				$data['reason']['id'] = 5;
 			}
+			
 
 			$att = collect($reasons)->map(function ($item, $key) use ($data) {
 				if (empty($data)) return null;
 
 				return $item == $data['reason']['id'] ? '<i class="fad fa-check"></i>' : null;
 			})->toArray();
+			// dd($att);
 
 			$detail = null;
 			if (!empty($data)) {
 				$detail = $data['detail'] ?? null;
 			}
-			if ($event) $detail = $event['title'];
-
+			// if ($event) $detail = $event['title'];
+			// dump($data['overtime_confirmed']);
 			$d = array_merge([
 				'no'       => count($days) + 1,
 				'date'     => $prev->format('l, d F Y'),
 				'start'    => !empty($data) ? $data['start'] : null,
 				'end'      => !empty($data) ? $data['end'] : null,
 				'overtime' => !empty($data) ? $data['overtime'] : null,
+				'overtime_confirmed' => !empty($data) ? ($data['overtime_confirmed'] ?? false) : null,
 				'total'    => 0,
 				'remark'   => $detail,
-				'event'    => $event ? true : false,
+				// 'event'    => $event ? true : false,
 				'weekend'  => in_array($prev->format('w'), [0, 6]),
 			], $att);
 
 			if (!empty($d['start']) || !empty($d['end']) || !empty($d['overtime'])) {
-				$day1hours = new \DateTime(sprintf("%s %s", (new \DateTime($data['at']))->format('Y-m-d'), $d['start']));
+				$day1hours = new DateTime(sprintf("%s %s", (new DateTime($data['at']))->format('Y-m-d'), $d['start']));
 
 				if (empty($d['end'])) {
 					$d['total'] = "00:00";
 					$day2hours = clone($day1hours);
 				}
 				else {
-					$day2hours = new \DateTime(sprintf("%s %s", (new \DateTime($data['at']))->format('Y-m-d'), $d['end']));
+					$day2hours = new DateTime(sprintf("%s %s", (new DateTime($data['at']))->format('Y-m-d'), $d['end']));
 					$d['total'] = $day2hours->diff($day1hours)->format('%H:%I');
 				}
 
 				if (!empty($d['overtime'])) {
-					$overtime = (new \DateTime($d['overtime']))->diff($day2hours)->format('%H:%I');
+					$overtime = (new DateTime($d['overtime']))->diff($day2hours)->format('%H:%I');
 					$parts = explode(':', $d['total']);
-					$overtime = (new \DateTime($overtime))->add(new \DateInterval('PT' . intval($parts[0]) . 'H' . intval($parts[1]) . 'M'));
+					$overtime = (new DateTime($overtime))->add(new \DateInterval('PT' . intval($parts[0]) . 'H' . intval($parts[1]) . 'M'));
 					$d['total'] = $overtime->format('H:i');
 				}
 
@@ -606,8 +745,10 @@ class EmployeeViewModel extends ViewModelBase {
 
 			$days[] = $d;
 
-			$prev = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateStart))));
-			$prev = $prev->add(new \DateInterval('P' . $day . 'D'));
+			// dump($prev->format('Y-m-d'));
+			// $prev = (new DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateStart))));
+			// $prev = $prev->add(new \DateInterval('P' . $day . 'D'));
+			$prev = $prev->add(new \DateInterval('P1D'));
 		}
 
 		return $days;
@@ -616,16 +757,24 @@ class EmployeeViewModel extends ViewModelBase {
 	private function totalHours(array $hourMin) {
 		$hours = 0;
 		$mins = 0;
+		// $totalHours = 0;
 
 		foreach ($hourMin as $val) {
-			if (!empty($val['overtime'])) {
-				$hours1 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['end']));
-				$hours2 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['overtime']));
+			// if (!empty($val['overtime'])) {
+			if (!empty($val['start']) && !empty($val['end'])) {
+				// $hours1 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['end']));
+				$hours1 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['start']));
+
+				// $hours2 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['overtime']));
+				$hours2 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['end']));
 				$overtime = $hours1->diff($hours2)->format('%H:%I');
 
 				$explodeHoursMins = explode(':', $overtime);
-				$hours += (int)$explodeHoursMins[0];
-				$mins += (int)$explodeHoursMins[1];
+
+				$hours += (int)$explodeHoursMins[0] > 8 ? 8 : (int)$explodeHoursMins[0];
+				// $hours = $hours > 8 ? 8 : $hours;
+				// $totalHours += $hours;
+				// $mins += (int)$explodeHoursMins[1];
 			}
 		}
 

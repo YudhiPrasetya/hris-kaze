@@ -88,6 +88,13 @@ class Presences {
 	 */
 	public int $permits = 0;
 
+	/**
+	 * Presences::$sickDays
+	 * 
+	 * @var int
+	 */
+	public int $sickDays = 0;
+
 	
 	/**
 	 * Presences::__get

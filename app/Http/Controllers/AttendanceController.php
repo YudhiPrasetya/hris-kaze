@@ -112,9 +112,11 @@ class AttendanceController extends Controller
    {
       $start = new \DateTime(sprintf("%d-%02d-%02d", $request->get('year'), $request->get('month'), date('d')));
       [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($this->settingsRepository, $start);
-      $this->viewModel->addData('start', $now);
+      // $this->viewModel->addData('start', $now);
+      $this->viewModel->addData('start', $prev);
       $this->viewModel->addData('end', $next);
-      $this->viewModel->addData('working_days', count($this->viewModel->workingDays($this->settingsRepository)));
+      // dump('start: ' . $prev->format('Y-m-d'), 'end: ' . $next->format('Y-m-d'));
+      $this->viewModel->addData('working_days', count($this->viewModel->workingDays($this->settingsRepository, $request)));
 
       return $this->viewModel->setRequest($request)
          ->createReportForm('POST', 'report.attendance')

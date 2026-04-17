@@ -265,27 +265,33 @@ class AttendanceViewModel extends ViewModelBase
          'annual_leave'  => 'annual_leave',
          'employee_name' => 'employee_name',
       ];
+
       list($offset, $limit, $sort, $order, $search, $date, $start, $end) = $this->getDefaultRequestParam($request);
+      // dd($start);
+      $strStart = $request->get('start');
+      $start = new \DateTime($strStart);
+
       $query = $this->getBaseQuery($request);
       $cutoff = $settingsRepository->findOneBySectionAndKey('attendance', 'cutoff');
       $current = clone($start);
       [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = self::getWorkingMonth($settingsRepository, $current);
+      // dump('prev: ' . $prev->format('Y-m-d'),  'next: ' . $next->format('Y-m-d'));
 
       // dd($prev->format('d-m-Y'), $next->format('d-m-Y'));
 
-      if ($cutoff->value !== 'end_of_month') {
-         if ((int) date('d') < (int)$cutoff->value)
-            $start = $start->sub(new \DateInterval('P1M'));
-      }
-      $year = $start->format('Y');
-      $month = $start->format('m');
-      $cutoffDateStart = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value + 1, 2, '0', STR_PAD_LEFT);
-      $cutoffDateEnd = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value, 2, '0', STR_PAD_LEFT);
-      $currentDate = new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateStart)));
-      $next = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateEnd))))->add(new \DateInterval('P1M'));
-      if ($cutoff->value === 'end_of_month') $next = $next->sub(new \DateInterval('P1D'));
+      // if ($cutoff->value !== 'end_of_month') {
+      //    if ((int) date('d') < (int)$cutoff->value)
+      //       $start = $start->sub(new \DateInterval('P1M'));
+      // }
+      // $year = $start->format('Y');
+      // $month = $start->format('m');
+      // $cutoffDateStart = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value + 1, 2, '0', STR_PAD_LEFT);
+      // $cutoffDateEnd = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value, 2, '0', STR_PAD_LEFT);
+      // $currentDate = new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateStart)));
+      // $next = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateEnd))))->add(new \DateInterval('P1M'));
+      // if ($cutoff->value === 'end_of_month') $next = $next->sub(new \DateInterval('P1D'));
 
-      // dd($prev,  $next);
+      // dump('prev: '. $prev->format('Y-m-d'), 'next: '. $next->format('Y-m-d'));
 
 		// @formatter:off
 		$query = $query->groupBy('employee_id')
@@ -298,22 +304,22 @@ class AttendanceViewModel extends ViewModelBase
 			               DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 2 GROUP BY attendance_reason_id) AS sick'),
 			               DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 3 GROUP BY attendance_reason_id) AS business_trip'),
 			               DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 4 GROUP BY attendance_reason_id) AS permit'),
-			               DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 5 GROUP BY attendance_reason_id) AS absent'),
 			               DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 6 GROUP BY attendance_reason_id) AS annual_leave'),
-		               );
-      // @formatter:on
+		);
 
-      if ($request->get('employee')) $query->where('employee_id', $request->get('employee'));
+      // if ($request->get('employee')) $query->where('employee_id', $request->get('employee'));
       $results = $query->with(['employee:id,name'/*, 'reason:id,name', 'annualLeave:id,no,year,used_at'*/])
          ->paginate($limit, self::ALL_FIELDS, 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
          ->toArray();
-      // dd($results);
-      $workingDays = count($this->workingDays($settingsRepository));
+
+      $workingDays = count($this->workingDays($settingsRepository, $request));
+
 
       return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self, $current, $workingDays) {
          if ($key === 'rows') {
             return collect($item)->map(function ($result, $i) use ($self, $current, $workingDays) {
                $result['employee_name'] = $self->createLink($result['employee_name'], route('employee.show', ['employee' => $result['employee']['id']]));
+               // $total = $result['present'] + $result['sick'] + $result['business_trip'] + $result['permit'] + $result['annual_leave'];
                $total = $result['present'] + $result['sick'] + $result['business_trip'] + $result['permit'] + $result['annual_leave'];
                $result['absent'] = $workingDays - $total;
                $result['actions'] = [
@@ -347,28 +353,46 @@ class AttendanceViewModel extends ViewModelBase
 
    public static function getWorkingMonth(SettingsRepository $settingsRepository, \DateTime $start)
    {
+      // dd($start);
       $cutoff = $settingsRepository->findOneBySectionAndKey('attendance', 'cutoff');
       $now = clone($start);
 
-      if ($cutoff->value !== 'end_of_month') {
-         //if ((int)date('d') < (int)$cutoff->value)
-         $now = $now->sub(new \DateInterval('P1M'));
-      }
+      // if ($cutoff->value !== 'end_of_month') {
+      //    //if ((int)date('d') < (int)$cutoff->value)
+      //    $now = $now->sub(new \DateInterval('P1M'));
+      //    // dump($now);
+      // }
 
-      $year = $now->format('Y');
-      $month = $now->format('m');
+      // $year = $now->format('Y');
+      $year = $start->format('Y');
+      // $month = $now->format('m');
+      // $month = (int)$now->format('m')-1;
+      $month = (int)$start->format('m')-1;
+
       $cutoffDateStart = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value + 1, 2, '0', STR_PAD_LEFT);
       $cutoffDateEnd = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value, 2, '0', STR_PAD_LEFT);
+      
       $prev = new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateStart)));
       $next = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateEnd))))->add(new \DateInterval('P1M'));
-      if ($cutoff->value === 'end_of_month') $next = $next->sub(new \DateInterval('P1D'));
+      // dd($prev, $next);
+      // dump('prev:' . $prev->format('Y-m-d') . ' next: ' . $next->format('Y-m-d'));
 
+      if ($cutoff->value === 'end_of_month') $next = $next->sub(new \DateInterval('P1D'));
       return [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd];
    }
 
-   public function workingDays(SettingsRepository $settingsRepository)
+   public function workingDays(SettingsRepository $settingsRepository, Request $request)
    {
-      [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new \DateTime());
+      $strStartDate = new \DateTime($request->get('start'));
+		// $monthStart = (int)$request['month']-1;
+		$monthStart = (int)$strStartDate->format('m');
+		// $monthEnd = (int)$request['month'];
+      // dump('start: '. $request->get('start'));
+		// $startDate = date('Y') . "-" . ($monthStart < 10 ? "0" . $monthStart : $monthStart) . "-" . "25";
+		$startDate = $strStartDate->format('Y') . "-" . ($monthStart < 10 ? "0" . $monthStart : $monthStart) . "-" . "26";
+		$start = new \DateTime($startDate);
+      // [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new \DateTime());
+      [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, $start);
 
       $d = clone($prev);
       $events = $this->nationalEvents(clone($d), clone($next));
@@ -698,22 +722,34 @@ class AttendanceViewModel extends ViewModelBase
       $query = $this->getBaseQuery($request);
 
       $imonth = $start->format('n');
-      [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = self::getWorkingMonth($settingsRepository, $start);
-      $year = $now->format('Y');
-      $month = $now->format('m');
-      $imonthprev = $now->format('n');
-      $start = 1;
+      $startDate = new \DateTime($request->get('start'));
+
+      [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = self::getWorkingMonth($settingsRepository, $startDate);
+
+      // $year = $now->format('Y');
+      $year = $startDate->format('Y');
+      // $month = (int)$now>format('m')+1;
+
+      $month = $next->format('m');
+      $imonthprev = $prev->format('n');
+
+      // $imonthprev = $now->format('n');
+
+      // $start = 1;
+      $no = 1;
       $days = [];
       $results = $query->with(['employee:id,name', 'reason:id,name', 'annualLeave:id,no,year,used_at'])
-         ->where('employee_id', '=', $employee->id)
+         ->where('employee_id', $employee->id)
          ->whereDate('at', '>=', $prev)
          ->whereDate('at', '<=', $next)
          ->paginate($limit, self::ALL_FIELDS, 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
          ->toArray();
 
       $reasons = ['present' => 1, 'sick' => 2, 'business_trip' => 3, 'permit' => 4, 'absent' => 5, 'annual_leave' => 6];
+      // $reasons = ['1' => 'present', '2' => 'sick', '3' => 'business_trip', '4' => 'permit', '5' => 'absent', '6' => 'annual_leave'];
 
       ///
+      /*
       $events = CalendarEvent::whereMonth('start_date', '=', $imonthprev)
          ->where('recurring', '=', 1)
          ->get()
@@ -721,7 +757,8 @@ class AttendanceViewModel extends ViewModelBase
             $item['start_date'] = new \DateTime($year . '-' . (new \DateTime($item['start_date']))->format('m-d'));
 
             return $item;
-         });
+      });
+
       $events = $events->merge(CalendarEvent::whereMonth('start_date', '=', $imonth)
          ->where('recurring', '=', 1)
          ->get()
@@ -729,12 +766,14 @@ class AttendanceViewModel extends ViewModelBase
             $item['start_date'] = new \DateTime($year . '-' . (new \DateTime($item['start_date']))->format('m-d'));
 
             return $item;
-         }));
+      }));
+
       $events = $events->merge(CalendarEvent::whereYear('start_date', '=', $prev->format('Y'))
          ->whereMonth('start_date', '=', $prev->format('n'))
          ->whereDay('start_date', '=', $prev->format('j'))
          ->where('recurring', '=', 0)
          ->get());
+
       if ($next->format('n') > $prev->format('n')) {
          $events = $events->merge(CalendarEvent::whereYear('start_date', '=', $next->format('Y'))
             ->whereMonth('start_date', '=', $next->format('n'))
@@ -742,44 +781,88 @@ class AttendanceViewModel extends ViewModelBase
             ->where('recurring', '=', 0)
             ->get());
       }
+            */
       ///
 
-      for ($day = $start; $prev <= $next; $day++) {
+      // $d = clone($prev);
+      // $events = $this->nationalEvents(clone($d), clone($next));
+      // dd($events);
+      // $dates = [];
+      // while ($d <= $next) {
+      //    if ($d->format('N') < 6 && !in_array($d, $events)) $dates[] = clone($d);
+      //    $d = $d->add(new \DateInterval('P1D'));
+      // }
+      // // dd($dates);
+      // return $dates;
+      $months = [$imonthprev, $imonthprev + 1];
+      $events = CalendarEvent::whereDate('start_date', '>=', $prev)
+         ->whereDate('start_date', '<=', $next)
+         ->where('recurring', '=', false)
+         ->get();
+		$recurringEvents = CalendarEvent::whereRaw(sprintf('MONTH(start_date) IN (%s)', implode(',', $months)))
+			->where('recurring', true)
+			->get()->pluck('start_date')->map(function ($date) use ($prev, $next) {
+				$eventDate = new \DateTime($date);
+				$eventDate->setDate($prev->format('Y'), $eventDate->format('m'), $eventDate->format('d'));
+
+				if ($eventDate >= $prev && $eventDate <= $next) {
+					return $eventDate->format('Y-m-d');
+				}
+
+				return null;
+		})->filter();         
+      $events = $events->merge($recurringEvents);
+
+      // $events = $events->merge(CalendarEvent::whereRaw(sprintf('MONTH(start_date) IN (%s)', implode(',', $months)))
+      //    ->where('recurring', '=', true)
+      //    ->get());
+      
+      // for ($day = $start; $prev <= $next; $day++) {
+      while ($prev <= $next) {
          $isWeekend = in_array($prev->format('w'), [0, 6]);
+
          $event = $events->filter(function ($item) use ($prev) {
-            return $item['start_date'] == $prev;
+            return  $prev->format('Y-m-d') == (new \DateTime($item['start_date']))->format('Y-m-d');
          })->first();
 
          $data = collect($results['data'])->filter(function ($item) use ($prev) {
+            // dump('prev:' . $prev->format('Y-m-d') . ' at: ' . (new \DateTime($item['at']))->format('Y-m-d'));
             return $prev->format('Y-m-d') == (new \DateTime($item['at']))->format('Y-m-d');
          })->first();
 
-         if (empty($data) && !($event || $isWeekend)) {
+         // if (empty($data) && !($event || $isWeekend)) {
+         if ($data == null && !($event || $isWeekend)) {
             $data = [];
             $data['start'] = null;
             $data['end'] = null;
             $data['overtime'] = null;
+            $data['overtime_confirmed'] = null;
             $data['reason']['id'] = 5;
          }
+         // dump($data);
 
          $att = collect($reasons)->map(function ($item, $key) use ($data) {
             if (empty($data)) return null;
 
             return $item == $data['reason']['id'] ? '<i class="fad fa-check"></i>' : null;
          })->toArray();
+         // dump($att);
 
          $detail = null;
-         if (!empty($data)) {
+         // if (!empty($data)) {
+         if ($data != null) {
             $detail = $data['detail'] ?? null;
          }
          if ($event) $detail = $event['title'];
 
          $d = array_merge([
-            'no'       => count($days) + 1,
+            // 'no'       => count($days) + 1,
+            'no'       => $no,
             'date'     => $prev->format('l, d F Y'),
             'start'    => !empty($data) ? $data['start'] : null,
             'end'      => !empty($data) ? $data['end'] : null,
             'overtime' => !empty($data) ? $data['overtime'] : null,
+            'overtime_confirmed' => !empty($data) ? $data['overtime_confirmed'] : null,
             'total'    => 0,
             'remark'   => $detail,
             'event'    => $event ? true : false,
@@ -804,7 +887,7 @@ class AttendanceViewModel extends ViewModelBase
                }
             }
 
-            if (!empty($d['overtime'])) {
+            if (!empty($d['overtime']) && $d['overtime_confirmed'] == 1) {
                $ot = Carbon::parse(sprintf($prev->format('Y-m-d') . ' %s', $d['overtime']));
                $start = Carbon::parse(sprintf($prev->format('Y-m-d') . ' %s', $d['start']));
                $diff = $ot->diffAsCarbonInterval($start);
@@ -823,11 +906,15 @@ class AttendanceViewModel extends ViewModelBase
 
          $days[] = $d;
 
-         $prev = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateStart))));
-         $prev = $prev->add(new \DateInterval('P' . $day . 'D'));
+         // $prev = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateStart))));
+         // $prev = $prev->add(new \DateInterval('P' . $day . 'D'));
+         $prev = $prev->add(new \DateInterval('P1D'));
+         // $prev->modify('+' . $day . ' day');
+         $no++;
       }
-
+      // dd($days);
       return $days;
+      
    }
 
    private function getCell(int $colChr, int $row)

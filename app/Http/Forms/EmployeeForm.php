@@ -174,6 +174,13 @@ class EmployeeForm extends Form {
 					'prepend' => '<span class="input-group-text meal_allowances_currency_symbol">Rp</span>',
 					'attr'    => ['class_append' => 'text-right'],
 				])
+			->add('eid_allowance',
+				Field::INPUT_GROUP,
+				[
+					'label'   => 'EID (THR)',
+					'prepend' => '<span class="input-group-text eid_allowance_currency_symbol">Rp</span>',
+					'attr'    => ['class_append' => 'text-right'],
+				])
 			->add('other_allowance',
 				Field::INPUT_GROUP,
 				[

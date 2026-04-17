@@ -79,6 +79,13 @@ class Employee {
 	public int $calculateHolidayAllowance = 0;
 
 	/**
+	 * Employee::$employeeCuttSalary
+	 * 
+	 * @var int
+	 */
+	public int $employeeCuttSalary = 0;
+
+	/**
 	 * Employee::$employeeGuarantee
 	 * 
 	 * @var bool

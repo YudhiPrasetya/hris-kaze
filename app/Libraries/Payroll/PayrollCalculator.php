@@ -20,7 +20,7 @@ use App\Libraries\Payroll\Taxes\Pph23;
 use App\Libraries\Payroll\Taxes\Pph26;
 use O2System\Spl\Datastructures\SplArrayObject;
 
-
+use App\Models\PPh21TerbaruKategoriA;
 class PayrollCalculator {
 	public const PPH21 = 21;
 
@@ -114,12 +114,26 @@ class PayrollCalculator {
 			'earnings'    => new SplArrayObject([
 				'base'           => 0,
 				'fixedAllowance' => 0,
+				'overtimes'	 => 0,
+				'eid'	=> 0,
 				'annually'       => new SplArrayObject([
 					'nett'  => 0,
 					'gross' => 0,
 				]),
 			]),
-			'takeHomePay' => 0,
+			'allowances'   => new SplArrayObject([
+				'functionalAllowance' => 0,
+				'transportAllowance'  => 0,
+				'mealAllowances'      => 0,
+				'otherAllowance'     => 0,
+				'bpjs'	=> 0,
+			]),
+			'tax' => new SplArrayObject([
+				'pph21' => 0,
+			]),
+			'takeHomePay' => new SplArrayObject([
+				'pay' => 0
+			]),
 			'method'      => 0,
 		]);
 	}
@@ -133,7 +147,8 @@ class PayrollCalculator {
 		$this->result->method = $this->method;
 
 		if ($this->taxNumber === self::PPH21) {
-			return $this->calculateBaseOnPph21();
+			// return $this->calculateBaseOnPph21();
+			return $this->calculateBaseOnNewPPH21();
 		}
 
 		if ($this->taxNumber === self::PPH23) {
@@ -159,7 +174,7 @@ class PayrollCalculator {
 		$this->result->earnings->baseTotal = $this->result->earnings->base + $this->employee->earnings->fixedAllowance;
 		$this->result->earnings->fixedAllowance = $this->employee->earnings->fixedAllowance;
 
-		// Penghasilan bruto bulanan merupakan gaji pokok ditambah tunjangan tetap
+		// Penghasilan bruto bulanan merupakan gaji pokok + tunjangan tetap + premi kehadiran + lembur + THR + BPJS Kes + JKK + JKM
 		$this->result->earnings->gross = $this->result->earnings->base + $this->employee->earnings->fixedAllowance;
 
 		if ($this->employee->calculateHolidayAllowance > 0) {
@@ -197,7 +212,8 @@ class PayrollCalculator {
 		// }
 
 		$this->result->earnings->overtime = $this->employee->presences->overtimeHours * 2 * 1 / 173 * $this->result->earnings->gross;
-
+		// dump($this->employee->presences->overtimeHours, $this->result->earnings->gross);
+		// dump($this->result->earnings->overtime);
 		$this->result->earnings->overtime = floor($this->result->earnings->overtime);
 
 		// Lembur ditambahkan sebagai pendapatan bruto bulanan
@@ -486,6 +502,79 @@ class PayrollCalculator {
 			}
 		}
 		return $this->result;
+	}
+
+	private function calculateBaseOnNewPPH21(): SplArrayObject{
+		$this->result->earnings->base = $this->employee->earnings->base;
+		$this->result->earnings->functionalAllowance = $this->employee->earnings->functionalAllowance;
+		$this->result ->earnings->eid = $this->employee->earnings->eidEarnings;
+
+		$this->result->allowances->transportAllowance = $this->employee->allowances->transportAllowance;
+		$this->result->allowances->mealAllowances = $this->employee->allowances->mealAllowances;
+		$this->result->allowances->otherAllowance = $this->employee->allowances->otherAllowance;
+					
+		if($this->employee->permanentStatus){
+			// if($this->employee->employeeGuarantee){
+				$this->employee->allowances->BPJSKesehatan = ceil(0.01 * ($this->result->earnings->base + $this->result->earnings->functionalAllowance));
+				$this->employee->allowances->JP = ceil(0.01 * $this->result->earnings->base);
+				$this->employee->allowances->JHT = ceil(0.02 * $this->result->earnings->base);
+			// }
+
+			// Premi kehadiran
+			if($this->employee->presences->absentDays >= 2){
+				$this->result->earnings->attendance_premium = 0;
+			}else if($this->employee->presences->absentDays === 1){
+				$this->result->earnings->attendance_premium = $this->employee->presences->rate / 2;
+			}else{
+				$this->result->earnings->attendance_premium = $this->employee->presences->rate * 1;
+			}
+			
+			// Overtime
+			$this->result->earnings->overtime = ceil($this->employee->presences->overtimeHours * 2 * 1 / 173 * ($this->result->earnings->base));
+
+			// Total income atau earnings
+			$this->result->earnings->total = $this->result->earnings->base + $this->result->earnings->functionalAllowance + 
+											 $this->result ->earnings->eid + $this->result->allowances->transportAllowance + 
+											 $this->result->allowances->mealAllowances + $this->result->allowances->otherAllowance + 
+											 $this->result->earnings->attendance_premium + $this->result->earnings->overtime;
+			
+			// BPJS by company
+			$this->company->allowances->BPJSKesehatan = ceil(0.004 * $this->result->earnings->base);
+
+			// JKK by company
+			$this->company->allowances->JKK = ceil(0.0024 * $this->result->earnings->base);
+
+			// JKM by company
+			$this->company->allowances->JKM = ceil(0.003 * $this->result->earnings->base);
+
+			// JP by company
+			$this->company->allowances->JP = ceil(0.02 * ($this->result->earnings->base + $this->result->earnings->functionalAllowance));
+
+			// JHT by company
+			$this->company->allowances->JHT = ceil(0.037 * ($this->result->earnings->base + $this->result->earnings->functionalAllowance));
+
+			// gross
+			$this->result->earnings->gross = $this->result->earnings->total + $this->company->allowances->BPJSKesehatan + 
+											 $this->company->allowances->JKK + $this->company->allowances->JKM;
+
+			// nett
+			$this->result->earnings->nett = $this->result->earnings->gross - $this->employee->allowances->JP - $this->employee->allowances->JHT;
+
+
+			// PPH21 terbaru
+			// dd($this->result->earnings->gross);
+			$prosentaseTER = PPh21TerbaruKategoriA::where('penghasilan_bruto_bulanan', '<=', $this->result->earnings->gross)
+					->orderBy('id', 'DESC')->first('ter');
+			// dd($prosentaseTER);
+
+			$this->result->tax->pph21 = floor($prosentaseTER->ter * $this->result->earnings->gross);
+
+			// take home pay
+			$this->result->takeHomePay->pay = $this->result->earnings->total - $this->employee->allowances->BPJSKesehatan - 
+											  $this->employee->allowances->JP - $this->employee->allowances->JHT - $this->result->tax->pph21;
+
+			}
+			return $this->result;
 	}
 
 	/**

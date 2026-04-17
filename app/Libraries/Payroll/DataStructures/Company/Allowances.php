@@ -18,5 +18,39 @@ use O2System\Spl\Datastructures\SplArrayObject;
 
 
 class Allowances extends SplArrayObject {
+    /**
+     * Allowances::$BPJSKesehatan
+     * 
+     * @var int
+     */
+    public int $BPJSKesehatan = 0;
+
+    /**
+     * Allowances::$JKK
+     * 
+     * @var int
+     */
+    public int $JKK = 0;
+
+    /**
+     * Allowances::$JKM
+     * 
+     * @var int
+     */
+    public int $JKM = 0;
+
+    /**
+     * Allowances::$JP
+     * 
+     * @var int
+     */
+    public int $JP = 0;
+
+    /**
+     * Allowances::$JHT
+     * 
+     * @var int
+     */
+    public int $JHT = 0;
 
 }

@@ -145,23 +145,39 @@ class OvertimeViewModel extends ViewModelBase{
 		// return false;
 	}
 
-	public static function getOvertimeTotalHours(SettingsRepository $settingsRepository, \DateTime $start): int{
-      $cutoff = $settingsRepository->findOneBySectionAndKey('attendance', 'cutoff');
-      $now = clone($start);
+	// public static function getOvertimeTotalHours(SettingsRepository $settingsRepository, \DateTime $start): int{
+	public static function getOvertimeTotalHours(SettingsRepository $settingsRepository, Request $request): int{
+	// dump('start: ' . $start->format('Y-m-d'));
+		$month = (int)$request->get('month');
+		$year = (int)$request->get('year');
 
-      if ($cutoff->value !== 'end_of_month') {
-         //if ((int)date('d') < (int)$cutoff->value)
-         $now = $now->sub(new \DateInterval('P1M'));
-      }
+      	$cutoff = $settingsRepository->findOneBySectionAndKey('attendance', 'cutoff');
 
-      $year = $now->format('Y');
-      $month = $now->format('m');
+      	// $now = clone($start);
+		//   dump('now1: ' . $now->format('Y-m-d'));
+
+		// if ($cutoff->value !== 'end_of_month') {
+		// 	//if ((int)date('d') < (int)$cutoff->value)
+		// 	$now = $now->sub(new \DateInterval('P1M'));
+		// }
+		//   dump('now2: ' . $now->format('Y-m-d'));
+
+    //   $year = $now->format('Y');
+    //   $month = $now->format('m');
+
+    //   $cutoffDateStart = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value + 1, 2, '0', STR_PAD_LEFT);
+    //   $cutoffDateEnd = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value, 2, '0', STR_PAD_LEFT);
+
       $cutoffDateStart = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value + 1, 2, '0', STR_PAD_LEFT);
       $cutoffDateEnd = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value, 2, '0', STR_PAD_LEFT);
-      $prev = new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateStart)));
-      $next = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateEnd))))->add(new \DateInterval('P1M'));
+
+      $prev = new \DateTime(date(sprintf("%s-%02d-%s", $year, $month-1, $cutoffDateStart)));
+    //   $next = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateEnd))))->add(new \DateInterval('P1M'));
+      $next = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateEnd))));
+
       if ($cutoff->value === 'end_of_month') $next = $next->sub(new \DateInterval('P1D'));
-	  
+	//   dump('prev: ' . $prev->format('Y-m-d'));
+	//   dump('next: ' . $next->format('Y-m-d'));
 	  $overtimes = Overtime::whereBetween('overtime_date', [$prev, $next])->get()->sum('overtime_duration');
 
 	  return $overtimes;

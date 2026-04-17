@@ -23,6 +23,20 @@ class Company {
 	public Company\Allowances $allowances;
 
 	/**
+	 * Company::$month
+	 * 
+	 * @var string
+	 */
+	public string $month;
+
+	/**
+	 * Company::$period
+	 * 
+	 * @var string
+	 */
+	public string $period;
+
+	/**
 	 * Employee::__construct
 	 */
 	public function __construct() {

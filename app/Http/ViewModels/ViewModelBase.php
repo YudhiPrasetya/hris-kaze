@@ -192,6 +192,9 @@ abstract class ViewModelBase extends ViewModel {
 	}
 
 	protected function getDefaultRequestParam(Request $request, int $offset = 0, int $limit = 25, string $sort = null, string $order = 'ASC'): array {
+		// dd($request['month'], $request['year']);
+		// dd($request);
+
 		$offset = $request->get('offset', $offset);
 		// $offset == 0 ? $offset + 1 : ($offset / $limit) + 1;
 		$limit = $request->get('limit', $limit);
@@ -199,9 +202,26 @@ abstract class ViewModelBase extends ViewModel {
 		$order = $request->get('order', $order);
 		$search = $request->get('search', null);
 		$date = $request->get('date', date('Y-m-d'));
-		$start = new \DateTime($request->get('start', date('Y-m-d')));
-		$end = new \DateTime($request->get('end', date('Y-m-d')));
 
+		$month = (int)$request->get('month');
+		$year = (int)$request->get('year');
+// dump($month, $year);
+		// $requestDate = new \DateTime($request->get('start'));
+		// $monthStart = (int)$requestDate->format('m')-1;
+		$monthEnd = $month+1;
+
+		// $startDate = date('Y') . "-" . ($monthStart < 10 ? "0" . $monthStart : $monthStart) . "-" . "25";
+		$startDate = (string)$year . "-" . ($month < 10 ? "0" . $month : (string)$month) . "-" . "26";
+		// $endDate = date('Y') . "-" . ($monthEnd < 10 ? "0" . $monthEnd : $monthEnd) . "-" . "26";
+		$endDate = (string)$year . "-" . ($monthEnd < 10 ? "0" . $monthEnd : (string)$monthEnd) . "-" . "25";
+
+		$start = new \DateTime($startDate);
+		$end = new \DateTime($endDate);
+		// dump($start);
+		// $start = new \DateTime($request->get('start', date('Y-m-d')));
+		// $end = new \DateTime($request->get('end', date('Y-m-d')));
+
+		// dd($start, $end);
 		return [$offset, $limit, $sort, $order, $search, $date, $start, $end];
 	}
 

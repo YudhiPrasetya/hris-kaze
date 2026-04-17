@@ -124,6 +124,7 @@
 											{!! form_row($form->functional_allowance) !!}
 											{!! form_row($form->transport_allowance) !!}
 											{!! form_row($form->meal_allowances) !!}
+											{!! form_row($form->eid_allowance) !!}
 											{!! form_row($form->other_allowance) !!}
 										</x-bootstrap::column>
 									</x-bootstrap::row>

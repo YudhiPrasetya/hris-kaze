@@ -45,6 +45,7 @@ class Employee extends ModelBase {
 		'functional_allowance',
 		'transport_allowance',
 		'meal_allowances',
+		'eid_allowance',
 		'other_allowance',
 		'attendance_premium',
 		'overtime',

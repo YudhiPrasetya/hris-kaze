@@ -49,4 +49,55 @@ class Earnings {
 	 * @var int
 	 */
 	public int $holidayAllowance = 0;
+
+	/**
+	 * Earnings::$functionalAllowance
+	 * 
+	 * @var int
+	 */
+	public int $functionalAllowance = 0;
+
+	/**
+	 * Earnings::$transportAllowance
+	 * 
+	 * @var int
+	 */
+	public int $transportAllowance = 0;
+
+	/**
+	 * Earnings::$mealAllowances
+	 * 
+	 * @var int
+	 */
+	public int $mealAllowances = 0;
+
+
+
+	/**
+	 * Earnings::$otherAllowance
+	 * 
+	 * @var int
+	 */
+	public int $otherAllowance = 0;
+
+	/**
+	 * Earnings::$attendaceEarnings
+	 * 
+	 * @var int
+	 */
+	public int $attendanceEarnings = 0;
+
+	/**
+	 * Earnings::$overtimeEarnings
+	 * 
+	 * @var int
+	 */
+	public int $overtimeEarnings = 0;
+
+	/**
+	 * Earnings::$eidEarnings
+	 * 
+	 * @var int
+	 */
+	public int $eidEarnings = 0;
 }

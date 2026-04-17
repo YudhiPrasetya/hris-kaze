@@ -141,24 +141,6 @@ class EmployeeController extends Controller {
 
 	public function showPayroll(Request $request){
 		// dd($request);
-		$months = [
-			"01" => "January",
-			"02" => "February",
-			"03" => "March",
-			"04" => "April",
-			"05" => "May",
-			"06" => "June",
-			"07" => "July",
-			"08" => "August",
-			"09" => "September",
-			"10" => "October",
-			"11" => "November",
-			"12" => "December",
-		];
-
-		$month = $request->month;
-		$year = $request->year;
-
 		$employee = Employee::find($request->employee);
 		$this->viewModel->setModel($employee);
 
@@ -166,85 +148,66 @@ class EmployeeController extends Controller {
 		$payrollCalc = new PayrollCalculator();
 		$payrollCalc = $employeePayroll[0];
 
-		// // dd($moneyFormat($employee->basic_salary, $employee->currencyCode()));
-
-		// // $employeePayroll = $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
-		$totalEarnings = $payrollCalc->result->earnings->baseTotal + $payrollCalc->employee->presences->rate + $payrollCalc->result->earnings->overtime;
-		$takeHomePay = $payrollCalc->result->takeHomePay + $payrollCalc->employee->presences->rate + $payrollCalc->result->earnings->overtime;
 		$data = [
-			'periode' => $months[$month] . "/" . $year,
+			// 'periode' => $months[$month] . "/" . $year,
+			'periode' => $payrollCalc->company->period,
+			'month' => $payrollCalc->company->month,
 			'nik' => $employee->nik, 
 			'name' => $employee->name,
-			'jobTitle' => $employee->jobTitle()->first()->name,
-			'position' => $employee->position()->first()->name,
-			'basicSalary' => $employee->basic_salary,
-			'functionalAllowance' => $employee->functional_allowance,
-			'transportAllowance' => $employee->transport_allowance,
-			'mealAllowance' => $employee->meal_allowances,
-			'otherAllowance' => $employee->other_allowance,
-			'overtimeDays' => $payrollCalc->employee->presences->overtimeDays,
-			'overtimeEarnings' => $payrollCalc->result->earnings->overtime,
-			// 'attendancePremium' => $payrollCalc->result->earnings->attendance_premium,
-			'attendancePremium' => $payrollCalc->employee->presences->rate,
-			'totalDependents' => $payrollCalc->employee->numOfDependentsFamily,
-			'BPJSKes' => $payrollCalc->result->deductions->BPJSKesehatan,
-			'JHT' => $payrollCalc->result->deductions->JHT,
-			'JIP' => $payrollCalc->result->deductions->JIP,
-			'PPH21' => $payrollCalc->result->deductions->pph21Tax,
-			'taxableRate' => $payrollCalc->result->taxable->rate,
-			'presences' => $payrollCalc->employee->presences->workDays,
-			'workingDays' => $payrollCalc->provisions->company->numOfWorkingDays,
-			'presencesDeduction' => $payrollCalc->result->deductions->presence,
-			'present' => $payrollCalc->employee->presences->workDays,
-			'sick' => $payrollCalc->employee->presences->indisposedDays,
-			'businessTrip' => $payrollCalc->employee->presences->travelDays,
-			'permit' => $payrollCalc->employee->presences->permits,
-			'absent' => $payrollCalc->employee->presences->absentDays,
-			'nett' => $payrollCalc->result->earnings->annually->nett,
-			'statusPTKP' => $payrollCalc->result->taxable->ptkp->status,
-			'amountPTKP' => $payrollCalc->result->taxable->ptkp->amount,
-			'PKP' => $payrollCalc->result->taxable->pkp,
-			'PPH21PerBulan' => $payrollCalc->result->taxable->liability->monthly,
-			'PPH21PerTahun' => $payrollCalc->result->taxable->liability->annual,
-			// 'totalEarnings' => $payrollCalc->result->earnings->baseTotal,
-			'totalEarnings' => $totalEarnings,
-			'totalDeductions' => $payrollCalc->result->deductions->getSum() - $payrollCalc->result->deductions->positionTax,
-			// 'takeHomePay' => $payrollCalc->result->takeHomePay
-			'takeHomePay' => $takeHomePay
+			'workingDays' => $payrollCalc->employee->presences->workDays,
+			'holidayDays' => $payrollCalc->employee->presences->holidayDays,
+			'remainingQuotaLeave' => gettype($payrollCalc->remainingLeaveQuota) === 'integer' ? $payrollCalc->remainingLeaveQuota : "-",
+			'leaves' => $payrollCalc->employee->presences->leaveDays,
+			'sicks' => $payrollCalc->employee->presences->sickDays,
+			// 'jobTitle' => $employee->jobTitle()->first()->name,
+			// 'position' => $employee->position()->first()->name,
+
+			'basicSalary' => number_format($payrollCalc->result->earnings->base, 2, ',', '.'),
+			'functionalAllowance' => number_format($payrollCalc->result->earnings->functionalAllowance, 2, ',', '.'),
+			'transportAllowance' => number_format($payrollCalc->result->allowances->transportAllowance, 2, ',', '.'),
+			'mealAllowance' => number_format($payrollCalc->result->allowances->mealAllowances, 2, ',', '.'),
+			'eidAllowance' => number_format($payrollCalc->result->earnings->eid ?? 0, 2, ',', '.'),
+			'otherAllowance' => number_format($payrollCalc->result->allowances->otherAllowance, 2, ',', '.'),
+			'attendancePremium' => number_format($payrollCalc->result->earnings->attendance_premium, 2, ',', '.'),
+			'overtimeEarnings' => number_format($payrollCalc->result->earnings->overtime, 2, ',', '.'),
+			'totalIncome' => number_format($payrollCalc->result->earnings->total, 2, ',', '.'),
+
+			'BPJSFromCompany' => number_format($payrollCalc->company->allowances->BPJSKesehatan, 2, ',', '.'),
+			'JKKFromCompany' => number_format($payrollCalc->company->allowances->JKK, 2, ',', '.'),
+			'JKMFromCompany' => number_format($payrollCalc->company->allowances->JKM, 2, ',', '.'),
+			'JPFromCompany' => number_format($payrollCalc->company->allowances->JP, 2, ',', '.'),
+			'JHTFromCompany' => number_format($payrollCalc->company->allowances->JHT, 2, ',', '.'),
+
+			'brutoEarnings' => number_format($payrollCalc->result->earnings->gross, 2, ',', '.'),
+
+			'BPJSFromEmployee' => number_format($payrollCalc->employee->allowances->BPJSKesehatan, 2, ',', '.'),
+			'JPFromEmployee' => number_format($payrollCalc->employee->allowances->JP, 2, ',', '.'),
+			'JHTFromEmployee' => number_format($payrollCalc->employee->allowances->JHT, 2, ',', '.'),
+
+			'nettEarnings' => number_format($payrollCalc->result->earnings->nett, 2, ',', '.'),
+			'pph21' => number_format($payrollCalc->result->tax->pph21, 2, ',', '.'),
+			'takeHomePay' => number_format($payrollCalc->result->takeHomePay->pay, 2, ',', '.')
+
 		];
 
-		// dd($data);
-
-		// $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
-		// $payrollCalc = new PayrollCalculator();
-		// $payrollCalc = $employeePayroll[0];
-		// $data = [
-		// 	'model' => $employeeModel,
-
-		// ];
-
-		// dump($payrollCalc->employee, $payrollCalc->result->takeHomePay);
-		// return $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
-
 		set_time_limit(300);
-		$pdf = PDF::loadView('pages.employee.payroll', $data);
-		// $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+		// $pdf = PDF::loadView('pages.employee.payroll', $data);
 
-		return $pdf->download('Payroll-' . $data['name'] . '-' . $data['periode'] . '.pdf');
+		// return $pdf->download('Payroll-' . $data['name'] . '-' . $data['periode'] . '.pdf');
 
-		// 												 ->with('alert', 'success');
-
-		// return $this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
+		return view('pages.employee.payroll1', $data);
 	}
 
 	public function showPayrollForm(Request $request, Employee $employee){
 		// Employee $employee = Employee::find($id);
 		$start = new \DateTime(sprintf("%d-%02d-%02d", $request->get('year'), $request->get('month'), date('d')));
-		[$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = $this->attendanceViewModel->getWorkingMonth($this->settingsRepository, $start);
+
+		// [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = $this->attendanceViewModel->getWorkingMonth($this->settingsRepository, $start);
+
 		$this->viewModel->setModel($employee);
-      	$this->viewModel->addData('start', $now);
-      	$this->viewModel->addData('end', $next);
-      	$this->viewModel->addData('working_days', count($this->attendanceViewModel->workingDays($this->settingsRepository)));
+      	$this->viewModel->addData('start', $start);
+      	// $this->viewModel->addData('end', $next);
+      	// $this->viewModel->addData('working_days', count($this->attendanceViewModel->workingDays($this->settingsRepository)));
 
       	return $this->viewModel->setRequest($request)
          ->createShowPayrollForm('POST', 'employee.payroll')

@@ -116,12 +116,27 @@ class LeaveViewModel extends ViewModelBase{
 		$employeeId = $fields->get('id_employee');
 		$startDate = new \DateTime($fields->get('start'));
 		$endDate = new \DateTime($fields->get('end'));
+		$months = [$startDate->format('n'), $endDate->format('n')];
 
 		$eventsCalendar = CalendarEvent::where('start_date', '>=', $startDate)
 			->where('start_date', '<=', $endDate)
-			->get()->pluck('start_date')->toArray();
+			->where('recurring', false)
+			->get()->pluck('start_date');
+		
+		$recurringEvents = CalendarEvent::whereRaw(sprintf('MONTH(start_date) IN (%s)', implode(',', $months)))
+			->where('recurring', true)
+			->get()->pluck('start_date')->map(function ($date) use ($startDate, $endDate) {
+				$eventDate = new \DateTime($date);
+				$eventDate->setDate($startDate->format('Y'), $eventDate->format('m'), $eventDate->format('d'));
 
-		// dd($eventCalendar['start_date']);
+				if ($eventDate >= $startDate && $eventDate <= $endDate) {
+					return $eventDate->format('Y-m-d');
+				}
+
+				return null;
+			})->filter();
+
+		$eventsCalendar = $eventsCalendar->merge($recurringEvents);
 
 		if ($fields->has('attachment_path'))
 			$fields->offsetSet('attachment_path', $this->convertImage($request, 'attachment_path'));
@@ -137,7 +152,7 @@ class LeaveViewModel extends ViewModelBase{
 		// $eventCalendar = new \DateTime($eventsCalendar['start_date']);
 		while($dateStartLeave <= $dateEndLeave){
 			$dayOfWeek = $dateStartLeave->format('w');
-			$checkNotInEventCalendar = in_array($dateStartLeave->format('Y-m-d'), $eventsCalendar);
+			$checkNotInEventCalendar = in_array($dateStartLeave->format('Y-m-d'), $eventsCalendar->toArray());
 			if($checkNotInEventCalendar === false && ($dayOfWeek != "0" && $dayOfWeek != "6")){
 				$attLeave = new Attendance([
 					'employee_id' => $employeeId,
