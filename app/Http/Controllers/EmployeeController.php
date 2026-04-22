@@ -162,7 +162,9 @@ class EmployeeController extends Controller {
 			// 'jobTitle' => $employee->jobTitle()->first()->name,
 			// 'position' => $employee->position()->first()->name,
 
-			'basicSalary' => number_format($payrollCalc->result->earnings->base, 2, ',', '.'),
+			// 'basicSalary' => number_format($payrollCalc->result->earnings->base, 2, ',', '.'),
+			'basicSalary' => number_format($employee->basic_salary, 2, ',', '.'),
+			'basicSalaryAdjustment' => number_format($payrollCalc->employee->earnings->baseSalaryAdjustment, 2, ',', '.'),
 			'functionalAllowance' => number_format($payrollCalc->result->earnings->functionalAllowance, 2, ',', '.'),
 			'transportAllowance' => number_format($payrollCalc->result->allowances->transportAllowance, 2, ',', '.'),
 			'mealAllowance' => number_format($payrollCalc->result->allowances->mealAllowances, 2, ',', '.'),
@@ -273,6 +275,7 @@ class EmployeeController extends Controller {
 	 * @return HttpViewModel|ViewModelBase|Response
 	 */
 	public function edit(Employee $employee): HttpViewModel|Response|ViewModelBase {
+		// dd($employee);
 		return $this->viewModel->createForm('PUT', 'employee.update', $employee)
 		                       ->view('pages.employee.form');
 	}
@@ -286,11 +289,13 @@ class EmployeeController extends Controller {
 	 * @return Application|RedirectResponse|Response|Redirector
 	 */
 	public function update(EmployeeFormRequest $request, Employee $employee): Response|Redirector|Application|RedirectResponse {
+		// dd($request);
 		if (!$this->viewModel->update($request, $employee)) {
 			return redirect(route('employee.edit', ['employee' => $employee->id]));
 		}
 
-		return redirect(route('employee.show', ['employee' => $employee->id]));
+		// return redirect(route('employee.show', ['employee' => $employee->id]));
+		return redirect(route('employee.index'));
 	}
 
 	/**

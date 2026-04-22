@@ -30,6 +30,8 @@ class Attendance extends ModelBase {
 		'overtime',
 		'overtime_confirmed',
 		'detail',
+		'cut_att_premium',
+		'cut_att_salary'
 	];
 
 	/**

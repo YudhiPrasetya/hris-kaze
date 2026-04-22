@@ -39,43 +39,46 @@ class EmployeeFormRequest extends FormRequest implements FormRequestInterface {
 	 * @return array
 	 */
 	public function rules() {
-		if ($this->isSubmitted()) {
-			$employee = Employee::where(['nik' => Request::input('nik')])->first();
-
-			return [
-				'nik'               => $employee ? "required|unique:employees,id,{$employee->id}|max:255" : "required|unique:employees,nik|max:255",
-				'user_id'           => $employee ? "nullable|unique:employees,user_id,{$employee->user_id}" : "nullable|unique:employees,user_id",
-				'name'              => 'required',
-                'personal_email'    => 'nullable',
-				'address'           => 'nullable',
-                'birth_date'        => 'nullable',
-                'effective_since'   => 'nullable',
-                'leave_allowance'   => 'nullable',
-                'gender_id'         => 'nullable',
-                'position_id'       => 'nullable',
-                'working_shift_id'  => 'nullable',
-                'job_title_id'      => 'nullable',
-                'country_id'        => 'nullable',
-                'state_id'          => 'nullable',
-                'city_id'           => 'nullable',
-                'district_id'       => 'nullable',
-                'village_id'        => 'nullable',
-                'postal_code'       => 'nullable',
-                'street'            => 'nullable',
-                'currency_code'     => 'nullable',
-                'basic_salary'      => 'nullable',
-                'meal_allowance'    => 'nullable',
-                'other_allowance'   => 'nullable',
-                'attendance_premium' => 'nullable',
-                'overtime'          => 'nullable',
-                'marital_status'    => 'nullable',
-                'has_npwp'          => 'nullable',
-                'num_of_dependents_family' => 'nullable',
-                'permanent_status'  => 'nullable',
-                // 'employee_guarantee' => 'nullable',
-				'profile_photo_url' => 'nullable',
-			];
-		}
+		// dd($this->isSubmitted());
+		// if ($this->isSubmitted()) {
+		// 	$employee = Employee::where(['nik' => Request::input('nik')])->first();
+		// 	dd($employee);
+		// 	return [
+		// 		'nik'               => $employee ? "required|unique:employees,id,{$employee->id}|max:255" : "required|unique:employees,nik|max:255",
+		// 		'user_id'           => $employee ? "nullable|unique:employees,user_id,{$employee->user_id}" : "nullable|unique:employees,user_id",
+		// 		'name'              => 'required',
+        //         'personal_email'    => 'nullable',
+		// 		'profile_photo_path' => 'nullable',
+		// 		// 'address'           => 'nullable',
+        //         'birth_date'        => 'nullable',
+        //         'effective_since'   => 'nullable',
+        //         // 'leave_allowance'   => 'nullable',
+        //         'gender_id'         => 'nullable',
+        //         'position_id'       => 'nullable',
+        //         'working_shift_id'  => 'nullable',
+        //         'job_title_id'      => 'nullable',
+        //         'country_id'        => 'nullable',
+        //         'state_id'          => 'nullable',
+        //         'city_id'           => 'nullable',
+        //         'district_id'       => 'nullable',
+        //         'village_id'        => 'nullable',
+        //         'postal_code'       => 'nullable',
+        //         'street'            => 'nullable',
+        //         'currency_code'     => 'nullable',
+        //         'basic_salary'      => 'nullable',
+		// 		'adjustment_salary' => 'nullable',
+        //         'meal_allowance'    => 'nullable',
+        //         'other_allowance'   => 'nullable',
+        //         'attendance_premium' => 'nullable',
+        //         'overtime'          => 'nullable',
+        //         'marital_status'    => 'nullable',
+        //         'has_npwp'          => 'nullable',
+        //         'num_of_dependents_family' => 'nullable',
+        //         'permanent_status'  => 'nullable',
+        //         'employee_guarantee' => 'nullable',
+		// 		// 'profile_photo_url' => 'nullable',
+		// 	];
+		// }
 
 		return [];
 	}

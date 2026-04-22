@@ -153,6 +153,9 @@ class EmployeeForm extends Form {
 					'prepend' => '<span class="input-group-text basic_salary_currency_symbol">Rp</span>',
 					'attr'    => ['class_append' => 'text-right'],
 				])
+			->add('adjustment_salary', Field::SWITCH, [
+				'label' => 'Adjustment Salary'
+			])				
 			->add('functional_allowance',
 				Field::INPUT_GROUP,
 				[
@@ -206,8 +209,8 @@ class EmployeeForm extends Form {
 				Field::BUTTON_SUBMIT,
 				[
 					'label' => '<i class="fad fa-save mr-1"></i> Submit',
-					// 'attr'  => ['class' => 'btn-falcon-danger', 'id' => 'submit-employee'],
-					'attr'  => ['class' => 'btn-falcon-danger', 'id' => 'submit-employee1'],
+					'attr'  => ['class' => 'btn-falcon-danger', 'id' => 'submit-employee'],
+					// 'attr'  => ['class' => 'btn-falcon-danger', 'id' => 'submit-employee1'],
 				]);
 	}
 }

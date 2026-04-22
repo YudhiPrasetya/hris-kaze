@@ -505,7 +505,8 @@ class PayrollCalculator {
 	}
 
 	private function calculateBaseOnNewPPH21(): SplArrayObject{
-		$this->result->earnings->base = $this->employee->earnings->base;
+		// $this->result->earnings->base = $this->employee->earnings->base;
+		$this->result->earnings->base = $this->employee->earnings->baseSalaryAdjustment;
 		$this->result->earnings->functionalAllowance = $this->employee->earnings->functionalAllowance;
 		$this->result ->earnings->eid = $this->employee->earnings->eidEarnings;
 
@@ -521,7 +522,7 @@ class PayrollCalculator {
 			// }
 
 			// Premi kehadiran
-			if($this->employee->presences->absentDays >= 2){
+			if($this->employee->presences->absentDays >= 2 || $this->employee->permits->cuttAttPremium == true){
 				$this->result->earnings->attendance_premium = 0;
 			}else if($this->employee->presences->absentDays === 1){
 				$this->result->earnings->attendance_premium = $this->employee->presences->rate / 2;

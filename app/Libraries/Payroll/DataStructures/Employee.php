@@ -100,6 +100,13 @@ class Employee {
 	public Employee\Bonus $bonus;
 
 	/**
+	 * Employee::$permits
+	 * 
+	 * @var \App\Libraries\Payroll\DataStructures\Employee\Permits
+	 */
+	public Employee\Permits $permits;
+
+	/**
 	 *
 	 */
 	public function __construct() {
@@ -108,5 +115,6 @@ class Employee {
 		$this->allowances = new Employee\Allowances();
 		$this->deductions = new Employee\Deductions();
 		$this->bonus = new Employee\Bonus();
+		$this->permits = new Employee\Permits();
 	}
 }

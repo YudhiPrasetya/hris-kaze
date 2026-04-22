@@ -133,7 +133,7 @@
                                         <span class="text-right font-weight-bold">IDR</span>
                                     </td>
                                     <td class="py-1 text-right">
-                                        <span class="text-right font-weight-bold">{{ $basicSalary }}</span>
+                                        <span class="text-right font-weight-bold">{{ $basicSalaryAdjustment }}</span>
                                     </td>
                                 </tr>
 

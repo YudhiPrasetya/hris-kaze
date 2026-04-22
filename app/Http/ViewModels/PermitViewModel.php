@@ -148,10 +148,14 @@ class PermitViewModel extends ViewModelBase{
 		$permitType = $fields->get('permit_type');
 		$dateStartPermit = new DateTime($fields->get('start'));
 		$dateEndPermit = new DateTime($fields->get('end'));
+		// $yearNow = new DateTime()->format('Y');
 
-		$eventsCalendar = CalendarEvent::where('start_date', '>=', $dateStartPermit)
-			->where('start_date', '<=', $dateEndPermit)
-			->get()->pluck('start_date')->toArray();
+		// $eventsCalendar = CalendarEvent::where('start_date', '>=', $dateStartPermit)
+		// 	->where('start_date', '<=', $dateEndPermit)
+		// 	->where('recurring', '=', 0)
+		// 	->get()->pluck('start_date')->toArray();
+
+		$eventsCalendar = $this->nationalEvents($dateStartPermit, $dateEndPermit);
 
 		while($dateStartPermit <= $dateEndPermit){
 			$dayOfWeek = $dateStartPermit->format('w');
@@ -160,7 +164,9 @@ class PermitViewModel extends ViewModelBase{
 				$attPermit = new Attendance([
 					'employee_id' => $employeeId,
 					'attendance_reason_id' => $permitType,
-					'at' => $dateStartPermit
+					'at' => $dateStartPermit,
+					'cut_att_premium' => $fields->get('cut_att_premium'),
+					'cut_att_salary' => $fields->get('cut_att_salary')
 				]);
 				$attPermit->save();
 			}
@@ -180,5 +186,54 @@ class PermitViewModel extends ViewModelBase{
 
 		return $ret ? $permit : false;
 	}
+
+	private function nationalEvents(DateTime $start, DateTime $end) {
+		$months = [];
+		$years = [];
+		$s = (int)$start->format('n');
+		$sy = (int)$start->format('Y');
+		$e = (int)$end->format('n');
+
+		while (1) {
+			$months[] = $s;
+			$years[] = $sy;
+			$s++;
+			if ($s > 12) {
+				$s = 1;
+				$sy++;
+			}
+
+			if ($s == $e) {
+				$months[] = $s;
+				$years[] = $sy;
+				break;
+			}
+		}
+
+		$map = function ($event) use ($start, $end, $years, $months) {
+			// Fix the year on recurring events
+			if ($event['recurring']) {
+				$d = new DateTime($event['start_date']);
+				$m = $d->format('n');
+				$index = array_search($m, $months);
+
+				if ($index !== false) {
+					$event['start_date'] = sprintf("%s-%s-%s", $years[$index], $d->format('m'), $d->format('d'));
+				}
+			}
+
+			return new DateTime($event['start_date']);
+		};
+
+		$event = CalendarEvent::whereDate('start_date', '>=', $start)
+		                      ->whereDate('start_date', '<=', $end)
+		                      ->where('recurring', '=', false)
+		                      ->get()->map($map)->toArray();
+		$recurring = CalendarEvent::whereRaw(sprintf('MONTH(start_date) IN (%s)', implode(',', $months)))
+		                          ->where('recurring', '=', true)
+		                          ->get()->map($map)->toArray();
+
+		return array_merge($event, $recurring);
+	}	
 
 }

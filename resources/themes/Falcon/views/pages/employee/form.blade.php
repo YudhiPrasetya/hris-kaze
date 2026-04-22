@@ -115,6 +115,7 @@
 												title="Earnings" subtitle="Employee basic salary." />
 											{!! form_row($form->currency_code, ['attr' => ['data-value' => $model->currency_code ? $model->currency_code : 'IDR']]) !!}
 											{!! form_row($form->basic_salary) !!}
+											{!! form_row($form->adjustment_salary) !!}
 											{!! form_row($form->attendance_premium) !!}
 											{!! form_row($form->overtime) !!}
 										</x-bootstrap::column>

@@ -23,6 +23,13 @@ class Earnings {
 	public int $base = 0;
 
 	/**
+	 * Earnings::$baseSalaryAdjustment
+	 * 
+	 * @var int
+	 */
+	public int $baseSalaryAdjustment = 0;
+
+	/**
 	 * Earnings::$fixedAllowance
 	 *
 	 * @var int
