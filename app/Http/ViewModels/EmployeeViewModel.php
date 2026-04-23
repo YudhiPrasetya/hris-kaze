@@ -328,6 +328,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$end = clone($next);
 		$events = $this->nationalEvents($begin, $end);
 		$totalHolidays = 0;
+		$totalWorksDayMonth = 0;
 		while($begin <= $end){
 			$isWeekend = in_array($begin->format('w'), [0, 6]);
 			$event = collect($events)->filter(function ($item) use ($begin) {
@@ -335,15 +336,19 @@ class EmployeeViewModel extends ViewModelBase {
 				return $item == $begin;
 			})->first();
 			if($isWeekend || $event != null) $totalHolidays++;
+			if( !$isWeekend && $event == null) $totalWorksDayMonth++;
 			$begin->modify('+1 day');
 		}
+		// dump($totalWorksDayMonth);
 		$overtime = [];
 		$overtimes = 0;
-		$totalPresence = 0;
-		$totalAbsent = 0;
+		$totalPresences = 0;
+		$totalAbsents = 0;
 		$totalWorkDays = 0;
 		$totalSick = 0;
-		$totalLeave = 0;
+		$totalLeaves = 0;
+		$totalPermit = 0;
+		$totalBusinessTrip = 0;
 		$totalPermits = 0;
 		$totalCutAttPremium = 0;
 		$totalCutAttSalary = 0;
@@ -351,15 +356,16 @@ class EmployeeViewModel extends ViewModelBase {
 		foreach ($attDetail as $detail) {
 			// if($detail['absent'] != null) dump($detail);
 			// dd($detail);
-			$totalPresence += !empty($detail['present']) ? 1 : 0;
-			$totalPresence += !empty($detail['business_trip']) ? 1 : 0;
+			$totalPresences += !empty($detail['present']) ? 1 : 0;
+			$totalPresences += !empty($detail['business_trip']) ? 1 : 0;
 			$totalWorkDays += ($detail['present'] != null ? 1 : 0) + ($detail['sick'] != null ? 1 : 0) + ($detail['business_trip'] != null ? 1 : 0) + ($detail['permit'] != null ? 1 : 0) + ($detail['annual_leave'] != null ? 1 : 0);
 			$totalSick += !empty($detail['sick']) ? 1 : 0;
-			$totalPermits += !empty($detail['permit'] ? 1 : 0);
+			$totalPermit += !empty($detail['permit'] ? 1 : 0);
+			$totalBusinessTrip += !empty($detail['business_trip'] ? 1 : 0);
 			$totalCutAttPremium += !empty($detail['cut_att_premium']) ? 1 : 0;
 			$totalCutAttSalary += !empty($detail['cut_att_salary']) ? 1 : 0;
-			$totalLeave += !empty($detail['annual_leave']) ? 1 : 0;
-			$totalAbsent += !empty($detail['absent']) ? 1 : 0;
+			$totalLeaves += !empty($detail['annual_leave']) ? 1 : 0;
+			$totalAbsents += !empty($detail['absent']) ? 1 : 0;
 			// $totalHolidays += ($detail['weekend'] === true || $detail['total'] === 0 ? 1 : 0);
 			// if($detail['overtime'] != null) $overtimes++;
 			
@@ -377,6 +383,7 @@ class EmployeeViewModel extends ViewModelBase {
 				}
 			}
 		}
+		$totalPermits = $totalSick + $totalPermit + $totalBusinessTrip;
 		$totalOvertime = $this->totalHours($overtime);
 
 		// cari izin potong gaji
@@ -397,10 +404,13 @@ class EmployeeViewModel extends ViewModelBase {
 		$payrollCalculator->employee->permits->cuttAttPremium = $totalCutAttPremium > 0;
 
 		$payrollCalculator->remainingLeaveQuota = $this->countRemainLeaveQuota($employee);
-		// $payrollCalculator->employee->presences->workDays = $totalPresence;                    // jumlah hari masuk kerja
+		// $payrollCalculator->employee->presences->workDays = $totalPresence;
+		$payrollCalculator->provisions->company->numOfWorkingDays = $totalWorksDayMonth;                   // jumlah hari masuk kerja
 		$payrollCalculator->employee->presences->workDays = $totalWorkDays;                    // jumlah hari masuk kerja
 		$payrollCalculator->employee->presences->sickDays = $totalSick;
-		$payrollCalculator->employee->presences->leaveDays = $totalLeave;		
+		$payrollCalculator->employee->presences->leaveDays = $totalLeaves;
+		$payrollCalculator->employee->presences->travelDays = $totalBusinessTrip;
+		$payrollCalculator->employee->presences->permits = $totalPermit;                  		
 		$payrollCalculator->employee->presences->holidayDays = $totalHolidays;
 
 
@@ -408,10 +418,12 @@ class EmployeeViewModel extends ViewModelBase {
 		// dump($payrollCalculator->employee->earnings->base / $payrollCalculator->employee->presences->workDays);
 		// dump($totalCutAttSalary + $totalAbsent);		
 
-		// Gaji pokok adjustment = gaji pokok / workDays x (totalCutAttSalary + totalAbsent)
-		if($employee->adjustment_salary == 1){
+		// Gaji pokok adjustment = gaji pokok / workDays x (workDays + cuti - izin)
 
-			$totalAbsentAndLeave = $totalAbsent + $totalLeave;
+		// if($employee->adjustment_salary == 1){
+		if($totalCutAttSalary > 0){
+
+			// $totalAbsentAndLeave = $totalAbsent + $totalLeave;
 	
 			// dump('baseSalary: ' . $payrollCalculator->employee->earnings->base);
 			// dump('workDays: ' . $totalWorkDays);
@@ -420,7 +432,8 @@ class EmployeeViewModel extends ViewModelBase {
 			// dump('absent: ' . $totalAbsent);
 			// dump('leave: ' . $totalLeave);
 			
-			$baseSalaryAdjustment = ceil(($payrollCalculator->employee->earnings->base / $totalWorkDays) * ($totalWorkDays + $totalPermits + $totalSick - $totalAbsentAndLeave));
+			// $baseSalaryAdjustment = ceil(($payrollCalculator->employee->earnings->base / $totalWorkDays) * ($totalWorkDays + $totalPermits + $totalSick - $totalAbsentAndLeave));
+			$baseSalaryAdjustment = ceil(($payrollCalculator->employee->earnings->base / $totalWorkDays) * ($totalWorkDays + $totalLeaves -($totalPermits + $totalAbsents)));
 	
 			// dump('baseSalaryAdjustment: ' . $baseSalaryAdjustment);
 	
@@ -434,7 +447,7 @@ class EmployeeViewModel extends ViewModelBase {
 
 		// dd('workingDays: '. $workingDays . ' totalWorkDays: ' . $totalWorkDays);
 
-		$payrollCalculator->employee->presences->absentDays = $totalAbsent; // perhitungan jumlah alpha
+		$payrollCalculator->employee->presences->absentDays = $totalAbsents; // perhitungan jumlah alpha
 		$payrollCalculator->employee->presences->rate = $employee->attendance_premium ?? 0;
 
 		
@@ -442,13 +455,14 @@ class EmployeeViewModel extends ViewModelBase {
 		// $payrollCalculator->employee->permanentStatus = $employee->permanent_status;
 		// $payrollCalculator->employee->maritalStatus = $employee->marital_status;
 		// $payrollCalculator->employee->hasNPWP = $employee->has_npwp;
-		// $payrollCalculator->employee->numOfDependentsFamily = $employee->num_of_dependents_family;
+		$payrollCalculator->employee->numOfDependentsFamily = $employee->num_of_dependents_family;
 		// $payrollCalculator->employee->earnings->base = $employee->basic_salary;
 		// $payrollCalculator->employee->earnings->fixedAllowance = (int)($employee->functional_allowance + $employee->transport_allowance + $employee->meal_allowances + $employee->other_allowance);
 
 
 		// $payrollCalculator->employee->presences->workDays = $att->present ?? 0;                    // jumlah hari masuk kerja
 		// $payrollCalculator->employee->presences->overtimeDays = $overtimes ?? 0;           // perhitungan jumlah lembur dalam satuan jam
+		$payrollCalculator->employee->presences->overtimeDays = count($totalOvertime) ?? 0;           // perhitungan jumlah lembur dalam satuan jam
 		// $payrollCalculator->employee->presences->overtime = $totalovertime['hours'] ?? 0;           // perhitungan jumlah lembur dalam satuan jam
 		// $payrollCalculator->employee->presences->overtimeHours = $totalovertime['hours'] ?? 0;
 		// $payrollCalculator->employee->presences->overtimeMinutes = $totalovertime['minutes'] ?? 0;
@@ -510,16 +524,16 @@ class EmployeeViewModel extends ViewModelBase {
 		return [$this->payroll, $attDetail];
 	}
 	public function countRemainLeaveQuota($emp): string|int{
-			$years = (new DateTime())->diff($emp->effective_since)->y;
-			if($years >=1){
-				$year = date('Y');
-				$count = Attendance::where('employee_id', $emp->id)
-									 ->where('attendance_reason_id', '=', 6)
-									 ->whereYear('at', '=', (int)$year)->get()->count();
-		
-				return 12-$count;
-			}		
-			return "Haven't received leave quota yet (belum mendapat jatah kuota cuti).";
+		$years = (new DateTime())->diff($emp->effective_since)->y;
+		if($years >=1){
+			$year = date('Y');
+			$count = Attendance::where('employee_id', $emp->id)
+									->where('attendance_reason_id', '=', 6)
+									->whereYear('at', '=', (int)$year)->get()->count();
+	
+			return 12-$count;
+		}		
+		return "Haven't received leave quota yet (belum mendapat jatah kuota cuti).";
 		// return $remainingLeaveQuota;
 		// return ['remainingLeaveQuota' => $remainingLeaveQuota];
 	}	

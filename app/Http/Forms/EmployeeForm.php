@@ -153,9 +153,9 @@ class EmployeeForm extends Form {
 					'prepend' => '<span class="input-group-text basic_salary_currency_symbol">Rp</span>',
 					'attr'    => ['class_append' => 'text-right'],
 				])
-			->add('adjustment_salary', Field::SWITCH, [
-				'label' => 'Adjustment Salary'
-			])				
+			// ->add('adjustment_salary', Field::SWITCH, [
+			// 	'label' => 'Adjustment Salary (Cut Salary)'
+			// ])				
 			->add('functional_allowance',
 				Field::INPUT_GROUP,
 				[

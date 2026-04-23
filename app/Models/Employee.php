@@ -43,7 +43,7 @@ class Employee extends ModelBase {
 		'effective_since',
         // 'leave_allowance',
 		'basic_salary',
-		'adjustment_salary',
+		// 'adjustment_salary',
 		'functional_allowance',
 		'transport_allowance',
 		'meal_allowances',

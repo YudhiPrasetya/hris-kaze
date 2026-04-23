@@ -99,6 +99,8 @@
 											<span id="user"
 												class="form-control-plaintext text-1000 fs-0">{!! $model->user()?->link() !!}</span>
 										</div>
+
+
 										<x-bootstrap::row>
 											<x-bootstrap::column breakpoint="MEDIUM|6">
 												<x-bootstrap::media variant="primary" class="my-4"
@@ -111,7 +113,7 @@
 												<div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">Basic Salary</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($model->basic_salary, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->employee->earnings->baseSalaryAdjustment, $model->currencyCode()) !!}
 													</div>
 												</div>
 												<div class="form-group row mb-0">
@@ -161,7 +163,15 @@
 														{{-- {!!
 														$moneyFormat($payroll->result->earnings->attendance_premium,
 														$model->currencyCode()) !!} --}}
-														{!! $moneyFormat($payroll->employee->presences->rate, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->result->earnings->attendance_premium, $model->currencyCode()) !!}
+													</div>
+												</div>
+												<div class="form-group row-mb-0">
+													<label class="col-sm-5 col-form-label">
+														Total Income<br /><small>Total Income</small>
+													</label>
+													<div class="col-sm-7 col-form-label">
+														{!! $moneyFormat($payroll->result->earnings->total, $model->currencyCode()) !!}
 													</div>
 												</div>
 												<x-bootstrap::column class="px-0">
@@ -175,7 +185,15 @@
 															{{ $payroll->employee->numOfDependentsFamily }}</small>
 													</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->deductions->BPJSKesehatan, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->employee->allowances->BPJSKesehatan, $model->currencyCode()) !!}
+													</div>
+												</div>
+
+												<div class="form-group row mb-0">
+													<label class="col-sm-5 col-form-label">JP <small
+															class="text-600">(Jaminan Pensiun)</small></label>
+													<div class="col-sm-7 col-form-label">
+														{!! $moneyFormat($payroll->employee->allowances->JP ?? 0, $model->currencyCode()) !!}
 													</div>
 												</div>
 
@@ -183,54 +201,60 @@
 													<label class="col-sm-5 col-form-label">JHT <small
 															class="text-600">(Jaminan Hari Tua)</small></label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->deductions->JHT ?? 0, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->employee->allowances->JHT ?? 0, $model->currencyCode()) !!}
 													</div>
 												</div>
 
-												<div class="form-group row mb-0">
-													<label class="col-sm-5 col-form-label">JIP <small
-															class="text-600">(Jaminan Pensiun)</small></label>
-													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->deductions->JIP ?? 0, $model->currencyCode()) !!}
-													</div>
-												</div>
-
-												<div class="form-group row mb-0">
+												{{-- <div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">Pajak Jabatan</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->deductions->positionTax ?? 0, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->result->deductions->positionTax ?? 0,
+														$model->currencyCode()) !!}
+													</div>
+												</div> --}}
+
+												<div class="form-group row mb-0">
+													<label class="col-sm-5 col-form-label">PPH 21
+														{{-- <small class="text-600">({{ $payroll->result->taxable->rate
+															}})</small> --}}
+													</label>
+													<div class="col-sm-7 col-form-label">
+														{!! $moneyFormat($payroll->result->tax->pph21 ?? 0, $model->currencyCode()) !!}
 													</div>
 												</div>
 
 												<div class="form-group row mb-0">
-													<label class="col-sm-5 col-form-label">PPH 21 <small
-															class="text-600">({{ $payroll->result->taxable->rate }})</small></label>
+													<label class="col-sm-5 col-form-label">Take Home Pay</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->deductions->pph21Tax ?? 0, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->result->takeHomePay->pay, $model->currencyCode()) !!}
 													</div>
 												</div>
+
 
 												<div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">
 														Presences<br />
 														<small class="text-600">Total
-															{{ $payroll->employee->presences->workDays }} days from
+															{{ $payroll->employee->presences->workDays }} days
+															from
 															{{ $payroll->provisions->company->numOfWorkingDays }} total work
 															days</small>
 													</label>
-													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->deductions->presence ?? 0, $model->currencyCode()) !!}
-													</div>
+													{{-- <div class="col-sm-7 col-form-label">
+														{!! $moneyFormat($payroll->result->deductions->presence ?? 0,
+														$model->currencyCode()) !!}
+													</div> --}}
 												</div>
 
-												<x-bootstrap::column class="px-0">
+												{{-- <x-bootstrap::column class="px-0">
 													<x-bootstrap::media variant="primary" class="mt-4"
 														title="<small>NETT</small>" />
 												</x-bootstrap::column>
 												<div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">Annually</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->earnings->annually->nett, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->result->earnings->annually->nett,
+														$model->currencyCode()) !!}
 													</div>
 												</div>
 												<x-bootstrap::column class="px-0">
@@ -243,13 +267,15 @@
 														{!! $payroll->result->taxable->ptkp->status !!}
 													</div>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->taxable->ptkp->amount, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->result->taxable->ptkp->amount,
+														$model->currencyCode()) !!}
 													</div>
 												</div>
 												<div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">PKP</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->taxable->pkp, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->result->taxable->pkp,
+														$model->currencyCode()) !!}
 													</div>
 												</div>
 												<x-bootstrap::column class="px-0">
@@ -259,15 +285,17 @@
 												<div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">Per-bulan</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->taxable->liability->monthly, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->result->taxable->liability->monthly,
+														$model->currencyCode()) !!}
 													</div>
 												</div>
 												<div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">Per-tahun</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->taxable->liability->annual, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->result->taxable->liability->annual,
+														$model->currencyCode()) !!}
 													</div>
-												</div>
+												</div> --}}
 
 
 												<x-bootstrap::column class="px-0">
@@ -283,7 +311,7 @@
 												<div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">Sick</label>
 													<div class="col-sm-7 col-form-label">
-														{{ $payroll->employee->presences->indisposedDays ?? 0 }} day(s)
+														{{ $payroll->employee->presences->sickDays ?? 0 }} day(s)
 														{{-- {{ $payroll->employee->presences->sick ?? 0 }} day(s) --}}
 														{{-- {{ $payroll->employee->presences->sick }} day(s) --}}
 													</div>
@@ -312,34 +340,33 @@
 												</div>
 
 
-												<x-bootstrap::column class="px-0">
+												{{-- <x-bootstrap::column class="px-0">
 													<x-bootstrap::media variant="primary" class="mt-4"
 														title="<small>Total</small>" />
 												</x-bootstrap::column>
 												<div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">Total Earnings</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->earnings->baseTotal, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->result->earnings->baseTotal,
+														$model->currencyCode()) !!}
 													</div>
-												</div>
-												<div class="form-group row mb-0">
+												</div> --}}
+
+												{{-- <div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">Total Deductions</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->deductions->getSum() - $payroll->result->deductions->positionTax, $model->currencyCode()) !!}
+														{!! $moneyFormat($payroll->result->deductions->getSum() -
+														$payroll->result->deductions->positionTax, $model->currencyCode())
+														!!}
 													</div>
-												</div>
-												<div class="form-group row mb-0">
-													<label class="col-sm-5 col-form-label">Take Home Pay</label>
-													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->result->takeHomePay, $model->currencyCode()) !!}
-													</div>
-												</div>
+												</div> --}}
+
 											</x-bootstrap::column>
-											<x-bootstrap::column>
+											{{-- <x-bootstrap::column>
 												<x-bootstrap::media variant="primary" class="my-4"
 													icon="fad fa-money-check-alt" title="AnnualLeave "
 													subtitle="Annual Leave." />
-											</x-bootstrap::column>
+											</x-bootstrap::column> --}}
 										</x-bootstrap::row>
 									</div>
 									<div class="fancy-tab-content">
@@ -408,151 +435,151 @@
 												],
 											],
 										])
-																																						</div>
-																																						<div class="fancy-tab-content">
-																																							@include('themes::Falcon.views.layouts.table', [
-																																								'method' => 'get',
-																																								'hasActions' => true,
-																																								'hasToolbar' => true,
-																																								'data' => [
-																																									'url' => route('api.task.employee', ['employee' => $model->id]),
-																																									'page-size' => 25,
-																																									'show-refresh' => 'true',
-																																									'method' => 'get',
-																																									'search' => 'true',
-																																								],
-																																								'columns' => [
-																																									[
-																																										'title' => '',
-																																										'attrs' => [
-																																											'field' => 'priority.name',
-																																											'class' => 'va-baseline text-nowrap text-center',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Title',
-																																										'attrs' => [
-																																											'field' => 'title',
-																																											'class' => 'va-baseline text-nowrap',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Dateline',
-																																										'attrs' => [
-																																											'field' => 'dateline',
-																																											'class' => 'va-baseline text-nowrap',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Assign At',
-																																										'attrs' => [
-																																											'field' => 'at',
-																																											'class' => 'va-baseline text-nowrap',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Status',
-																																										'attrs' => [
-																																											'field' => 'current_status.reason',
-																																											'class' => 'va-baseline text-nowrap',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																								],
-																																							])
-																																						</div>
-																																						<div class="fancy-tab-content">
-																																							@include('themes::Falcon.views.layouts.table', [
-																																								'method' => 'get',
-																																								'hasActions' => false,
-																																								'hasToolbar' => true,
-																																								'data' => [
-																																									'url' => route('api.attendance.employee', ['employee' => $model->id]),
-																																									'page-size' => 25,
-																																									'show-refresh' => 'true',
-																																									'method' => 'get',
-																																									'search' => 'false',
-																																									'sort-name' => "at",
-																																									'sort-order' => "desc"
-																																								],
-																																								'columns' => [
-																																									[
-																																										'title' => 'Date',
-																																										'attrs' => [
-																																											'field' => 'at',
-																																											'class' => 'va-baseline text-nowrap',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Check-In',
-																																										'attrs' => [
-																																											'field' => 'start',
-																																											'class' => 'va-baseline text-center text-nowrap',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Check-Out',
-																																										'attrs' => [
-																																											'field' => 'end',
-																																											'class' => 'va-baseline text-center text-nowrap',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Overtime',
-																																										'attrs' => [
-																																											'field' => 'overtime',
-																																											'class' => 'va-baseline text-center text-nowrap',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Total Hours',
-																																										'attrs' => [
-																																											'field' => 'total_hours',
-																																											'class' => 'va-baseline text-center text-nowrap',
-																																											'sortable' => 'false',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Total Overtime',
-																																										'attrs' => [
-																																											'field' => 'total_overtime',
-																																											'class' => 'va-baseline text-center text-nowrap',
-																																											'sortable' => 'false',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Presence',
-																																										'attrs' => [
-																																											'field' => 'reason.name',
-																																											'class' => 'va-baseline text-nowrap',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																									[
-																																										'title' => 'Attachment',
-																																										'attrs' => [
-																																											'field' => 'attactment',
-																																											'class' => 'va-baseline text-nowrap',
-																																											'sortable' => 'true',
-																																										],
-																																									],
-																																								],
-																																							])
-																																						</div>
-																																					</div>
-																																				</div>
-																																			</x-bootstrap::column>
-																																		</x-bootstrap::row>
-																																	</x-bootstrap::card.body>
-																																</x-bootstrap::card>
-																															</x-bootstrap::column>
-																														</x-bootstrap::row>
+																																														</div>
+																																														<div class="fancy-tab-content">
+																																															@include('themes::Falcon.views.layouts.table', [
+																																																'method' => 'get',
+																																																'hasActions' => true,
+																																																'hasToolbar' => true,
+																																																'data' => [
+																																																	'url' => route('api.task.employee', ['employee' => $model->id]),
+																																																	'page-size' => 25,
+																																																	'show-refresh' => 'true',
+																																																	'method' => 'get',
+																																																	'search' => 'true',
+																																																],
+																																																'columns' => [
+																																																	[
+																																																		'title' => '',
+																																																		'attrs' => [
+																																																			'field' => 'priority.name',
+																																																			'class' => 'va-baseline text-nowrap text-center',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Title',
+																																																		'attrs' => [
+																																																			'field' => 'title',
+																																																			'class' => 'va-baseline text-nowrap',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Dateline',
+																																																		'attrs' => [
+																																																			'field' => 'dateline',
+																																																			'class' => 'va-baseline text-nowrap',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Assign At',
+																																																		'attrs' => [
+																																																			'field' => 'at',
+																																																			'class' => 'va-baseline text-nowrap',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Status',
+																																																		'attrs' => [
+																																																			'field' => 'current_status.reason',
+																																																			'class' => 'va-baseline text-nowrap',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																],
+																																															])
+																																														</div>
+																																														<div class="fancy-tab-content">
+																																															@include('themes::Falcon.views.layouts.table', [
+																																																'method' => 'get',
+																																																'hasActions' => false,
+																																																'hasToolbar' => true,
+																																																'data' => [
+																																																	'url' => route('api.attendance.employee', ['employee' => $model->id]),
+																																																	'page-size' => 25,
+																																																	'show-refresh' => 'true',
+																																																	'method' => 'get',
+																																																	'search' => 'false',
+																																																	'sort-name' => "at",
+																																																	'sort-order' => "desc"
+																																																],
+																																																'columns' => [
+																																																	[
+																																																		'title' => 'Date',
+																																																		'attrs' => [
+																																																			'field' => 'at',
+																																																			'class' => 'va-baseline text-nowrap',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Check-In',
+																																																		'attrs' => [
+																																																			'field' => 'start',
+																																																			'class' => 'va-baseline text-center text-nowrap',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Check-Out',
+																																																		'attrs' => [
+																																																			'field' => 'end',
+																																																			'class' => 'va-baseline text-center text-nowrap',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Overtime',
+																																																		'attrs' => [
+																																																			'field' => 'overtime',
+																																																			'class' => 'va-baseline text-center text-nowrap',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Total Hours',
+																																																		'attrs' => [
+																																																			'field' => 'total_hours',
+																																																			'class' => 'va-baseline text-center text-nowrap',
+																																																			'sortable' => 'false',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Total Overtime',
+																																																		'attrs' => [
+																																																			'field' => 'total_overtime',
+																																																			'class' => 'va-baseline text-center text-nowrap',
+																																																			'sortable' => 'false',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Presence',
+																																																		'attrs' => [
+																																																			'field' => 'reason.name',
+																																																			'class' => 'va-baseline text-nowrap',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																	[
+																																																		'title' => 'Attachment',
+																																																		'attrs' => [
+																																																			'field' => 'attactment',
+																																																			'class' => 'va-baseline text-nowrap',
+																																																			'sortable' => 'true',
+																																																		],
+																																																	],
+																																																],
+																																															])
+																																														</div>
+																																													</div>
+																																												</div>
+																																											</x-bootstrap::column>
+																																										</x-bootstrap::row>
+																																									</x-bootstrap::card.body>
+																																								</x-bootstrap::card>
+																																							</x-bootstrap::column>
+																																						</x-bootstrap::row>
 @endsection
