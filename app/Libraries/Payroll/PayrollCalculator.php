@@ -80,7 +80,7 @@ class PayrollCalculator {
 
 	/**
 	 * PayrollCalculator::$remainingLeaveQuota
-	 * 
+	 *
 	 * @var string|int
 	 */
 	public string|int $remainingLeaveQuota;
@@ -217,7 +217,7 @@ class PayrollCalculator {
 		$this->result->earnings->overtime = floor($this->result->earnings->overtime);
 
 		// Lembur ditambahkan sebagai pendapatan bruto bulanan
-		$this->result->earnings->gross += $this->result->earnings->overtime;		
+		$this->result->earnings->gross += $this->result->earnings->overtime;
 
 		// split shifts
 		if ($this->provisions->company->calculateSplitShifts) {
@@ -275,7 +275,7 @@ class PayrollCalculator {
 				// Calculate BPJS Kesehatan Allowance & Deduction
 				// $this->company->allowances->BPJSKesehatan = $this->result->earnings->gross * (4 / 100);
 				// $this->employee->deductions->BPJSKesehatan = $this->result->earnings->gross * (1 / 100);
-				
+
 				// Guarantee is covered by employee paid by company
 				if ($this->employee->employeeGuarantee) {
 					$this->company->allowances->BPJSKesehatan = $this->result->earnings->base * (5 / 100);
@@ -297,7 +297,7 @@ class PayrollCalculator {
 			if ($this->provisions->company->JKK === true) {
 				$this->company->allowances->JKK = ceil($this->result->earnings->base * ($this->provisions->state->getJKKRiskGradePercentage($this->provisions->company->riskGrade) / 100));
 				// $this->employee->allowances->JKK = $this->company->allowances->JKK;
-		
+
 				/*
 				if ($this->result->earnings->gross < $this->provisions->state->highestWage) {
 					$this->employee->allowances->JKK = $this->result->earnings->base *
@@ -325,7 +325,7 @@ class PayrollCalculator {
 			}
 
 			if ($this->provisions->company->JHT === true) {
-				
+
 				// Guarantee is covered by employee paid by company
 				if ($this->employee->employeeGuarantee) {
 					$this->company->allowances->JHT = $this->result->earnings->base * (5.7 / 100);
@@ -399,10 +399,10 @@ class PayrollCalculator {
 			$overtime = $this->employee->presences->overtimeRate * $this->employee->presences->overtimeDays;
 
 			// $this->result->earnings->overtime = $overtime;
-			
+
 			$this->result->earnings->attendance_premium = $premi;
 			// $this->employee->deductions->attendance_premium = $premi;
-			
+
 			$this->result->earnings->annually->gross = (($this->result->earnings->base +
 													   $this->result->allowances->getSum() +
 													   $this->company->allowances->BPJSKesehatan +
@@ -410,17 +410,17 @@ class PayrollCalculator {
 													   $this->company->allowances->JKM +
 													   $premi + $overtime) - $this->employee->deductions->JIP -
 													   $this->employee->deductions->JHT) * 12;
-													   
+
 			$this->result->earnings->gross = $this->result->earnings->base +
 			                                 $this->result->allowances->getSum() +
 											 $this->company->allowances->BPJSKesehatan +
 											 $this->company->allowances->JKK +
 											 $this->company->allowances->JKM +
 			                                 $premi + $overtime;
-			
+
 			$monthlyPositionTax = round($this->result->earnings->annually->gross * (5 / 100));
 			$thr = 0;
-			
+
 			if ($monthlyPositionTax > $this->provisions->state->provinceMinimumWage) {
 				/**
 				 * According to Undang-Undang Direktur Jenderal Pajak Nomor PER-32/PJ/2015 Pasal 21 ayat 3
@@ -433,11 +433,11 @@ class PayrollCalculator {
 				$monthlyPositionTax = ($this->result->earnings->gross + ($thr / 12)) * (5 / 100);
 			}
 			// Pendapatan bersih
-			$this->result->earnings->annually->nett = round($this->result->earnings->gross - 
+			$this->result->earnings->annually->nett = round($this->result->earnings->gross -
 													  $monthlyPositionTax -
 													  $this->employee->deductions->JIP -
-													  $this->employee->deductions->JHT) * 12;										  
-			
+													  $this->employee->deductions->JHT) * 12;
+
 			$this->result->earnings->nett = $this->result->earnings->gross -
 											$this->employee->deductions->JIP -
 											$this->employee->deductions->JHT;
@@ -513,7 +513,7 @@ class PayrollCalculator {
 		$this->result->allowances->transportAllowance = $this->employee->allowances->transportAllowance;
 		$this->result->allowances->mealAllowances = $this->employee->allowances->mealAllowances;
 		$this->result->allowances->otherAllowance = $this->employee->allowances->otherAllowance;
-					
+
 		if($this->employee->permanentStatus){
 			// if($this->employee->employeeGuarantee){
 				$this->employee->allowances->BPJSKesehatan = ceil(0.01 * ($this->result->earnings->base + $this->result->earnings->functionalAllowance));
@@ -529,18 +529,18 @@ class PayrollCalculator {
 			}else{
 				$this->result->earnings->attendance_premium = $this->employee->presences->rate * 1;
 			}
-			
+
 			// Overtime
 			$this->result->earnings->overtime = ceil($this->employee->presences->overtimeHours * 2 * 1 / 173 * ($this->result->earnings->base));
 
 			// Total income atau earnings
-			$this->result->earnings->total = $this->result->earnings->base + $this->result->earnings->functionalAllowance + 
-											 $this->result ->earnings->eid + $this->result->allowances->transportAllowance + 
-											 $this->result->allowances->mealAllowances + $this->result->allowances->otherAllowance + 
+			$this->result->earnings->total = $this->result->earnings->base + $this->result->earnings->functionalAllowance +
+											 $this->result ->earnings->eid + $this->result->allowances->transportAllowance +
+											 $this->result->allowances->mealAllowances + $this->result->allowances->otherAllowance +
 											 $this->result->earnings->attendance_premium + $this->result->earnings->overtime;
-			
+
 			// BPJS by company
-			$this->company->allowances->BPJSKesehatan = ceil(0.004 * $this->result->earnings->base);
+			$this->company->allowances->BPJSKesehatan = ceil(0.04 * $this->result->earnings->base);
 
 			// JKK by company
 			$this->company->allowances->JKK = ceil(0.0024 * $this->result->earnings->base);
@@ -555,7 +555,7 @@ class PayrollCalculator {
 			$this->company->allowances->JHT = ceil(0.037 * ($this->result->earnings->base + $this->result->earnings->functionalAllowance));
 
 			// gross
-			$this->result->earnings->gross = $this->result->earnings->total + $this->company->allowances->BPJSKesehatan + 
+			$this->result->earnings->gross = $this->result->earnings->total + $this->company->allowances->BPJSKesehatan +
 											 $this->company->allowances->JKK + $this->company->allowances->JKM;
 
 			// nett
@@ -571,7 +571,7 @@ class PayrollCalculator {
 			$this->result->tax->pph21 = floor($prosentaseTER->ter * $this->result->earnings->gross);
 
 			// take home pay
-			$this->result->takeHomePay->pay = $this->result->earnings->total - $this->employee->allowances->BPJSKesehatan - 
+			$this->result->takeHomePay->pay = $this->result->earnings->total - $this->employee->allowances->BPJSKesehatan -
 											  $this->employee->allowances->JP - $this->employee->allowances->JHT - $this->result->tax->pph21;
 
 			}
