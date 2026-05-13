@@ -163,7 +163,9 @@
 														{{-- {!!
 														$moneyFormat($payroll->result->earnings->attendance_premium,
 														$model->currencyCode()) !!} --}}
-														{!! $moneyFormat($payroll->result->earnings->attendance_premium, $model->currencyCode()) !!}
+														{{-- {!! $moneyFormat($payroll->result->earnings->attendance_premium, $model->currencyCode()) !!} --}}
+
+                                                        {!! $moneyFormat($model->attendance_premium, $model->currencyCode()) !!}
 													</div>
 												</div>
 												<div class="form-group row-mb-0">

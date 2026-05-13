@@ -40,7 +40,7 @@ class EmployeeController extends Controller {
 	private AttendanceViewModel $attendanceViewModel;
 	private LeaveRepository $leaveRepository;
 
-   	
+
 	/**
 	 * EmployeeController constructor.
 	 *
@@ -49,9 +49,9 @@ class EmployeeController extends Controller {
 	 *
 	 * @throws \Illuminate\Contracts\Container\BindingResolutionException
 	 */
-	public function __construct(EmployeeRepository $repository, SettingsRepository $settingsRepository, 
-								AttendanceRepository $attendanceRepository, CalendarEventRepository $calendarEventRepository, 
-								LeaveRepository $leaveRepository, FormBuilder $builder) 
+	public function __construct(EmployeeRepository $repository, SettingsRepository $settingsRepository,
+								AttendanceRepository $attendanceRepository, CalendarEventRepository $calendarEventRepository,
+								LeaveRepository $leaveRepository, FormBuilder $builder)
 	{
 		$this->viewModel = new EmployeeViewModel($repository, $builder);
 		$this->settingsRepository = $settingsRepository;
@@ -152,7 +152,7 @@ class EmployeeController extends Controller {
 			// 'periode' => $months[$month] . "/" . $year,
 			'periode' => $payrollCalc->company->period,
 			'month' => $payrollCalc->company->month,
-			'nik' => $employee->nik, 
+			'nik' => $employee->nik,
 			'name' => $employee->name,
 			'workingDays' => $payrollCalc->employee->presences->workDays,
 			'holidayDays' => $payrollCalc->employee->presences->holidayDays,
@@ -171,7 +171,9 @@ class EmployeeController extends Controller {
 			'eidAllowance' => number_format($payrollCalc->result->earnings->eid ?? 0, 2, ',', '.'),
 			'otherAllowance' => number_format($payrollCalc->result->allowances->otherAllowance, 2, ',', '.'),
 			'attendancePremium' => number_format($payrollCalc->result->earnings->attendance_premium, 2, ',', '.'),
-			'overtimeEarnings' => number_format($payrollCalc->result->earnings->overtime, 2, ',', '.'),
+			// 'overtimeEarnings' => number_format($payrollCalc->result->earnings->overtime, 2, ',', '.'),
+			'overtimeOutboundEarnings' => number_format($payrollCalc->result->earnings->overtimeOutbound, 2, ',', '.'),
+			'overtimeInboundEarnings' => number_format($payrollCalc->result->earnings->overtimeInbound, 2, ',', '.'),
 			'totalIncome' => number_format($payrollCalc->result->earnings->total, 2, ',', '.'),
 
 			'BPJSFromCompany' => number_format($payrollCalc->company->allowances->BPJSKesehatan, 2, ',', '.'),
@@ -213,7 +215,7 @@ class EmployeeController extends Controller {
 
       	return $this->viewModel->setRequest($request)
          ->createShowPayrollForm('POST', 'employee.payroll')
-         ->view('pages.employee.showPayroll');		
+         ->view('pages.employee.showPayroll');
 
 
 
@@ -237,10 +239,10 @@ class EmployeeController extends Controller {
 				'LeaveQuota' => $leaveQuota,
 			];
 			// $leaveModel = new Leave();
-	
+
 			// $this->leaveViewModel->setModel($leaveModel);
 			$this->leaveViewModel->setData($data);
-	
+
 			// return $this->leaveViewModel->createForm('POST', 'employee.leave', $employee, null, ['employee' => $employee->id])->view('pages.leave.form');
 			return $this->leaveViewModel->createForm('POST', 'leave.store', new Leave())->view('pages.leave.form');
 

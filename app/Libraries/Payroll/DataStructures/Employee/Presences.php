@@ -31,7 +31,8 @@ class Presences {
 
 	public int $overtime = 0;
 
-	public int $overtimeHours = 0;
+	public int $overtimeOutboundHours = 0;
+	public int $overtimeInboundHours = 0;
 
 	public int $overtimeMinutes = 0;
 
@@ -83,19 +84,19 @@ class Presences {
 
 	/**
 	 * Presences::$permits
-	 * 
+	 *
 	 * @var int
 	 */
 	public int $permits = 0;
 
 	/**
 	 * Presences::$sickDays
-	 * 
+	 *
 	 * @var int
 	 */
 	public int $sickDays = 0;
 
-	
+
 	/**
 	 * Presences::__get
 	 *

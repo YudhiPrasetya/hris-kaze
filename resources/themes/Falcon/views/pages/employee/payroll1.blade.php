@@ -236,7 +236,7 @@
                                         <span class="text-right font-weight-bold">IDR</span>
                                     </td>
                                     <td class="py-1 text-right">
-                                        <span class="text-right font-weight-bold">{{ $overtimeEarnings }}</span>
+                                        <span class="text-right font-weight-bold">{{ $overtimeOutboundEarnings }}</span>
                                     </td>
                                 </tr>
 
@@ -249,7 +249,7 @@
                                         <span class="text-right font-weight-bold">IDR</span>
                                     </td>
                                     <td class="py-1 text-right">
-                                        <span class="text-right font-weight-bold">0,00</span>
+                                        <span class="text-right font-weight-bold">{{ $overtimeInboundEarnings }}</span>
                                     </td>
                                 </tr>
 
@@ -337,7 +337,8 @@
                                         <span class="text-right font-weight-bold">{{ $brutoEarnings }}</span>
                                     </td>
                                 </tr>
-                                <tr>
+
+                                {{-- <tr>
                                     <td></td>
                                     <td class="p-1 text-right font-weight-bold">
                                         JPP Emp. -
@@ -373,7 +374,7 @@
                                     <td class="py-1 text-right">
                                         <span class="text-right font-weight-bold">{{ $nettEarnings }}</span>
                                     </td>
-                                </tr>
+                                </tr> --}}
                             </table>
                         </div>
 

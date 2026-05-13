@@ -162,10 +162,10 @@ class AttendanceViewModel extends ViewModelBase
       $query = $this->getBaseQuery($request, ...$columns);
       $columns = $this->getDefaultColumns(...$columns);
       $results = $query->with(['employee:id,name'])->whereNotNull('overtime')->whereYear('at', date('Y'))
-         ->whereRaw('DAYOFWEEK(at) = 1 OR DAYOFWEEK(at) = 7')
-         ->orderBy('at', 'DESC')
-         ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
-         ->toArray();
+            ->orWhereRaw('DAYOFWEEK(at) = 1')->orWhereRaw('DAYOFWEEK(at) = 7')
+            ->orderBy('at', 'DESC')
+            ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+            ->toArray();
 
       return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
          if ($key == 'rows') {
@@ -184,13 +184,13 @@ class AttendanceViewModel extends ViewModelBase
 								// 'href' => '#',
 							],
 							'type'    => 'a',
-							'tooltip' => 'Overtime Confirmation',							
+							'tooltip' => 'Overtime Confirmation',
 						],
 
 					];
 
                $result['actions'] = $result['overtime_confirmed']  == 'Pending' ? $action : '';
-               $result['overtime_confirmed'] = $self->getConfirmedColor($result['overtime_confirmed']); 
+               $result['overtime_confirmed'] = $self->getConfirmedColor($result['overtime_confirmed']);
 
                return $result;
             });
@@ -215,7 +215,7 @@ class AttendanceViewModel extends ViewModelBase
 				break;
 		}
 
-		return '<span class="'.$color.'"><i class="'.$icon.' mr-1"></i>' . $isConfirmed . '</span>';   
+		return '<span class="'.$color.'"><i class="'.$icon.' mr-1"></i>' . $isConfirmed . '</span>';
    }
 
    public function byEmployee(Request $request, Employee $employee)
@@ -253,28 +253,28 @@ class AttendanceViewModel extends ViewModelBase
       });
    }
 
-   public function reports(AttendanceReportFormRequest $request, SettingsRepository $settingsRepository)
+   public function reports(Request $request, SettingsRepository $settingsRepository)
    {
-      $self = $this;
-      $this->aliases = [
-         'sick'          => 'sick',
-         'present'       => 'present',
-         'business_trip' => 'business_trip',
-         'permit'        => 'permit',
-         'absent'        => 'absent',
-         'annual_leave'  => 'annual_leave',
-         'employee_name' => 'employee_name',
-      ];
+        $self = $this;
+        $this->aliases = [
+            'sick'          => 'sick',
+            'present'       => 'present',
+            'business_trip' => 'business_trip',
+            'permit'        => 'permit',
+            'absent'        => 'absent',
+            'annual_leave'  => 'annual_leave',
+            'employee_name' => 'employee_name',
+        ];
 
-      list($offset, $limit, $sort, $order, $search, $date, $start, $end) = $this->getDefaultRequestParam($request);
-      // dd($start);
-      $strStart = $request->get('start');
-      $start = new \DateTime($strStart);
+        list($offset, $limit, $sort, $order, $search, $date, $start, $end) = $this->getDefaultRequestParam($request);
+        // dd($start);
+        $strStart = $request->get('start');
+        $start = new \DateTime($strStart);
 
-      $query = $this->getBaseQuery($request);
-      $cutoff = $settingsRepository->findOneBySectionAndKey('attendance', 'cutoff');
-      $current = clone($start);
-      [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = self::getWorkingMonth($settingsRepository, $current);
+        $query = $this->getBaseQuery($request);
+        $cutoff = $settingsRepository->findOneBySectionAndKey('attendance', 'cutoff');
+        $current = clone($start);
+        [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = self::getWorkingMonth($settingsRepository, $current);
       // dump('prev: ' . $prev->format('Y-m-d'),  'next: ' . $next->format('Y-m-d'));
 
       // dd($prev->format('d-m-Y'), $next->format('d-m-Y'));
@@ -294,61 +294,85 @@ class AttendanceViewModel extends ViewModelBase
       // dump('prev: '. $prev->format('Y-m-d'), 'next: '. $next->format('Y-m-d'));
 
 		// @formatter:off
-		$query = $query->groupBy('employee_id')
-		               ->select(
-			               DB::raw('employee_id'),
-			               DB::raw('DATE("' . $prev->format('Y-m-d') . '") as start'),
-			               DB::raw('DATE("' . $next->format('Y-m-d') . '") as end'),
-			               DB::raw('(SELECT name FROM employees b WHERE b.id = attendances.employee_id) AS employee_name'),
-			               DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 1 GROUP BY attendance_reason_id) AS present'),
-			               DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 2 GROUP BY attendance_reason_id) AS sick'),
-			               DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 3 GROUP BY attendance_reason_id) AS business_trip'),
-			               DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 4 GROUP BY attendance_reason_id) AS permit'),
-			               DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 6 GROUP BY attendance_reason_id) AS annual_leave'),
+        $query = $query->groupBy('employee_id')
+                ->select(
+                    DB::raw('employee_id'),
+                    DB::raw('DATE("' . $prev->format('Y-m-d') . '") as start'),
+                    DB::raw('DATE("' . $next->format('Y-m-d') . '") as end'),
+                    DB::raw('(SELECT name FROM employees b WHERE b.id = attendances.employee_id) AS employee_name'),
+                    DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 1 GROUP BY attendance_reason_id) AS present'),
+                    DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 2 GROUP BY attendance_reason_id) AS sick'),
+                    DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 3 GROUP BY attendance_reason_id) AS business_trip'),
+                    DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 4 GROUP BY attendance_reason_id) AS permit'),
+                    DB::raw('(SELECT COUNT(*) FROM attendances b WHERE DATE(b.at) >= DATE("' . $prev->format('Y-m-d') . '") AND DATE(b.at) <= DATE("' . $next->format('Y-m-d') . '") AND b.employee_id = attendances.employee_id AND b.attendance_reason_id = 6 GROUP BY attendance_reason_id) AS annual_leave'),
 		);
 
       // if ($request->get('employee')) $query->where('employee_id', $request->get('employee'));
-      $results = $query->with(['employee:id,name'/*, 'reason:id,name', 'annualLeave:id,no,year,used_at'*/])
-         ->paginate($limit, self::ALL_FIELDS, 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
-         ->toArray();
+        $results = $query->with(['employee:id,name'/*, 'reason:id,name', 'annualLeave:id,no,year,used_at'*/])
+            ->paginate($limit, self::ALL_FIELDS, 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+            ->toArray();
 
-      $workingDays = count($this->workingDays($settingsRepository, $request));
+        $workingDays = count($this->workingDays($settingsRepository, $request));
+        // $workingDays = $this->workingDays($settingsRepository, $request);
+        //   dump($workingDays);
 
+        // while($begin <= $end){
+        //     $data = collect($results['data'])->filter(function($item) use($begin){
+        //         // return $item->format('Y-m-d') == $begin->format('Y-m-d');
+        //     })->last();
+        //     if($data == null) $absents++;
 
-      return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self, $current, $workingDays) {
-         if ($key === 'rows') {
-            return collect($item)->map(function ($result, $i) use ($self, $current, $workingDays) {
-               $result['employee_name'] = $self->createLink($result['employee_name'], route('employee.show', ['employee' => $result['employee']['id']]));
-               // $total = $result['present'] + $result['sick'] + $result['business_trip'] + $result['permit'] + $result['annual_leave'];
-               $total = $result['present'] + $result['sick'] + $result['business_trip'] + $result['permit'] + $result['annual_leave'];
-               $result['absent'] = $workingDays - $total;
-               $result['actions'] = [
-                  'show'     => [
-                     'icon'    => 'fad fa-eye',
-                     'attr'    => [
-                        'class' => 'btn btn-sm btn-falcon-primary',
-                        'href'  => route('report.attendance.employee', ['employee' => $result['employee']['id'], 'start' => $current->format('Y-m-d')]),
-                     ],
-                     'type'    => 'a',
-                     'tooltip' => 'View',
-                  ],
-                  'download' => [
-                     'icon'    => 'fad fa-download',
-                     'attr'    => [
-                        'class' => 'btn btn-sm btn-falcon-success',
-                        'href'  => route('report.attendance.employee.download', ['employee' => $result['employee']['id'], 'start' => $current->format('Y-m-d')]),
-                     ],
-                     'type'    => 'a',
-                     'tooltip' => 'Download',
-                  ],
-               ];
+        //     $begin->modify('+1 day');
+        // }
+        // dump($absents);
 
-               return $result;
-            });
-         }
+        // $begin = clone($prev);
+        // $ebd = clone($next);
 
-         return $item;
-      });
+        return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self, $current, $workingDays) {
+            if ($key === 'rows') {
+                return collect($item)->map(function ($result, $i) use ($self, $current, $workingDays) {
+                    // dump($result);
+                    $result['employee_name'] = $self->createLink($result['employee_name'], route('employee.show', ['employee' => $result['employee']['id']]));
+                    // $total = $result['present'] + $result['sick'] + $result['business_trip'] + $result['permit'] + $result['annual_leave'];
+                    $total = $result['present'] + $result['sick'] + $result['business_trip'] + $result['permit'] + $result['annual_leave'];
+
+                    //    dump($total);
+                    $result['absent'] = $workingDays - $total;
+                    $result['actions'] = [
+                        'show'     => [
+                            'icon'    => 'fad fa-eye',
+                            'attr'    => [
+                                'class' => 'btn btn-sm btn-falcon-primary',
+                                'href'  => route('report.attendance.employee', ['employee' => $result['employee']['id'], 'start' => $current->format('Y-m-d')]),
+                            ],
+                            'type'    => 'a',
+                            'tooltip' => 'View',
+                        ],
+                        'download' => [
+                            'icon'    => 'fad fa-download',
+                            'attr'    => [
+                                'class' => 'btn btn-sm btn-falcon-success',
+                                'href'  => route('report.attendance.employee.download', ['employee' => $result['employee']['id'], 'start' => $current->format('Y-m-d')]),
+                            ],
+                            'type'    => 'a',
+                            'tooltip' => 'Download',
+                        ],
+                    ];
+
+                    return $result;
+                });
+            }
+
+            return $item;
+        });
+   }
+
+   public function reports1(AttendanceReportFormRequest $request, SettingsRepository $settingsRepository){
+    $self = $this;
+
+    list($offset, $limit, $sort, $order, $search, $date, $start, $end) = $this->getDefaultRequestParam($request);
+
    }
 
    public static function getWorkingMonth(SettingsRepository $settingsRepository, \DateTime $start)
@@ -371,7 +395,7 @@ class AttendanceViewModel extends ViewModelBase
 
       $cutoffDateStart = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value + 1, 2, '0', STR_PAD_LEFT);
       $cutoffDateEnd = str_pad($cutoff->value === 'end_of_month' ? 1 : (int)$cutoff->value, 2, '0', STR_PAD_LEFT);
-      
+
       $prev = new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateStart)));
       $next = (new \DateTime(date(sprintf("%s-%02d-%s", $year, $month, $cutoffDateEnd))))->add(new \DateInterval('P1M'));
       // dd($prev, $next);
@@ -383,26 +407,26 @@ class AttendanceViewModel extends ViewModelBase
 
    public function workingDays(SettingsRepository $settingsRepository, Request $request)
    {
-      $strStartDate = new \DateTime($request->get('start'));
+        $strStartDate = new \DateTime($request->get('start'));
 		// $monthStart = (int)$request['month']-1;
 		$monthStart = (int)$strStartDate->format('m');
 		// $monthEnd = (int)$request['month'];
-      // dump('start: '. $request->get('start'));
+        // dump('start: '. $request->get('start'));
 		// $startDate = date('Y') . "-" . ($monthStart < 10 ? "0" . $monthStart : $monthStart) . "-" . "25";
 		$startDate = $strStartDate->format('Y') . "-" . ($monthStart < 10 ? "0" . $monthStart : $monthStart) . "-" . "26";
 		$start = new \DateTime($startDate);
-      // [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new \DateTime());
-      [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, $start);
+        // [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, new \DateTime());
+        [$prev, $now, $next, $cutoffDateStart, $cutoffDateEnd] = AttendanceViewModel::getWorkingMonth($settingsRepository, $start);
 
-      $d = clone($prev);
-      $events = $this->nationalEvents(clone($d), clone($next));
-      $dates = [];
-      while ($d <= $next) {
-         if ($d->format('N') < 6 && !in_array($d, $events)) $dates[] = clone($d);
-         $d = $d->add(new \DateInterval('P1D'));
-      }
-      // dd($dates);
-      return $dates;
+        $d = clone($prev);
+        $events = $this->nationalEvents(clone($d), clone($next));
+        $dates = [];
+        while ($d <= $next) {
+            if ($d->format('N') < 6 && !in_array($d, $events)) $dates[] = clone($d);
+            $d = $d->add(new \DateInterval('P1D'));
+        }
+        // dd($dates);
+        return $dates;
    }
 
    private function nationalEvents(\DateTime $start, \DateTime $end)
@@ -465,8 +489,8 @@ class AttendanceViewModel extends ViewModelBase
 
       $results = $query->with(['employee:id,name', 'reason:id,name', 'annualLeave:id,no,year,used_at'])
          ->where('employee_id', '=', $employee->id)
-         ->paginate($limit, self::ALL_FIELDS, 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
-         ->toArray();
+         ->paginate($limit, self::ALL_FIELDS, 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)->toArray();
+
 
       return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
          if ($key === 'rows') {
@@ -794,12 +818,14 @@ class AttendanceViewModel extends ViewModelBase
       // }
       // // dd($dates);
       // return $dates;
-      $months = [$imonthprev, $imonthprev + 1];
-      $events = CalendarEvent::whereDate('start_date', '>=', $prev)
-         ->whereDate('start_date', '<=', $next)
-         ->where('recurring', '=', false)
-         ->get();
-		$recurringEvents = CalendarEvent::whereRaw(sprintf('MONTH(start_date) IN (%s)', implode(',', $months)))
+        $months = [$imonthprev, $imonthprev + 1];
+        $events = CalendarEvent::whereDate('start_date', '>=', $prev)
+            ->whereDate('start_date', '<=', $next)
+            ->where('recurring', '=', false)
+            ->get();
+        // dump($events);
+
+	    $recurringEvents = CalendarEvent::whereRaw(sprintf('MONTH(start_date) IN (%s)', implode(',', $months)))
 			->where('recurring', true)
 			->get()->pluck('start_date')->map(function ($date) use ($prev, $next) {
 				$eventDate = new \DateTime($date);
@@ -807,16 +833,22 @@ class AttendanceViewModel extends ViewModelBase
 
 				if ($eventDate >= $prev && $eventDate <= $next) {
 					return $eventDate->format('Y-m-d');
+					// return $eventDate;
 				}
 
 				return null;
-		})->filter();         
-      $events = $events->merge($recurringEvents);
+		})->filter();
+        // dump($recurringEvents);
+        if($events->count() == 0){
+            $events->append(['start_date' => $recurringEvents])->collect();
+        }else{
+            $events = $events->merge($recurringEvents);
+        }
 
       // $events = $events->merge(CalendarEvent::whereRaw(sprintf('MONTH(start_date) IN (%s)', implode(',', $months)))
       //    ->where('recurring', '=', true)
       //    ->get());
-      
+
       // for ($day = $start; $prev <= $next; $day++) {
       while ($prev <= $next) {
          $isWeekend = in_array($prev->format('w'), [0, 6]);
@@ -914,7 +946,7 @@ class AttendanceViewModel extends ViewModelBase
       }
       // dd($days);
       return $days;
-      
+
    }
 
    private function getCell(int $colChr, int $row)

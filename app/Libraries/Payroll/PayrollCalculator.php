@@ -514,6 +514,9 @@ class PayrollCalculator {
 		$this->result->allowances->mealAllowances = $this->employee->allowances->mealAllowances;
 		$this->result->allowances->otherAllowance = $this->employee->allowances->otherAllowance;
 
+        $fixedAlllowances = $this->employee->earnings->functionalAllowance + $this->employee->earnings->eidEarnings + $this->employee->allowances->transportAllowance +
+                            $this->employee->allowances->mealAllowances + $this->employee->allowances->otherAllowance;
+
 		if($this->employee->permanentStatus){
 			// if($this->employee->employeeGuarantee){
 				$this->employee->allowances->BPJSKesehatan = ceil(0.01 * ($this->result->earnings->base + $this->result->earnings->functionalAllowance));
@@ -530,14 +533,35 @@ class PayrollCalculator {
 				$this->result->earnings->attendance_premium = $this->employee->presences->rate * 1;
 			}
 
-			// Overtime
-			$this->result->earnings->overtime = ceil($this->employee->presences->overtimeHours * 2 * 1 / 173 * ($this->result->earnings->base));
+			// Overtime outbound
+			$this->result->earnings->overtimeOutbound = ceil($this->employee->presences->overtimeOutboundHours * 2 * 1 / 173 * ($this->result->earnings->base));
+
+            // Overtime inbound
+            // Berdasarkan PP No. 35 tahun 2021
+            if ($this->employee->presences->overtimeInboundHours > 1) {
+                // $overtime1stHours = 1 * 1.5 * 1 / 173 * $this->result->earnings->gross;
+                $overtime1stHours = ceil(1 * 1.5 * 1 / 173 * ($this->employee->earnings->base + $fixedAlllowances));
+                // $overtime2ndHours = ($this->employee->presences->overtimeInboundHours - 1) * 2 * 1 / 173 * $this->result->earnings->gross;
+                $overtime2ndHours = ceil(($this->employee->presences->overtimeInboundHours - 1) * 2 * 1 / 173 * ($this->employee->earnings->base + $fixedAlllowances));
+                $this->result->earnings->overtimeInbound = $overtime1stHours + $overtime2ndHours;
+            }
+            else {
+                // $this->result->earnings->overtime = $this->employee->presences->overtime * 1.5 * 1 / 173 * $this->result->earnings->gross;
+                $this->result->earnings->overtimeInbound = ceil($this->employee->presences->overtime * 1.5 * 1 / 173 * ($this->employee->earnings->base + $fixedAlllowances));
+            }
+
 
 			// Total income atau earnings
+			// $this->result->earnings->total = $this->result->earnings->base + $this->result->earnings->functionalAllowance +
+			// 								 $this->result ->earnings->eid + $this->result->allowances->transportAllowance +
+			// 								 $this->result->allowances->mealAllowances + $this->result->allowances->otherAllowance +
+			// 								 $this->result->earnings->attendance_premium + $this->result->earnings->overtime;
+
 			$this->result->earnings->total = $this->result->earnings->base + $this->result->earnings->functionalAllowance +
-											 $this->result ->earnings->eid + $this->result->allowances->transportAllowance +
+											 $this->result->earnings->eid + $this->result->allowances->transportAllowance +
 											 $this->result->allowances->mealAllowances + $this->result->allowances->otherAllowance +
-											 $this->result->earnings->attendance_premium + $this->result->earnings->overtime;
+											 $this->result->earnings->attendance_premium + $this->result->earnings->overtimeInbound +
+                                             $this->result->earnings->overtimeOutbound;
 
 			// BPJS by company
 			$this->company->allowances->BPJSKesehatan = ceil(0.04 * $this->result->earnings->base);

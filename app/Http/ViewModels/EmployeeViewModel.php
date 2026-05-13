@@ -340,8 +340,12 @@ class EmployeeViewModel extends ViewModelBase {
 			$begin->modify('+1 day');
 		}
 		// dump($totalWorksDayMonth);
-		$overtime = [];
-		$overtimes = 0;
+		$overtimeOutbound = [];
+		$overtimesOutbound = 0;
+
+		$overtimeInbound = [];
+		$overtimesInbound = 0;
+
 		$totalPresences = 0;
 		$totalAbsents = 0;
 		$totalWorkDays = 0;
@@ -354,37 +358,73 @@ class EmployeeViewModel extends ViewModelBase {
 		$totalCutAttSalary = 0;
 		// $totalHolidays = 0;
 		foreach ($attDetail as $detail) {
-			// if($detail['absent'] != null) dump($detail);
-			// dd($detail);
-			$totalPresences += !empty($detail['present']) ? 1 : 0;
-			$totalPresences += !empty($detail['business_trip']) ? 1 : 0;
-			$totalWorkDays += ($detail['present'] != null ? 1 : 0) + ($detail['sick'] != null ? 1 : 0) + ($detail['business_trip'] != null ? 1 : 0) + ($detail['permit'] != null ? 1 : 0) + ($detail['annual_leave'] != null ? 1 : 0);
-			$totalSick += !empty($detail['sick']) ? 1 : 0;
-			$totalPermit += !empty($detail['permit'] ? 1 : 0);
-			$totalBusinessTrip += !empty($detail['business_trip'] ? 1 : 0);
-			$totalCutAttPremium += !empty($detail['cut_att_premium']) ? 1 : 0;
-			$totalCutAttSalary += !empty($detail['cut_att_salary']) ? 1 : 0;
-			$totalLeaves += !empty($detail['annual_leave']) ? 1 : 0;
-			$totalAbsents += !empty($detail['absent']) ? 1 : 0;
-			// $totalHolidays += ($detail['weekend'] === true || $detail['total'] === 0 ? 1 : 0);
-			// if($detail['overtime'] != null) $overtimes++;
+            // dump($detail);
+			$totalPresences += $detail['present'] != null ? 1 : 0;
 
-			// if (!empty($detail['total'])) {
+			$totalPresences += $detail['business_trip'] != null ? 1 : 0;
+
+			$totalWorkDays += ($detail['present'] != null ? 1 : 0) + ($detail['sick'] != null ? 1 : 0) + ($detail['business_trip'] != null ? 1 : 0) + ($detail['permit'] != null ? 1 : 0) + ($detail['annual_leave'] != null ? 1 : 0);
+
+			$totalSick += $detail['sick'] != null ? 1 : 0;
+
+			$totalPermit += $detail['permit'] != null ? 1 : 0;
+
+			$totalBusinessTrip += $detail['business_trip'] != null ? 1 : 0;
+
+			$totalCutAttPremium += $detail['cut_att_premium'] != null ? (int)$detail['cut_att_premium'] : 0;
+
+			$totalCutAttSalary += $detail['cut_att_salary'] != null ? (int)$detail['cut_att_salary'] : 0;
+
+			$totalLeaves += $detail['annual_leave'] != null ? 1 : 0;
+
+			$totalAbsents += $detail['absent'] != null ? 1 : 0;
+
 			if ($detail['total'] != 0) {
 				if($detail['overtime_confirmed'] == 1){
-					$overtime[] = [
-						'at'       => DateTime::createFromFormat('l, d F Y', $detail['date'])->format('Y-m-d'),
-						'start'    => $detail['start'],
-						'end'      => $detail['end'],
-						'overtime' => $detail['overtime'],
-					];
-					if (Carbon::parse($detail['date'])->isWeekend()) ++$overtimes;
+                    if(Carbon::parse($detail['date'])->isWeekend()){
+                        array_push($overtimeOutbound, [
+                            'at'       => DateTime::createFromFormat('l, d F Y', $detail['date'])->format('Y-m-d'),
+                            'start'    => $detail['start'],
+                            'end'      => $detail['end'],
+                            'overtime_outbound' => $detail['overtime'],
+                        ]);
+                        // $overtimeOutbound[] = [
+                        //     'at'       => DateTime::createFromFormat('l, d F Y', $detail['date'])->format('Y-m-d'),
+                        //     'start'    => $detail['start'],
+                        //     'end'      => $detail['end'],
+                        //     'overtime_outbound' => $detail['overtime'],
+                        // ];
+                        ++$overtimesOutbound;
+                    }else{
+                        array_push($overtimeInbound, [
+                            'at'       => DateTime::createFromFormat('l, d F Y', $detail['date'])->format('Y-m-d'),
+                            'start'    => $detail['start'],
+                            'end'      => $detail['end'],
+                            'overtime_inbound' => $detail['overtime'],
+                        ]);
+						// $overtimeInbound[] = [
+						// 	'at'       => DateTime::createFromFormat('l, d F Y', $detail['date'])->format('Y-m-d'),
+						// 	'start'    => $detail['start'],
+						// 	'end'      => $detail['end'],
+						// 	'overtime_inbound' => $detail['overtime'],
+					    // ];
+                        ++$overtimesInbound;
+                    }
+					// if (Carbon::parse($detail['date'])->isWeekend()) ++$overtimes;
 
 				}
 			}
-		}
+
+        }
+        // dump($overtimeInbound);
+
 		$totalPermits = $totalSick + $totalPermit + $totalBusinessTrip;
-		$totalOvertime = $this->totalHours($overtime);
+
+		// $totalOvertimeOutbound = $this->totalHours($overtimeOutbound);
+		$totalOvertimeOutbound = $this->totalOvertimeOutboundHours($overtimeOutbound);
+
+		// $totalOvertimeInbound = $this->totalHours($overtimeInbound);
+		$totalOvertimeInbound = $this->totalOvertimeInboundHours($overtimeInbound);
 
 		// cari izin potong gaji
 		// $permitCutSalary = Permit::where('id_employee', '=', $employee->id)->get()->count();
@@ -421,19 +461,22 @@ class EmployeeViewModel extends ViewModelBase {
 		// Gaji pokok adjustment = gaji pokok / workDays x (workDays + cuti - izin)
 
 		// if($employee->adjustment_salary == 1){
-		if($totalCutAttSalary > 0){
+        if($totalCutAttSalary > 0){
 
-			// $totalAbsentAndLeave = $totalAbsent + $totalLeave;
+            // $totalAbsentAndLeave = $totalAbsent + $totalLeave;
 
-			// dump('baseSalary: ' . $payrollCalculator->employee->earnings->base);
-			// dump('workDays: ' . $totalWorkDays);
-			// dump('permits: '. $totalPermits);
-			// dump('sick: '. $totalSick);
-			// dump('absent: ' . $totalAbsent);
-			// dump('leave: ' . $totalLeave);
+            // dump('baseSalary: ' . $payrollCalculator->employee->earnings->base);
+            // dump('workDays: ' . $totalWorkDays);
+            // dump('permits: '. $totalPermits);
+            // dump('sick: '. $totalSick);
+            // dump('absent: ' . $totalAbsent);
+            // dump('leave: ' . $totalLeave);
+            $totalWorkDays = $totalPresences + $totalBusinessTrip + $totalLeaves + $totalSick + $totalPermit;
 
-			// $baseSalaryAdjustment = ceil(($payrollCalculator->employee->earnings->base / $totalWorkDays) * ($totalWorkDays + $totalPermits + $totalSick - $totalAbsentAndLeave));
-			$baseSalaryAdjustment = ceil(($payrollCalculator->employee->earnings->base / $totalWorkDays) * ($totalWorkDays + $totalLeaves -($totalPermits + $totalAbsents)));
+
+            // $baseSalaryAdjustment = ceil(($payrollCalculator->employee->earnings->base / $totalWorkDays) * ($totalWorkDays + $totalPermits + $totalSick - $totalAbsentAndLeave));
+            // $baseSalaryAdjustment = ceil(($payrollCalculator->employee->earnings->base / $totalWorkDays) * ($totalWorkDays + $totalLeaves -($totalPermits + $totalAbsents)));
+            $baseSalaryAdjustment = ceil(($payrollCalculator->employee->earnings->base / $totalWorkDays) * ($totalWorkDays-($totalPermits + $totalAbsents)));
 
 			// dump('baseSalaryAdjustment: ' . $baseSalaryAdjustment);
 
@@ -442,15 +485,18 @@ class EmployeeViewModel extends ViewModelBase {
 			$payrollCalculator->employee->earnings->baseSalaryAdjustment = $payrollCalculator->employee->earnings->base;
 		}
 
-		$payrollCalculator->employee->presences->overtimeHours = $totalOvertime['hours'] ?? 0;           // perhitungan jumlah lembur dalam jam
+        // $payrollCalculator->employee->presences->workDays = $totalWorkDays;                    // jumlah hari masuk kerja
+        // dump($totalWorkDays);
+		// $payrollCalculator->employee->presences->overtimeHours = $totalOvertime['hours'] ?? 0;           // perhitungan jumlah lembur dalam jam
+		$payrollCalculator->employee->presences->overtimeOutboundHours = $totalOvertimeOutbound['hours'] ?? 0;           // perhitungan jumlah lembur outbound dalam jam
+		$payrollCalculator->employee->presences->overtimeInboundHours = $totalOvertimeInbound['hours'] ?? 0;           // perhitungan jumlah lembur inbound dalam jam
+
 		// dd($totalOvertime['hours']);
 
 		// dd('workingDays: '. $workingDays . ' totalWorkDays: ' . $totalWorkDays);
 
 		$payrollCalculator->employee->presences->absentDays = $totalAbsents; // perhitungan jumlah alpha
 		$payrollCalculator->employee->presences->rate = $employee->attendance_premium ?? 0;
-
-
 
 		// $payrollCalculator->employee->permanentStatus = $employee->permanent_status;
 		// $payrollCalculator->employee->maritalStatus = $employee->marital_status;
@@ -462,7 +508,8 @@ class EmployeeViewModel extends ViewModelBase {
 
 		// $payrollCalculator->employee->presences->workDays = $att->present ?? 0;                    // jumlah hari masuk kerja
 		// $payrollCalculator->employee->presences->overtimeDays = $overtimes ?? 0;           // perhitungan jumlah lembur dalam satuan jam
-		$payrollCalculator->employee->presences->overtimeDays = count($totalOvertime) ?? 0;           // perhitungan jumlah lembur dalam satuan jam
+		// $payrollCalculator->employee->presences->overtimeDays = count($totalOvertime) ?? 0;           // perhitungan jumlah lembur dalam satuan jam
+		$payrollCalculator->employee->presences->overtimeDays = count($totalOvertimeOutbound + $totalOvertimeInbound) ?? 0;           // perhitungan jumlah lembur dalam satuan jam
 		// $payrollCalculator->employee->presences->overtime = $totalovertime['hours'] ?? 0;           // perhitungan jumlah lembur dalam satuan jam
 		// $payrollCalculator->employee->presences->overtimeHours = $totalovertime['hours'] ?? 0;
 		// $payrollCalculator->employee->presences->overtimeMinutes = $totalovertime['minutes'] ?? 0;
@@ -726,6 +773,7 @@ class EmployeeViewModel extends ViewModelBase {
 		$events = $this->nationalEvents(clone($prev), clone($next));
 		// $eventsCollection = collect($events);
 		// dd($eventsCollection);
+        // dump($results['data']);
 		while ($prev <= $next) {
 			$isWeekend = in_array($prev->format('w'), [0, 6]);
 			$event = collect($events)->filter(function ($item) use ($prev) {
@@ -737,7 +785,8 @@ class EmployeeViewModel extends ViewModelBase {
 				// dump($item);
 				// dump($prev->format('Y-m-d') == (new DateTime($item['at']))->format('Y-m-d'));
 				return $prev->format('Y-m-d') == (new DateTime($item['at']))->format('Y-m-d');
-			})->first();
+			})->last();
+            // dump($data);
 			if (empty($data) && !($event || $isWeekend)) {
 			// if (empty($data)) {
 				$data = [];
@@ -769,7 +818,12 @@ class EmployeeViewModel extends ViewModelBase {
 				'overtime' => !empty($data) ? $data['overtime'] : null,
 				'overtime_confirmed' => !empty($data) ? ($data['overtime_confirmed'] ?? false) : null,
 				'cut_att_premium' => !empty($data) ? ($data['cut_att_premium'] ?? false) : null,
+
+				// 'cut_att_premium' => !empty($data) ? $data['cut_att_premium'] : null,
+
 				'cut_att_salary' => !empty($data) ? ($data['cut_att_salary'] ?? false) : null,
+				// 'cut_att_salary' => !empty($data) ? $data['cut_att_salary'] : null,
+
 				'total'    => 0,
 				'remark'   => $detail,
 				// 'event'    => $event ? true : false,
@@ -818,10 +872,74 @@ class EmployeeViewModel extends ViewModelBase {
 			// if (!empty($val['overtime'])) {
 			if (!empty($val['start']) && !empty($val['end'])) {
 				// $hours1 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['end']));
-				$hours1 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['start']));
+				$hours1 = new DateTime(sprintf("%s %s", (new DateTime($val['at']))->format('Y-m-d'), $val['start']));
 
 				// $hours2 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['overtime']));
-				$hours2 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['end']));
+				$hours2 = new DateTime(sprintf("%s %s", (new DateTime($val['at']))->format('Y-m-d'), $val['end']));
+				$overtime = $hours1->diff($hours2)->format('%H:%I');
+
+				$explodeHoursMins = explode(':', $overtime);
+
+				$hours += (int)$explodeHoursMins[0] > 8 ? 8 : (int)$explodeHoursMins[0];
+				// $hours = $hours > 8 ? 8 : $hours;
+				// $totalHours += $hours;
+				// $mins += (int)$explodeHoursMins[1];
+			}
+		}
+
+		$minToHours = date('H:i', mktime(0, $mins)); //Calculate Hours From Minutes
+		$explodeMinToHours = explode(':', $minToHours);
+		$hours += (int)$explodeMinToHours[0];
+		$finalMinutes = (int)$explodeMinToHours[1];
+
+		return ['hours' => (int)$hours, 'minutes' => (int)$finalMinutes];
+	}
+
+	private function totalOvertimeInboundHours(array $hourMin) {
+		$hours = 0;
+		$mins = 0;
+		// $totalHours = 0;
+
+		foreach ($hourMin as $val) {
+			// if (!empty($val['overtime'])) {
+			if (!empty($val['start']) && !empty($val['end'])) {
+				// $hours1 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['end']));
+				$hours1 = new DateTime(sprintf("%s %s", (new DateTime($val['at']))->format('Y-m-d'), $val['end']));
+
+				// $hours2 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['overtime']));
+				$hours2 = new DateTime(sprintf("%s %s", (new DateTime($val['at']))->format('Y-m-d'), $val['overtime_inbound']));
+				$overtime = $hours1->diff($hours2)->format('%H:%I');
+
+				$explodeHoursMins = explode(':', $overtime);
+
+				$hours += (int)$explodeHoursMins[0] > 8 ? 8 : (int)$explodeHoursMins[0];
+				// $hours = $hours > 8 ? 8 : $hours;
+				// $totalHours += $hours;
+				// $mins += (int)$explodeHoursMins[1];
+			}
+		}
+
+		$minToHours = date('H:i', mktime(0, $mins)); //Calculate Hours From Minutes
+		$explodeMinToHours = explode(':', $minToHours);
+		$hours += (int)$explodeMinToHours[0];
+		$finalMinutes = (int)$explodeMinToHours[1];
+
+		return ['hours' => (int)$hours, 'minutes' => (int)$finalMinutes];
+	}
+
+	private function totalOvertimeOutboundHours(array $hourMin) {
+		$hours = 0;
+		$mins = 0;
+		// $totalHours = 0;
+
+		foreach ($hourMin as $val) {
+			// if (!empty($val['overtime'])) {
+			if (!empty($val['start']) && !empty($val['end'])) {
+				// $hours1 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['end']));
+				$hours1 = new DateTime(sprintf("%s %s", (new DateTime($val['at']))->format('Y-m-d'), $val['end']));
+
+				// $hours2 = new \DateTime(sprintf("%s %s", (new \DateTime($val['at']))->format('Y-m-d'), $val['overtime']));
+				$hours2 = new DateTime(sprintf("%s %s", (new DateTime($val['at']))->format('Y-m-d'), $val['overtime_outbound']));
 				$overtime = $hours1->diff($hours2)->format('%H:%I');
 
 				$explodeHoursMins = explode(':', $overtime);
