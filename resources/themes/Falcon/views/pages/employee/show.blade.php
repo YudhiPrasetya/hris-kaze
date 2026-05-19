@@ -113,7 +113,8 @@
 												<div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label">Basic Salary</label>
 													<div class="col-sm-7 col-form-label">
-														{!! $moneyFormat($payroll->employee->earnings->baseSalaryAdjustment, $model->currencyCode()) !!}
+														{{-- {!! $moneyFormat($payroll->employee->earnings->baseSalaryAdjustment, $model->currencyCode()) !!} --}}
+                                                        {!! $moneyFormat($model->basic_salary, $model->currencyCode()) !!}
 													</div>
 												</div>
 												<div class="form-group row mb-0">
