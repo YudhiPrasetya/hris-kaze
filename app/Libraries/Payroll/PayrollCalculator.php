@@ -564,7 +564,7 @@ class PayrollCalculator {
                                              $this->result->earnings->overtimeOutbound;
 
 			// BPJS by company
-			$this->company->allowances->BPJSKesehatan = ceil(0.04 * $this->result->earnings->base);
+			$this->company->allowances->BPJSKesehatan = ceil(0.04 * ($this->result->earnings->base + $this->result->earnings->functionalAllowance));
 
 			// JKK by company
 			$this->company->allowances->JKK = ceil(0.0024 * $this->result->earnings->base);
