@@ -79,6 +79,30 @@ class LeaveViewModel extends ViewModelBase{
         return redirect(route('leave.index'));
 	}
 
+    public function cancelLeave(Request $request){
+        $leaveId = (int)$request->leave;
+        $employeeId = (int)$request->employee;
+        $start = new \DateTime($request->start);
+        $end = new \DateTime($request->end);
+
+        if(Leave::find($leaveId)->forceDelete()){
+            while($start <= $end){
+                $att = Attendance::where('employee_id', '=', $employeeId)->where('at', '=', $start);
+                if($att){
+                    $att->forceDelete();
+                }
+                $start->modify('+ 1 day');
+            }
+            $request->session()->flash('message', "Successfully cancel <strong>Leave</strong>.");
+            $request->session()->flash('alert', "success");
+            // return redirect(route('permit.index'));
+        }else{
+            $request->session()->flash('message', "Failed to cancel permit with id <strong>{$leaveId}</strong>");
+            $request->session()->flash('alert', "danger");
+        }
+        redirect('/leave')->send();
+    }
+
 	public function list(Request $request, ...$columns): Collection {
 		$self = $this;
 		list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
@@ -97,7 +121,30 @@ class LeaveViewModel extends ViewModelBase{
                     $result['start'] = $result['start']->format('Y-m-d');
                     $result['end'] = $result['end']->format('Y-m-d');
 
-					return $self->addDefaultListActions($result, 'edit', 'destroy');
+                    $action = [
+                        'cancelLeave' => [
+                        'icon' => 'fad fa-ban',
+                        'attr' => [
+                            'class' => 'btn btn-sm btn-falcon-warning',
+                            'target' => '_self',
+                            'href' => route('leave.cancel', [
+                                'leave' => $result['id'],
+                                'employee' => $result['id_employee'],
+                                'start' => $result['start'],
+                                'end' =>  $result['end']
+                                // 'params' => $params
+                            ]),
+                        ],
+                        'type' => 'a',
+                        'tooltip' => 'Cancel leave'
+                    ]];
+
+					// return $self->addDefaultListActions($result, 'edit', 'destroy');
+
+                    $result['actions'] = $action;
+                    return $result;
+
+					// return $self->addDefaultListActions($result, 'edit', 'destroy');
 				});
 			}
 
@@ -122,7 +169,7 @@ class LeaveViewModel extends ViewModelBase{
 			->where('start_date', '<=', $endDate)
 			->where('recurring', false)
 			->get()->pluck('start_date');
-		
+
 		$recurringEvents = CalendarEvent::whereRaw(sprintf('MONTH(start_date) IN (%s)', implode(',', $months)))
 			->where('recurring', true)
 			->get()->pluck('start_date')->map(function ($date) use ($startDate, $endDate) {
@@ -145,7 +192,7 @@ class LeaveViewModel extends ViewModelBase{
 		$p = $fields->toArray();
 		$leave = new Leave($p);
 		$ret = $leave->save();
-		
+
 		// Add leave attendaces
 		$dateStartLeave = new \DateTime($fields->get('start'));
 		$dateEndLeave = new \DateTime($fields->get('end'));
@@ -188,10 +235,10 @@ class LeaveViewModel extends ViewModelBase{
 		// 	// 		'at' => $dateLeave->modify('+'.$x.' day')
 		// 	// 	]);
 
-				
+
 		// 	// 	$attLeave->save();
 		// 	// }
-			
+
 		// }
 		return $ret;
 	}

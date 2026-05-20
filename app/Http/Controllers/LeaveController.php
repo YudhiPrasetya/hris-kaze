@@ -52,6 +52,10 @@ class LeaveController extends Controller{
         return $this->leaveViewModel->list($request);
     }
 
+    public function cancelLeave(Request $request){
+        $this->leaveViewModel->cancelLeave($request);
+    }
+
 	/**
 	 * Store a newly created resource in storage.
 	 *

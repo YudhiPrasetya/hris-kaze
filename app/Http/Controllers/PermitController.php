@@ -55,6 +55,12 @@ class PermitController extends Controller{
         return $this->permitViewModel->list($request);
     }
 
+    public function cancelPermit(Request $request){
+        // $this->permitViewModel->setRequest($request);
+        // dd($request->permit);
+        $this->permitViewModel->cancelPermit($request);
+    }
+
 	/**
 	 * Store a newly created resource in storage.
 	 *

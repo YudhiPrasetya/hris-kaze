@@ -184,9 +184,12 @@ Route::domain(config('app.domain'))->group(function () {
 
       // Permit
       Route::resource('permit', PermitController::class);
+    //   Route::get('/permit/{ids}/{dateRange}/cancel', [PermitController::class, 'cancelPermit'])->name('permit.cancel');
+      Route::get('/permit/{permit}/{employee}/{start}/{end}/cancel', [PermitController::class, 'cancelPermit'])->name('permit.cancel');
 
       // Leave
       Route::resource('leave', LeaveController::class);
+      Route::get('/leave/{leave}/{employee}/{start}/{end}/cancel', [LeaveController::class, 'cancelLeave'])->name('leave.cancel');
 
       // Overtime
       Route::resource('ot', OvertimeController::class);
@@ -242,7 +245,7 @@ Route::domain(config('app.domain'))->group(function () {
 
       // Attendance overtime
       Route::get('/api/v1/attendance/overtime', [AttendanceController::class, 'listOvertime'])->name('api.attendance.overtime');
-      
+
       Route::get('/api/v1/attendance/employee/{employee}', [AttendanceController::class, 'byEmployee'])->name('api.attendance.employee');
       Route::get('/api/v1/attendance/reports', [AttendanceController::class, 'reports'])->name('api.attendance.report');
       Route::get('/api/v1/attendance/reports/monthly', [AttendanceController::class, 'reportsMonthly'])->name('api.attendance.report.monthly');

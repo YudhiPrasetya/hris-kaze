@@ -23,6 +23,8 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\CalendarEvent;
 class PermitViewModel extends ViewModelBase{
+    private ?Request $request;
+
 	/**
 	 * PermitViewModel constructor.
 	 *
@@ -37,6 +39,7 @@ class PermitViewModel extends ViewModelBase{
 		$this->routeBasename = 'permit';
 		$this->routeKey = 'permit';
 		$this->form = $this->formBuilder->create(PermitForm::class);
+        $this->request = null;
 	}
 
 	/**
@@ -85,6 +88,35 @@ class PermitViewModel extends ViewModelBase{
         return redirect(route('permit.index'));
 	}
 
+    public function cancelPermit(Request $request){
+        $permitId = (int)$request->permit;
+        $employeeId = (int)$request->employee;
+        $start = new DateTime($request->start);
+        $end = new DateTime($request->end);
+
+        if(Permit::find($permitId)->forceDelete()){
+            while($start <= $end){
+                $att = Attendance::where('employee_id', '=', $employeeId)->where('at', '=', $start);
+                if($att){
+                    $att->forceDelete();
+                }
+                $start->modify('+ 1 day');
+            }
+            $request->session()->flash('message', "Successfully cancel <strong>Permit</strong>.");
+            $request->session()->flash('alert', "success");
+            // return redirect(route('permit.index'));
+        }else{
+            $request->session()->flash('message', "Failed to cancel permit with id <strong>{$permitId}</strong>");
+            $request->session()->flash('alert', "danger");
+        }
+        redirect('/permit')->send();
+        // exit();
+
+        // return redirect(route('permit.index'));
+        // return redirect()->back();
+
+    }
+
 	public function list(Request $request, ...$columns): Collection {
 		$self = $this;
 		list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
@@ -111,12 +143,38 @@ class PermitViewModel extends ViewModelBase{
 							$result['permit_type'] = "Permit (Izin)";
 							break;
 					}
-
                     $result['permit_date'] = $result['permit_date']->format('Y-m-d');
                     $result['start'] = $result['start']->format('Y-m-d');
                     $result['end'] = $result['end']->format('Y-m-d');
 
-					return $self->addDefaultListActions($result, 'edit', 'destroy');
+                    // $cancelParams = [
+                    //     'ids' => `{$result['id']} - {$result['id_employee']}`,
+                    //     'dateRange' => `{$result['start']} - {$result['end']}`
+                    // ];
+                    // dump($result);
+                    // $params = (string)$result['id'] . "-" . (string)$result['id_employee'] . "-" . (new DateTime($result['start']))->format('Y/m/d') . "-". (new DateTime($result['end']))->format('Y/m/d');
+
+                    $action = [
+                        'cancelPermit' => [
+                        'icon' => 'fad fa-ban',
+                        'attr' => [
+                            'class' => 'btn btn-sm btn-falcon-warning',
+                            'target' => '_self',
+                            'href' => route('permit.cancel', [
+                                'permit' => $result['id'],
+                                'employee' => $result['id_employee'],
+                                'start' => $result['start'],
+                                'end' =>  $result['end']
+                                // 'params' => $params
+                            ]),
+                        ],
+                        'type' => 'a',
+                        'tooltip' => 'Cancel permit'
+                    ]];
+
+					// return $self->addDefaultListActions($result, 'edit', 'destroy');
+                    $result['actions'] = $action;
+                    return $result;
 				});
 			}
 
@@ -137,12 +195,12 @@ class PermitViewModel extends ViewModelBase{
 
 		$fields->offsetSet('cut_att_premium', $this->toBool($fields->get('cut_att_premium')));
 		$fields->offsetSet('cut_att_salary', $this->toBool($fields->get('cut_att_salary')));
-		
+
 		$p = $fields->toArray();
 		// dd($p);
 		$permit = new Permit($p);
 		$ret = $permit->save();
-		
+
 		// Add sick, businnes trip or permit attendances
 		$employeeId = $fields->get('id_employee');
 		$permitType = $fields->get('permit_type');
@@ -182,7 +240,7 @@ class PermitViewModel extends ViewModelBase{
 		// 		'at' => $datePermit->modify('+'.$x.' day')
 		// 	]);
 		// 	$attPermit->save();
-		// }		
+		// }
 
 		return $ret ? $permit : false;
 	}
@@ -234,6 +292,11 @@ class PermitViewModel extends ViewModelBase{
 		                          ->get()->map($map)->toArray();
 
 		return array_merge($event, $recurring);
-	}	
+	}
+
+    public function setRequest(Request $request){
+        $this->request = $request;
+        return $this;
+    }
 
 }
