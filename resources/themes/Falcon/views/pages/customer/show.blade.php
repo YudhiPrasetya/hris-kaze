@@ -36,6 +36,10 @@
 								<div class="fancy-tab-contents mt-3">
 									<div class="tab-content fancy-tab-content active">
 										<div class="form-group">
+											<h6 class="text-600 control-label mb-1">Customer No.</h6>
+											<span id="name" class="form-control-plaintext text-1000 fs-0">{{ $model->customer_no }}</span>
+										</div>
+										<div class="form-group">
 											<h6 class="text-600 control-label mb-1">Name</h6>
 											<span id="name" class="form-control-plaintext text-1000 fs-0">{{ $model->name }}</span>
 										</div>
@@ -44,8 +48,12 @@
 											<span id="name" class="form-control-plaintext text-1000 fs-0">{!! $model->mailto() !!}</span>
 										</div>
 										<div class="form-group">
-											<h6 class="text-600 control-label mb-1">Address</h6>
-											<span id="name" class="form-control-plaintext text-1000 fs-0">{{ $model->address() }}</span>
+											<h6 class="text-600 control-label mb-1">Phone</h6>
+											<span id="name" class="form-control-plaintext text-1000 fs-0">{{ $model->phone }}</span>
+										</div>
+										<div class="form-group">
+											<h6 class="text-600 control-label mb-1">Contact Name</h6>
+											<span id="name" class="form-control-plaintext text-1000 fs-0">{{ $model->contact_name }}</span>
 										</div>
 									</div>
 									<div class="fancy-tab-content" style="margin-top: -1rem">

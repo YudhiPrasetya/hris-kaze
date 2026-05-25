@@ -8,9 +8,11 @@
 @section('api_list_url', route('api.customer'))
 
 @section('columns')
+	<th scope="col" data-class="va-baseline" data-field="customer_no" data-sortable="true">Customer No.</th>
 	<th scope="col" data-class="va-baseline" data-field="name" data-sortable="true">Name</th>
 	<th scope="col" data-class="va-baseline" data-field="email" data-sortable="true">Email</th>
-	<th scope="col" data-class="va-baseline" data-field="country.name" data-sortable="true">Country</th>
-	<th scope="col" data-class="va-baseline" data-field="state.name" data-sortable="true">State</th>
-	<th scope="col" data-class="va-baseline" data-field="city.name" data-sortable="true">City</th>
+	<th scope="col" data-class="va-baseline" data-field="phone" data-sortable="true">Phone</th>
+	<th scope="col" data-class="va-baseline" data-field="contact_name" data-sortable="true">Contact Name</th>
+	<th scope="col" data-class="va-baseline" data-field="is_active" data-sortable="true">Suspended</th>
+
 @endsection

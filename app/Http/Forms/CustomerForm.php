@@ -14,22 +14,27 @@ use App\Models\World\Village;
 class CustomerForm extends Form {
 	public function buildForm() {
 		$this
-			->add('country_id',
-				Field::ENTITY,
-				[
-					'class'    => Country::class,
-					'property' => 'name',
-					'label'    => 'Country',
-					'attr'     => ['data-placeholder' => "Select a country"],
-				])
-			->add('state_id', Field::SELECT, ['label' => 'State', 'attr' => ['data-placeholder' => "Select a state"]])
-			->add('city_id', Field::SELECT, ['label' => 'City', 'attr' => ['data-placeholder' => "Select a city"]])
-			->add('district_id', Field::SELECT, ['label' => 'District', 'attr' => ['data-placeholder' => "Select a district"]])
-			->add('village_id', Field::SELECT, ['label' => 'Village', 'attr' => ['data-placeholder' => "Select a village"]])
+            ->add('customer_no', Field::TEXT)
+			// ->add('country_id',
+			// 	Field::ENTITY,
+			// 	[
+			// 		'class'    => Country::class,
+			// 		'property' => 'name',
+			// 		'label'    => 'Country',
+			// 		'attr'     => ['data-placeholder' => "Select a country"],
+			// 	])
+			// ->add('state_id', Field::SELECT, ['label' => 'State', 'attr' => ['data-placeholder' => "Select a state"]])
+			// ->add('city_id', Field::SELECT, ['label' => 'City', 'attr' => ['data-placeholder' => "Select a city"]])
+			// ->add('district_id', Field::SELECT, ['label' => 'District', 'attr' => ['data-placeholder' => "Select a district"]])
+			// ->add('village_id', Field::SELECT, ['label' => 'Village', 'attr' => ['data-placeholder' => "Select a village"]])
 			->add('name', Field::TEXT)
-			->add('postal_code', Field::TEXT)
+			// ->add('postal_code', Field::TEXT)
 			->add('email', Field::EMAIL)
-			->add('street', Field::TEXTAREA)
+            ->add('phone', Field::TEXT)
+            ->add('contact_name', Field::TEXT)
+            ->add('is_active', Field::CHECKBOX)
+
+			// ->add('street', Field::TEXTAREA)
 			->add('submit',
 				Field::BUTTON_SUBMIT,
 				[

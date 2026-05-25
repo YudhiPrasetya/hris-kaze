@@ -75,9 +75,10 @@ class CustomerViewModel extends ViewModelBase {
 		return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
 			if ($key == 'rows') {
 				return collect($item)->map(function ($result, $i) use ($self) {
-					$result['email'] = '<a href="mailto:'.$result['email'].'">'.$result['email'].'</a>';
+					$result['email'] != null ? '<a href="mailto:'.$result['email'].'">'.$result['email'].'</a>' : "-";
+                    $result['is_active'] = $result['is_active'] == 1 ? 'Active' : 'Not Active';
 
-					return $self->addDefaultListActions($result);
+					return $self->addDefaultListActions($result, 'destroy');
 				});
 			}
 

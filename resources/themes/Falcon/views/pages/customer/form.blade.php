@@ -41,15 +41,19 @@
 							<div class="fancy-tab-content active">
 								<x-bootstrap::row>
 									<x-bootstrap::column>
+										{!! form_row($form->customer_no) !!}
 										{!! form_row($form->name) !!}
 										{!! form_row($form->email) !!}
-										{!! form_row($form->country_id, ['attr' => ['data-value' => $model->country_id ? $model->country_id : 'ID']]) !!}
+										{!! form_row($form->phone) !!}
+										{!! form_row($form->contact_name) !!}
+										{!! form_row($form->is_active) !!}
+										{{-- {!! form_row($form->country_id, ['attr' => ['data-value' => $model->country_id ? $model->country_id : 'ID']]) !!}
 										{!! form_row($form->state_id, ['attr' => ['data-value' => $model->state_id]]) !!}
 										{!! form_row($form->city_id, ['attr' => ['data-value' => $model->city_id]]) !!}
 										{!! form_row($form->district_id, ['attr' => ['data-value' => $model->district_id]]) !!}
 										{!! form_row($form->village_id, ['attr' => ['data-value' => $model->village_id]]) !!}
 										{!! form_row($form->postal_code) !!}
-										{!! form_row($form->street) !!}
+										{!! form_row($form->street) !!} --}}
 									</x-bootstrap::column>
 								</x-bootstrap::row>
 							</div>

@@ -22,15 +22,13 @@ class Customer extends ModelBase {
 
 
 	protected $fillable = [
+        'customer_no',
 		'name',
 		'email',
-		'country_id',
-		'state_id',
-		'city_id',
-		'district_id',
-		'village_id',
-		'postal_code',
-		'street',
+        'phone',
+        'contact_name',
+        'is_active'
+
 	];
 
 	protected $casts = [
