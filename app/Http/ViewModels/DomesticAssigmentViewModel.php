@@ -90,8 +90,8 @@ class DomesticAssigmentViewModel extends ViewModelBase{
             $empYears = $empEffectiveDate->diffInYears($dateNow);
 
             $domesticAssignmentMeal = DomesticAssignmentMeal::where('position_id', '=',$dataEmployee->position_id)
-                                                              ->where('year_employee', '=', $empYears)->first();
-            dd($domesticAssignmentMeal);
+                                                              ->where('year_employee', '=', $empYears)->first()->get();
+            // dd($domesticAssignmentMeal);
 
             $checkInDate = Carbon::parse($preService['check_in_date']);
 
