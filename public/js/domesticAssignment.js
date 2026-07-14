@@ -492,16 +492,16 @@ $(function(){
         let $breakfast = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][breakfast]" style="cursor: pointer; width: 25px; height: 25px;">');
         // console.log('now:', now.toISOString().split('T')[0]);
         // console.log('from:', new Date(from + day).toISOString().split('T')[0]);
-        $breakfast.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
+        // $breakfast.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
 
         let $startJob = $('<input type="text" class="p-2 time24h text-center w-20" style="width: 80px;" placeholder="HH:MM" name="duringservice['+count+'][start_job]" style="cursor: pointer;" />');
-        $startJob.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
+        // $startJob.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
 
         let $lunch = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][lunch]" style="cursor: pointer; width: 25px; height: 25px;">');
-        $lunch.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
+        // $lunch.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
 
         let $finishJob = $('<input type="text" class="p-2 time24h text-center w-20" style="width: 80px;" placeholder="HH:MM" name="duringservice['+count+'][finish_job]" style="cursor: pointer;" />');
-        $finishJob.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
+        // $finishJob.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
 
         let $dinner = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][dinner]" style="cursor: pointer; width: 25px; height: 25px;">');
         $dinner.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
