@@ -50,7 +50,7 @@ class ReasonForLeave extends ModelBase{
      * @var array
      */
     protected $fillable = [
-        'name', 'number_of_days', 'attachment_requirement'
+        'name', 'number_of_days', 'cut_leave_allowance', 'attachment_requirement'
     ];
 
     /**

@@ -18,11 +18,11 @@
 						<x-bootstrap::column breakpoint=" EXTRA_SMALL|6;SMALL|auto;MEDIUM|9" class="d-flex flex-column align-items-baseline">
 							<h5 class="fs-2 font-weight-semi-bold mb-0 text-nunito py-2 py-xl-0 text-truncate w-100 text-truncate">
 								@if(!$model->name)
-									Machine
-									<small class="fs-0 text-muted d-block">Add new machine</small>
+									Customer Machine
+									<small class="fs-0 text-muted d-block">Add new customer machine</small>
 								@else
 									{{ $model->name }}
-									<small class="fs-0 text-muted d-block">Machine</small>
+									<small class="fs-0 text-muted d-block">Customer Machine</small>
 								@endif
 							</h5>
 						</x-bootstrap::column>
@@ -34,8 +34,10 @@
 				<x-bootstrap::card.body class="bg-light">
 					<x-bootstrap::row>
 						<x-bootstrap::column>
+							{!! form_row($form->customer_id) !!}
 							{!! form_row($form->name) !!}
 							{!! form_row($form->type) !!}
+							{!! form_row($form->serial_number) !!}
 						</x-bootstrap::column>
 					</x-bootstrap::row>
 				</x-bootstrap::card.body>

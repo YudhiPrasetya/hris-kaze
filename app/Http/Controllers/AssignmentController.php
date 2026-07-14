@@ -38,12 +38,13 @@ class AssignmentController extends Controller {
 	/**
 	 * Store a newly created resource in storage.
 	 *
-	 * @param \Illuminate\Http\Request $request
+	 * @param \App\Http\Requests\AssignmentFormRequest $request
 	 *
 	 * @return Application|RedirectResponse|Redirector|Response|ViewModel|ViewModelBase
 	 */
 	public function store(AssignmentFormRequest $request) {
 		$model = $this->viewModel->new($request);
+        // dd($request);
 
 		if ($model !== false) {
 			return redirect(route('assignment.show', ['assignment' => $model->id]));

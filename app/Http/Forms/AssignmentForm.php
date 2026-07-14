@@ -30,7 +30,7 @@ class AssignmentForm extends Form {
             ->add('destination', Field::ENTITY, [
 					'class' => AssignmentDestination::class,
 					'property' => 'name',
-					'label' => 'Destination', 
+					'label' => 'Destination',
 					'attr' => ['data-class' => 'col-3']
 				]
 			)
@@ -42,7 +42,7 @@ class AssignmentForm extends Form {
 					'label'   => 'Charge Price',
 					'prepend' => '<span class="input-group-text charge_price_currency_symbol">Rp</span>',
 					'attr'    => ['class_append' => 'text-right'],
-				])			
+				])
 			->add('product_code', Field::TEXT, ['label' => 'Product Code'])
 			//->add('machine_id',
 			//	Field::ENTITY,
@@ -51,7 +51,15 @@ class AssignmentForm extends Form {
 			//		'property' => 'name',
 			//		'label'    => 'Machine Type',
 			//	])
-			->add('customer_machine_id', Field::SELECT, ['label' => 'Machine', 'attr' => ['data-placeholder' => "Select a machine"]])
+			->add('customer_machine_id',
+                Field::ENTITY,
+                [
+                    'class' => Machine::class,
+                    'property' => 'name',
+                    'label' => 'Machine',
+                    'attr' => ['data-placeholder' => "Select a machine"]
+                ]
+            )
 			->add('vehicle_id',
 				Field::ENTITY,
 				[

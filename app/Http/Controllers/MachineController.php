@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\MachineFormRequest;
 use App\Http\ViewModels\EmployeeViewModel;
 use App\Http\ViewModels\MachineViewModel;
-use App\Http\ViewModels\ViewModelBase;
-use App\Http\ViewModels\ViewModel;
 use App\Http\ViewModels\ViewModel as HttpViewModel;
+use App\Http\ViewModels\ViewModel;
+use App\Http\ViewModels\ViewModelBase;
 use App\Managers\Form\FormBuilder;
+use App\Models\Customer;
 use App\Models\Machine;
 use App\Repositories\Eloquent\MachineRepository;
 use Illuminate\Contracts\Foundation\Application;
@@ -117,4 +118,9 @@ class MachineController extends Controller {
 	public function list(Request $request): Collection {
 		return $this->viewModel->list($request);
 	}
+
+    public function getMachineByCustomer(Request $request, Customer $customer){
+        // dd($customer);
+        return $this->viewModel->getMachineByCustomer($request, $customer);
+    }
 }

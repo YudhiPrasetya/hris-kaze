@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class AttendanceForm extends Form {
 	public function buildForm() {
 		$this
-			->add('employee_id', Field::SELECT, ['label' => 'Employee', 'attr' => ['data-placeholder' => "Select a employee"]])
+			->add('employee_id', Field::SELECT, ['label' => 'Employee', 'attr' => ['data-placeholder' => "Select an employee"]])
 			->add('attendance_reason_id',
 				Field::ENTITY,
 				[

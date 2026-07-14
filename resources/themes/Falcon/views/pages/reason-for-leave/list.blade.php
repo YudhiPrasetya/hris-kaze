@@ -20,6 +20,10 @@
         Number Of Days
     </th>
 
+    <th class="col" data-class="va-baseline" data-field="cut_leave_allowance" data-sortable="true">
+        Cut Leave Allowance
+    </th>
+
     <th class="col" data-class="va-baseline" data-field="attachment_requirement" data-sortable="true">
         Attachment
     </th>

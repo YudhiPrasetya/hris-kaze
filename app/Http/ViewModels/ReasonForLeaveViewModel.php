@@ -68,6 +68,8 @@ class ReasonForLeaveViewModel extends ViewModelBase{
 		$self = $this;
 		$results = $this->getPaginatedList($request, $this->repository, ...$columns);
 		$rows = $results->get('rows')->map(function ($result, $key) use ($self) {
+					$result['cut_leave_allowance'] = '<span class="badge badge-pill badge-' . ($result['cut_leave_allowance'] ? 'success' : 'danger') . '">' .
+					                           ($result['cut_leave_allowance'] ? 'Yes' : 'No') . '</span>';            
 			return $self->addDefaultListActions($result, 'show');
 		});
 		$results->offsetSet('rows', $rows);

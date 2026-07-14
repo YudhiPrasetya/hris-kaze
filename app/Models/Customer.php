@@ -10,6 +10,7 @@ use App\Models\World\State;
 use App\Models\World\Village;
 use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -89,4 +90,9 @@ class Customer extends ModelBase {
 	public function machines(): HasMany {
 		return $this->hasMany(CustomerMachine::class, 'customer_id', 'id');
 	}
+
+    // public function machines(): BelongsToMany{
+    //     return $this->belongsToMany(Machine::class, 'customer_machines')->withPivot('serial_number')->withTimestamps();
+    // }
+
 }

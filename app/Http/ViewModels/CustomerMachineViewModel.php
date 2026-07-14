@@ -102,20 +102,42 @@ class CustomerMachineViewModel extends ViewModelBase {
 					                  return $one->where('name', 'LIKE', "%$search%");
 				                  })
 			                  ->get();
+
+            // $items = $customer->machines()->where('name', 'LIKE', "%$search%");
+
 		}
 		else {
 			$items = $customer->machines()
 			                  ->select('machine_id', 'serial_number')
 			                  ->with(['machine:id,name,type'])
 			                  ->get();
-		}
 
+            // $items = $customer->machines()->get();
+
+            // $items = $customer->machines()
+            //                   ->select('id', 'name')
+            //                   ->get();
+		}
 		$results->offsetSet('results',
 			$items->map(function ($item) {
 				$item['machine']['name'] .= sprintf(', %s, %s', $item['machine']['type'], $item['serial_number']);
 				return $item['machine'];
 			})->toArray());
 
-		return $results;
+		// return $results;
+
+        // dd($items);
+
+        // $results->offsetSet('results', $items->map(function($item){
+        //     $item .= \sprintf(', %s, %s', $item['id'], $item['name']);
+        //     return $item;
+
+        //     // $item['name'] .= \sprintf(', %s, %s', $item['id'], $item['name']);
+        //     // return $item['name'];
+        // })->toArray());
+        // dd($results);
+
+        return $results;
+
 	}
 }

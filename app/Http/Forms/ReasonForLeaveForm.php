@@ -11,6 +11,7 @@ class ReasonForLeaveForm extends Form{
         $this
             ->add('name', Field::TEXT, ['attr' => ['class_append' => 'col-12']])
             ->add('number_of_days', Field::NUMBER, ['attr' => ['class_append' => 'col-6']])
+            ->add('cut_leave_allowance', Field::SWITCH, ['attr' => ['class_append' => 'col-6']])
             ->add('attachment_requirement', Field::TEXT, ['attr' => ['class_append' => 'col-12']])
             ->add('submit', Field::BUTTON_SUBMIT, [
             'label' => '<i class="fad fa-save mr-1"></i> Submit', 'attr' => ['class' => 'btn-falcon-success']

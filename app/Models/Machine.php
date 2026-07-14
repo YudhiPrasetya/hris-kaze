@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Casts\DateTimeCasts;
 use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
@@ -34,4 +36,13 @@ class Machine extends ModelBase {
 
 		parent::__construct($attributes);
 	}
+
+    // public function customer(): HasOne{
+    //     return $this->hasOne(Customer::class, 'id', 'customer_id');
+    // }
+
+    // public function customers(): BelongsToMany{
+    //     return $this->belongsToMany(Customer::class, 'customer_machines')->withPivot('serial_number')->withTimestamps();
+    // }
+
 }

@@ -6,6 +6,8 @@ use App\Http\Forms\EmployeeForm;
 use App\Http\Forms\MachineForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Managers\Form\FormBuilder;
+use App\Models\Customer;
+use App\Models\CustomerMachine;
 use App\Models\Machine;
 use App\Models\ModelInterface;
 use App\Repositories\EloquentRepositoryInterface;
@@ -38,11 +40,24 @@ class MachineViewModel extends ViewModelBase {
 		$self = $this;
 		$results = $this->getPaginatedList($request, $this->repository, ...$columns);
 		$rows = $results->get('rows')->map(function ($result, $key) use ($self) {
-			return $self->addDefaultListActions($result, 'show');
+			return $self->addDefaultListActions($result, 'show', 'destroy');
 		});
 		$results->offsetSet('rows', $rows);
 
 		return $results;
+	}
+
+	public function getMachineByCustomer(Request $request, Customer $customer): Collection {
+		// $search = $request->get('search', null);
+		// $results = collect([]);
+		$items = null;
+
+        $items = $customer->machines()
+                            ->select('machine_id', 'serial_number')
+                            ->with(['machine:id,name,type'])
+                            ->get();
+
+        return $items;
 	}
 
 	public function update(FormRequestInterface $request, ModelInterface $model): bool {
@@ -67,8 +82,30 @@ class MachineViewModel extends ViewModelBase {
 		$this->form->redirectIfNotValid();
 
 		$fields = $this->getFormFields();
-		$machine = new Machine($fields->toArray());
-		$ret = $machine->save();
+        $machine = new Machine([
+            'name' => $fields['name'],
+            'type' => $fields['type']
+        ]);
+        $ret = $machine->save();
+
+        // $machine->customers()->attach(
+        //     $fields['customer_id'],
+        //     [
+        //         'machine_id' => $machine->id,
+        //         'serial_number' => $fields['serial_number']
+        //     ]
+        // );
+
+        $customerMachine = new CustomerMachine([
+            'customer_id' => $fields['customer_id'],
+            'machine_id' => $machine->id,
+            'serial_number' => $fields['serial_number']
+        ]);
+
+        $customerMachine->save();
+
+		// $machine = new Machine($fields->toArray());
+		// $ret = $machine->save();
 
 		return $ret ? $machine : false;
 	}

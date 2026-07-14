@@ -85,4 +85,20 @@ class CustomerViewModel extends ViewModelBase {
 			return $item;
 		});
 	}
+
+public function listForSelect(Request $request): Collection {
+		// $search = $request->get('search', null);
+		// $results = collect([]);
+		$items = null;
+
+		if (!empty($search)) {
+            $items = Customer::where('name', 'LIKE', "%$search%")->select(['id', 'name'])->get();
+
+		}
+		else {
+            $items = Customer::select(['id', 'customer_no', 'name'])->get();
+		}
+        // dd($items);
+        return $items;
+	}
 }

@@ -324,6 +324,10 @@ class EmployeeController extends Controller {
 		return $this->viewModel->select2List($request);
 	}
 
+    public function forSelect(Request $request){
+        return $this->viewModel->forSelect($request);
+    }
+
 	public function selectAvailableEmployee(Request $request, EmployeeRepository $employeeRepository): Collection {
 		return $this->viewModel->selectAvailableEmployee($request, $employeeRepository);
 	}

@@ -3,11 +3,11 @@
 use App\Http\Controllers\AnnualLeaveController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerMachineController;
+use App\Http\Controllers\DomesticAssignmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FingerPrintDeviceController;
 use App\Http\Controllers\FingerPrintDeviceDataController;
@@ -15,28 +15,31 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\iClockController;
 use App\Http\Controllers\ImagePlaceholderController;
 use App\Http\Controllers\JobTitleController;
+use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\MachineController;
+use App\Http\Controllers\OverseasAssignmentController;
+use App\Http\Controllers\OvertimeController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PermitController;
-use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ReasonForLeaveController;
+use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\Settings\AttendanceController as SettingAttendanceController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TrackerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\WorkingShiftController;
 use App\Http\Controllers\World\CityController;
 use App\Http\Controllers\World\CountryController;
 use App\Http\Controllers\World\CurrencyController;
 use App\Http\Controllers\World\DistrictController;
 use App\Http\Controllers\World\StateController;
 use App\Http\Controllers\World\VillageController;
-use App\Http\Controllers\WorkingShiftController;
-use App\Http\Controllers\OvertimeController;
 use App\Models\Overtime;
 use App\Models\ReasonForLeave;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 
 /*
@@ -159,6 +162,14 @@ Route::domain(config('app.domain'))->group(function () {
       Route::get('/tracker', [TrackerController::class, 'index'])->name('tracker');
 
       Route::resource('assignment', AssignmentController::class);
+
+      // domestic assigment route
+      Route::resource('assignment-domestic', DomesticAssignmentController::class);
+        // Route::get('/assignment-domestic/index', [DomesticAssignmentController::class, 'index'])->name('assignment-domestic.index');
+
+      // overseas assignment route
+      Route::resource('assignment-overseas', OverseasAssignmentController::class);
+
       Route::resource('customer', CustomerController::class);
       Route::resource('customer.machine', CustomerMachineController::class);
       Route::resource('vehicle', VehicleController::class);
@@ -219,6 +230,9 @@ Route::domain(config('app.domain'))->group(function () {
       // Employee
       Route::get('/api/v1/working-shift', [WorkingShiftController::class, 'list'])->name('api.working-shift');
       Route::get('/api/v1/employee', [EmployeeController::class, 'list'])->name('api.employee');
+
+      Route::get('/api/v1/employee/forSelect', [EmployeeController::class, 'forSelect'])->name('api.employee.forSelect');
+
       Route::get('/api/v1/employee/select', [EmployeeController::class, 'select2List'])->name('api.employee.select');
       Route::get('/api/v1/employee/attendance/available', [EmployeeController::class, 'selectAvailableEmployee'])
          ->name('api.employee.attendance.available');
@@ -232,7 +246,14 @@ Route::domain(config('app.domain'))->group(function () {
       Route::get('/api/v1/assignment/customer/{customer}', [AssignmentController::class, 'getByCustomer'])->name('api.assignment.customer');
       Route::get('/api/v1/assignment/employee/{employee}', [AssignmentController::class, 'getByEmployee'])->name('api.assignment.employee');
 
+      // Assigment domestic api routes
+      Route::get('/api/v1/assignment-domestic', [DomesticAssignmentController::class, 'list'])->name('api.assignment-domestic');
+      Route::post('/api/v1/assignment-domestic-AddNew',[DomesticAssignmentController::class, 'addNew'])->name('api.assignment-domestic-addNew');
+
       Route::get('/api/v1/customer', [CustomerController::class, 'list'])->name('api.customer');
+
+      Route::get('/api/v1/customer/listForSelect', [CustomerController::class, 'listForSelect'])->name('api.customer.listForSelect');
+
       Route::get('/api/v1/customer/{customer}/machines', [CustomerMachineController::class, 'list'])->name('api.customer.machine');
       Route::get('/api/v1/customer/{customer}/machines.json', [CustomerMachineController::class, 'selectMachineByCustomer'])
          ->name('api.customer.machine.select');
@@ -240,6 +261,7 @@ Route::domain(config('app.domain'))->group(function () {
       Route::get('/api/v1/vehicle', [VehicleController::class, 'list'])->name('api.vehicle');
 
       Route::get('/api/v1/machine', [MachineController::class, 'list'])->name('api.machine');
+      Route::get('/api/v1/machine/{customer}/customer', [MachineController::class, 'getMachineByCustomer'])->name('api.machine.customer');
 
       Route::get('/api/v1/attendance', [AttendanceController::class, 'list'])->name('api.attendance');
 

@@ -234,6 +234,10 @@ class EmployeeViewModel extends ViewModelBase {
 		return $results;
 	}
 
+    public function forSelect(Request $request){
+        return Employee::select(['id', 'name'])->get();
+    }
+
 	public function selectAvailableEmployee(Request $request, EmployeeRepository $employeeRepository) {
 		list($offset, $limit, $sort, $order, $search, $date, $start, $end) = $this->getDefaultRequestParam($request);
 		$search = $request->get('search', null);

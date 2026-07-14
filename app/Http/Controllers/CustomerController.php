@@ -114,4 +114,8 @@ class CustomerController extends Controller {
 	public function list(Request $request): Collection {
 		return $this->viewModel->list($request);
 	}
+
+    public function listForSelect(Request $request){
+        return $this->viewModel->listForSelect($request);
+    }
 }

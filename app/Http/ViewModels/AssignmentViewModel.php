@@ -43,7 +43,7 @@ class AssignmentViewModel extends ViewModelBase {
 		$this->form->setModel($model);
 		$this->form->setRequest($request);
 		$this->form->redirectIfNotValid();
-		
+
 		$fields = $this->getFormFields();
 		// dd($model, $request);
 		// $fields->offset('is_chargeable', $this->toBool($fields->get('is_chargeable')));
@@ -67,7 +67,7 @@ class AssignmentViewModel extends ViewModelBase {
 
 			return $model->technicians()->updateOrCreate($technician, ['assignment_id', 'employee_id']);
 		});
-		
+
 		return $ret;
 	}
 
@@ -81,6 +81,7 @@ class AssignmentViewModel extends ViewModelBase {
 	public function new(FormRequestInterface $request): mixed {
 		$this->form->setModel(new Assignment());
 		$this->form->setRequest($request);
+        // dd($request->all());
 		$this->form->redirectIfNotValid();
 
 		$fields = $this->getFormFields();

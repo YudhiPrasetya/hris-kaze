@@ -5,16 +5,18 @@ namespace App\Http\ViewModels;
 use App\Http\Forms\LeaveForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Managers\Form\FormBuilder;
-use App\Models\Leave;
+use App\Models\Attendance;
+use App\Models\CalendarEvent;
 use App\Models\Employee;
+use App\Models\Leave;
 use App\Models\ModelInterface;
+use App\Models\ReasonForLeave;
 use App\Repositories\EloquentRepositoryInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
-use App\Models\Attendance;
-use App\Models\CalendarEvent;
+
 class LeaveViewModel extends ViewModelBase{
 	/**
 	 * LeaveViewModel constructor.
@@ -161,6 +163,9 @@ class LeaveViewModel extends ViewModelBase{
 
 		$fields = $this->getFormFields();
 		$employeeId = $fields->get('id_employee');
+
+        $reasonForLeave = $fields->get('id_reason_for_leave');
+
 		$startDate = new \DateTime($fields->get('start'));
 		$endDate = new \DateTime($fields->get('end'));
 		$months = [$startDate->format('n'), $endDate->format('n')];
@@ -197,6 +202,8 @@ class LeaveViewModel extends ViewModelBase{
 		$dateStartLeave = new \DateTime($fields->get('start'));
 		$dateEndLeave = new \DateTime($fields->get('end'));
 		// $eventCalendar = new \DateTime($eventsCalendar['start_date']);
+        $isCutLeaveAllowance = ReasonForLeave::find($reasonForLeave);
+        
 		while($dateStartLeave <= $dateEndLeave){
 			$dayOfWeek = $dateStartLeave->format('w');
 			$checkNotInEventCalendar = in_array($dateStartLeave->format('Y-m-d'), $eventsCalendar->toArray());

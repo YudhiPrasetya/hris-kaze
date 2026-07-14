@@ -11,7 +11,7 @@
 	@endphp
 	{!! form_start($form, ['attr' => ['autocomplete' => "off"]]) !!}
 	<x-bootstrap::row class="justify-content-center">
-		<x-bootstrap::column breakpoint="EXTRA_SMALL|12;MEDIUM|10">
+		<x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
 			<x-bootstrap::card>
 				<x-bootstrap::card.header>
 					<x-bootstrap::row class="align-items-baseline justify-content-between">
@@ -21,24 +21,26 @@
 								<small class="fs-0 text-muted d-block">Add new reason for leave</small>
 							</h5>
 						</x-bootstrap::column>
-						<x-bootstrap::column breakpoint="EXTRA_SMALL|6;SMALL|auto" class="d-flex align-items-baseline">
+						{{-- <x-bootstrap::column breakpoint="EXTRA_SMALL|6;SMALL|auto" class="d-flex align-items-baseline">
 							{!! form_row($form->submit) !!}
-						</x-bootstrap::column>
+						</x-bootstrap::column> --}}
 					</x-bootstrap::row>
 				</x-bootstrap::card.header>
 				<x-bootstrap::card.body class="bg-light">
 					<x-bootstrap::row>
 						<x-bootstrap::column>
-							<x-bootstrap::row class="small-gutters">
-								<x-bootstrap::column>{!! form_row($form->name) !!}</x-bootstrap::column>
-
-								<x-bootstrap::column>{!! form_row($form->number_of_days) !!}</x-bootstrap::column>
-
-								<x-bootstrap::column>{!! form_row($form->attachment_requirement) !!}</x-bootstrap::column>
-							</x-bootstrap::row>
+							{{-- <x-bootstrap::row class="small-gutters"> --}}
+								{!! form_row($form->name) !!}
+								{!! form_row($form->number_of_days) !!}
+								{!! form_row($form->cut_leave_allowance) !!}
+								{!! form_row($form->attachment_requirement) !!}
+							{{-- </x-bootstrap::row> --}}
 						</x-bootstrap::column>
 					</x-bootstrap::row>
 				</x-bootstrap::card.body>
+                <div class="card-footer">
+                    {!! form_row($form->submit) !!}
+                </div>                
 			</x-bootstrap::card>
 		</x-bootstrap::column>
 	</x-bootstrap::row>
