@@ -14,7 +14,8 @@ class DomesticAssignment extends ModelBase{
     protected $fillable = [
         'assignment_no', 'letter_date',
         'customer_id', 'is_chargeable','charge_price',
-        'sr_no', 'machine_id'
+        'sr_no', 'machine_id', 'assignment_date_from',
+        'assignment_date_to'
     ];
 
     public function __construct(array $attributes = []){
@@ -32,11 +33,19 @@ class DomesticAssignment extends ModelBase{
         return $this->hasMany(DomesticAssignmentPreService::class, 'assignment_id', 'id');
     }
 
+    public function latestPreservice(){
+        return $this->hasOne(DomesticAssignmentPreService::class)->latestOfMany();
+    }
+
     public function domesticAssignmentDuringServices(): HasMany{
         return $this->hasMany(DomesticAssignmentDuringService::class, 'assignment_id', 'id');
     }
 
     public function customer(): HasOne{
         return $this->hasOne(Customer::class, 'id', 'customer_id');
+    }
+
+    public function machine(): HasOne{
+        return $this->hasOne(Machine::class, 'id', 'machine_id');
     }
 }

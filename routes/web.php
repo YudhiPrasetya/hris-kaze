@@ -249,6 +249,9 @@ Route::domain(config('app.domain'))->group(function () {
       // Assigment domestic api routes
       Route::get('/api/v1/assignment-domestic', [DomesticAssignmentController::class, 'list'])->name('api.assignment-domestic');
       Route::post('/api/v1/assignment-domestic-AddNew',[DomesticAssignmentController::class, 'addNew'])->name('api.assignment-domestic-addNew');
+      Route::get('/api/v1/domestic-assignment-preService/Id/{id}', [DomesticAssignmentController::class, 'preServiceGetById'])->name('api.assignment-domestic-preSerice-getById');
+      Route::get('/api/v1/domestic-assignment-duringService/Id/{id}', [DomesticAssignmentController::class, 'duringServiceGetById'])->name('api.assignment-domestic-duringSerice-getById');
+      Route::post('/api/v1/assignment-domestic-update', [DomesticAssignmentController::class, 'domesticAssignmentUpdate'])->name('api.assignment-domestic-update');
 
       Route::get('/api/v1/customer', [CustomerController::class, 'list'])->name('api.customer');
 

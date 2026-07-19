@@ -24,4 +24,8 @@ class DomesticAssignmentPreService extends Model
 
         parent::__construct($attributes);
     }
+
+    public function employee(): \Illuminate\Database\Eloquent\Relations\HasOne{
+        return $this->hasOne(Employee::class, 'id', 'employee_id');
+    }
 }

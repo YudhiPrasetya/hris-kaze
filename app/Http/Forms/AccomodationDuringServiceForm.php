@@ -13,7 +13,7 @@ class AccomodationDuringServiceForm extends Form {
 		$this
 			->add('employee_id', Field::TEXT, ['attr' => ['class_append' => 'technisian']])
 			->add('employee_name', Field::TEXT)
-			// ->add('check_out', Field::DATE, ['attr' => ['class_append' => 'col-2']])
+			->add('assignment_date', Field::DATE, ['attr' => ['class_append' => 'col-2']])
 			->add('breakfast', Field::CHECKBOX, ['attr' => ['class_append' => 'col-2']])
 			->add('start_job', Field::TEXT, ['attr' => [
                 'class_append' => 'col-2',

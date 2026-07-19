@@ -77,7 +77,7 @@ class DomesticAssignmentForm extends Form{
             ])
             ->add('checkOut', Field::DATE, [
                 'label' => 'Check Out',
-                'attr' => ['class_append' => 'col-3']
+                'attr' => ['class_append' => 'col-4']
             ])
             ->add('preService', Field::COLLECTION, [
                 'type' => 'form',

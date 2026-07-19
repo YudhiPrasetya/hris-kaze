@@ -6,15 +6,16 @@ use App\Http\Forms\DomesticAssignmentForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Http\ViewModels\ViewModelBase;
 use App\Managers\Form\FormBuilder;
+use App\Models\Attendance;
 use App\Models\DomesticAssignment;
 use App\Models\DomesticAssignmentDuringService;
-use App\Models\DomesticAssignmentEmployee;
 use App\Models\DomesticAssignmentMeal;
 use App\Models\DomesticAssignmentPreService;
 use App\Models\Employee;
 use App\Models\ModelInterface;
 use App\Repositories\EloquentRepositoryInterface;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -34,9 +35,6 @@ class DomesticAssigmentViewModel extends ViewModelBase{
 
 	public function createForm(string $method, string $route, ?ModelInterface $model = null, ?string $formClass = null, array $options = []
 	): ViewModelBase {
-		$this->setModel($model);
-		$this->form->setMethod($method);
-		$this->form->setUrl(route($route, ['assignment-domestic' => $model->id]));
 		$this->setModel($model);
 		$this->form->setMethod($method);
 		$this->form->setUrl(route($route, ['assignment_domestic' => $model->id]));
@@ -68,7 +66,8 @@ class DomesticAssigmentViewModel extends ViewModelBase{
         $charge_price = $data['charge_price'];
         $customer_id = $data['customer_id'];
         $machine_id = $data['machine_id'];
-
+        $assignment_date_from = $data['assignment_date_from'];
+        $assignment_date_to = $data['assignment_date_to'];
 
         $newAssignment = DomesticAssignment::create([
             'assignment_no' => $assignment_no,
@@ -77,12 +76,18 @@ class DomesticAssigmentViewModel extends ViewModelBase{
             'is_chargeable' => $is_chargeable,
             'charge_price' => $charge_price,
             'customer_id' => $customer_id,
-            'machine_id' => $machine_id
+            'machine_id' => $machine_id,
+            'assignment_date_from' => $assignment_date_from,
+            'assignment_date_to' => $assignment_date_to
         ]);
         $insertedId = $newAssignment->id;
 
         $dateNow = Carbon::now();
         $domesticAssignmentPreServices = $data['pre_service'];
+
+        $dateFrom = new DateTime($assignment_date_from);
+        $dateTo = new DateTime($assignment_date_to);
+
         foreach($domesticAssignmentPreServices as $preService){
             // Process pre-service data
             $dataEmployee = Employee::find($preService['employee_id']);
@@ -90,7 +95,7 @@ class DomesticAssigmentViewModel extends ViewModelBase{
             $empYears = $empEffectiveDate->diffInYears($dateNow);
 
             $domesticAssignmentMeal = DomesticAssignmentMeal::where('position_id', '=',$dataEmployee->position_id)
-                                                              ->where('year_employee', '=', $empYears)->first()->get();
+                                                              ->where('year_employee', '=', $empYears)->first();
             // dd($domesticAssignmentMeal);
 
             $checkInDate = Carbon::parse($preService['check_in_date']);
@@ -130,11 +135,13 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                 'pre_service_supper' => $preServiceSupper
             ]);
 
-            // DomesticAssignmentPreService::create($preService);
+
+
         }
-        // $ret = DomesticAssignmentEmployee::insert($domesticAssignmentEmployees);
 
         $domesticAssignmentDuringServices = $data['during_service'];
+        $duringServiceLunch = 0;
+        $duringServiceDinner = 0;
         foreach($domesticAssignmentDuringServices as $duringService){
             // Process during-service data
             $dataEmployee1 = Employee::find($duringService['employee_id']);
@@ -142,7 +149,9 @@ class DomesticAssigmentViewModel extends ViewModelBase{
             $empYears1 = $empEffectiveDate1->diffInYears($dateNow);
 
             $domesticAssignmentMeal1 = DomesticAssignmentMeal::where('position_id', '=',$dataEmployee1->position_id)
-                                                              ->where('year_employee', '=', $empYears1)->firstOrFail();
+                                                              ->where('year_employee', '=', $empYears1)->first();
+
+            // dd($domesticAssignmentMeal1);
 
             $assignmentDate = Carbon::parse($duringService['assignment_date']);
 
@@ -173,11 +182,138 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                 'start_job' => $duringService['start_job'],
                 'finish_job' => $duringService['finish_job'],
             ]);
+            Attendance::create([
+                'employee_id' => $duringService['employee_id'],
+                'attendance_reason_id' => 3,
+                // 'at' => $dateFrom
+                'at' => $duringService['assignment_date']
+            ]);
+                // $dateFrom->modify('+1 day');
+        }
+        return $newAssignment;
+    }
 
+    public function domesticAssignmentUpdate(string $method, Request $request){
+        $this->form->setMethod($method);
+        $data = $request->get('data');
+        $assignmentId = $data['assignment_id'];
+
+        // Remove pre service based on assignmentId
+        $deletedPreService = DomesticAssignmentPreService::where('assignment_id', $assignmentId);
+        $deletedPreService->delete();
+
+        // Remove during service based on assignmentId
+        $deletedDuringService = DomesticAssignmentDuringService::where('assignment_id', $assignmentId);
+        $deletedDuringService->delete();
+
+        $dateNow = Carbon::now();
+
+        // Process pre service
+        $domesticAssignmentPreServices = $data['pre_service'];
+        foreach($domesticAssignmentPreServices as $preService){
+            // Process pre-service data
+            $dataEmployee = Employee::find($preService['employee_id']);
+            $empEffectiveDate = Carbon::parse($dataEmployee->effective_since);
+            $empYears = $empEffectiveDate->diffInYears($dateNow);
+
+            $domesticAssignmentMeal = DomesticAssignmentMeal::where('position_id', '=',$dataEmployee->position_id)
+                                                              ->where('year_employee', '=', $empYears)->first();
+            // dd($domesticAssignmentMeal);
+
+            $checkInDate = Carbon::parse($preService['check_in_date']);
+
+            if($preService['pre_service_lunch'] == 1 && $checkInDate->isWeekend()){
+                $preServiceLunch = $domesticAssignmentMeal->lunch_weekend;
+            }else if($preService['pre_service_lunch'] == 1 && $checkInDate->isWeekday()){
+                $preServiceLunch = $domesticAssignmentMeal->lunch_weekday;
+            }elseif($preService['pre_service_lunch'] == 0){
+                $preServiceLunch = 0;
+            }
+
+            if($preService['pre_service_dinner'] == 1 && $checkInDate->isWeekend()){
+                $preServiceDinner = $domesticAssignmentMeal->dinner_weekend;
+            }else if($preService['pre_service_dinner'] == 1 && $checkInDate->isWeekday()){
+                $preServiceDinner = $domesticAssignmentMeal->dinner_weekday;
+            }elseif($preService['pre_service_dinner'] == 0){
+                $preServiceDinner = 0;
+            }
+
+            if($preService['pre_service_supper'] == 1 && $checkInDate->isWeekend()){
+                $preServiceSupper = $domesticAssignmentMeal->supper_weekend;
+            }else if($preService['pre_service_supper'] == 1 && $checkInDate->isWeekday()){
+                $preServiceSupper = $domesticAssignmentMeal->supper_weekday;
+            }elseif($preService['pre_service_supper'] == 0){
+                $preServiceSupper = 0;
+            }
+
+            DomesticAssignmentPreService::create([
+                'assignment_id' => $assignmentId,
+                'employee_id' => $preService['employee_id'],
+                'check_in_date' => $preService['check_in_date'],
+                'check_in_at' => $preService['check_in_at'],
+                'pre_service_breakfast' => 0,
+                'pre_service_lunch' => $preServiceLunch,
+                'pre_service_dinner' => $preServiceDinner,
+                'pre_service_supper' => $preServiceSupper
+            ]);
+
+            // DomesticAssignmentPreService::create($preService);
         }
 
-        return $newAssignment;
+        $domesticAssignmentDuringServices = $data['during_service'];
+        $defaultFinishJob = strtotime('19:00');
+        foreach($domesticAssignmentDuringServices as $duringService){
+            // Process during-service data
+            $dataEmployee1 = Employee::find($duringService['employee_id']);
+            $empEffectiveDate1 = Carbon::parse($dataEmployee1->effective_since);
+            $empYears1 = $empEffectiveDate1->diffInYears($dateNow);
 
+            $domesticAssignmentMeal1 = DomesticAssignmentMeal::where('position_id', '=',$dataEmployee1->position_id)
+                                                              ->where('year_employee', '=', $empYears1)->firstOrFail();
+
+            $assignmentDate = Carbon::parse($duringService['assignment_date']);
+
+            if($duringService['during_service_lunch'] == 1 && $assignmentDate->isWeekend()){
+                $duringServiceLunch = $domesticAssignmentMeal1->lunch_weekend;
+            }else if($duringService['during_service_lunch'] == 1 && $assignmentDate->isWeekday()){
+                $duringServiceLunch = $domesticAssignmentMeal1->lunch_weekday;
+            }elseif($preService['pre_service_lunch'] == 0){
+                $duringServiceLunch = 0;
+            }
+
+            if($duringService['during_service_dinner'] == 1 && $assignmentDate->isWeekend()){
+                $duringServiceDinner = $domesticAssignmentMeal1->dinner_weekend;
+            }else if($duringService['during_service_dinner'] == 1 && $assignmentDate->isWeekday()){
+                $duringServiceDinner = $domesticAssignmentMeal1->dinner_weekday;
+            }elseif($duringService['during_service_dinner'] == 0){
+                $duringServiceDinner = 0;
+            }
+
+            $finishJob = strtotime($duringService['finish_job']);
+            DomesticAssignmentDuringService::create([
+                'assignment_id' => $assignmentId,
+                'employee_id' => $duringService['employee_id'],
+                'check_out_date' => $duringService['check_out_date'],
+                'assignment_date' => $duringService['assignment_date'],
+                'during_service_breakfast' => 0,
+                'during_service_lunch' => $duringServiceLunch,
+                'during_service_dinner' => $duringServiceDinner,
+                'start_job' => $duringService['start_job'],
+                'finish_job' => ($finishJob > $defaultFinishJob ? '19:00' : $duringService['finish_job']),
+                'overtime' => ($finishJob > $defaultFinishJob ? $duringService['finish_job'] : '00:00:00')
+            ]);
+
+            // Update attendace
+            $att = Attendance::where('employee_id', $duringService['employee_id'])
+                              ->where('at', $duringService['assignment_date'])->first();
+            $att->update([
+                'start' => $duringService['start_job'],
+                'end' => ($finishJob > $defaultFinishJob ? '19:00' : $duringService['finish_job']),
+                'overtime' => ($finishJob > $defaultFinishJob ? $duringService['finish_job'] : '00:00:00')
+            ]);
+
+        }
+        return true;
     }
 
 	public function update(FormRequestInterface $request, ModelInterface $model): bool {
@@ -200,7 +336,7 @@ class DomesticAssigmentViewModel extends ViewModelBase{
 		$query = $this->getBaseQuery($request, ...$columns);
 		$columns = $this->getDefaultColumns(...$columns);
 		// $results = $query->with(['customer:id,name', 'destination:id,name', 'technicians:assignment_id', 'currentStatus:id,name,reason,model_id'])
-		$results = $query->with(['customer:id,name'])
+		$results = $query->with(['customer:id,name', 'machine:id,name'])->orderBy('id', 'DESC')
 		                 ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
 		                 ->toArray();
 
@@ -226,7 +362,7 @@ class DomesticAssigmentViewModel extends ViewModelBase{
 						],
 
 					];
-                    $result['actions'] = $action;                                               
+                    $result['actions'] = $action;
 
 					// return $self->addDefaultListActions($result, 'show');
                     return $result;
@@ -235,5 +371,49 @@ class DomesticAssigmentViewModel extends ViewModelBase{
 
 			return $item;
 		});
+    }
+
+    public function preServiceGetById($id){
+        $preServices = DomesticAssignmentPreService::with('employee')->where('assignment_id', $id)->get();
+
+        $dataPreServices = [];
+
+        foreach($preServices as $ps){
+            $data = [
+                'check_in_date' => $ps->check_in_date,
+                'check_in_at' => $ps->check_in_at,
+                'employee_id' => $ps->employee->id,
+                'employee_name' => $ps->employee->name,
+                'ps_breakfast' => $ps->pre_service_breakfast > 0 ? 1 : 0,
+                'ps_lunch' => $ps->pre_service_lunch > 0 ? 1 : 0,
+                'ps_dinner' => $ps->pre_service_dinner > 0 ? 1 : 0,
+                'ps_supper' => $ps->pre_service_supper > 0 ? 1 : 0,
+            ];
+            array_push($dataPreServices, $data);
+        }
+
+        return $dataPreServices;
+    }
+    public function duringServiceGetById($id){
+        $duringServices = DomesticAssignmentDuringService::with('employee')->where('assignment_id', $id)->get();
+
+        $dataDuringServices = [];
+
+        foreach($duringServices as $ds){
+            $data = [
+                'check_out_date' => $ds->check_in_date,
+                'assignment_date' => $ds->assignment_date,
+                'employee_id' => $ds->employee->id,
+                'employee_name' => $ds->employee->name,
+                'ds_breakfast' => $ds->during_service_breakfast > 0 ? 1 : 0,
+                'start_job' => $ds->start_job,
+                'ds_lunch' => $ds->during_service_lunch > 0 ? 1 : 0,
+                'finish_job' => $ds->finish_job,
+                'ds_dinner' => $ds->during_service_dinner > 0 ? 1 : 0,
+                'overtime' => $ds->overtime,
+            ];
+            array_push($dataDuringServices, $data);
+        }
+        return $dataDuringServices;
     }
 }

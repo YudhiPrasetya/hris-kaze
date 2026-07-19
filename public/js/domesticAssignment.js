@@ -79,6 +79,12 @@ function loadMachine($owner, customer){
 }
 
 $(function(){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
     let $assignmentNo = $('#assignment_no');
     let $letterDate = $('#letter_date');
     let $srNO = $('#sr_no');
@@ -92,8 +98,8 @@ $(function(){
 
     let $btnDomesticAssignment = $('.btnDomesticAssignment');
 
-    let assignmentDateFrom = $('#assignment_date_from');
-    let assignmentDateTo = $('#assignment_date_to');
+    let $assignmentDateFrom = $('#assignment_date_from');
+    let $assignmentDateTo = $('#assignment_date_to');
 
     let $technicians = $('#employees').select2();
     // let arrTechnisians = [{}];
@@ -152,15 +158,16 @@ $(function(){
             totalTechnicians++;
         });
 
-        let dateAssignmentFrom = new Date(assignmentDateFrom.val());
-        let dateAssignmentTo = new Date(assignmentDateTo.val());
+        let dateAssignmentFrom = new Date($assignmentDateFrom.val());
+        let dateAssignmentTo = new Date($assignmentDateTo.val());
         let diffAssignmentDateInDays = 0;
 
-        diffAssignmentDateInDays = Math.floor((dateAssignmentTo - dateAssignmentFrom) / (1000 * 60 * 60 * 24)) + 1;
-        if(assignmentDateTo.val() !== "" && dateAssignmentFrom <= dateAssignmentTo){
+        diffAssignmentDateInDays = Math.floor((dateAssignmentTo - dateAssignmentFrom) / (1000 * 60 * 60 * 24));
+        console.log('diffAssignmentDateInDays: ', diffAssignmentDateInDays);
+        if($assignmentDateTo.val() !== "" && dateAssignmentFrom <= dateAssignmentTo){
             let dateNow = new Date();
 
-            for(let x = 0; x < diffAssignmentDateInDays; x++){
+            for(let x = 0; x <= diffAssignmentDateInDays; x++){
                 let $p = $('<p style="font-weight: bold;">').html('Day ' + ' - ' + (x+1) + ' (' + ' Job Date: ' + new Date(dateAssignmentFrom.getTime() + (x * 24 * 60 * 60 * 1000)).toISOString().split('T')[0] + ')');
                 $accDuringServiceTableContainer.append($p);
                 let $table = $('<table class=" table table-hover bg-white table-accduringservice">');
@@ -202,10 +209,97 @@ $(function(){
             }
         }
 
-
     });
 
+    function addDuringService(i, day, $b, $t, now, from){
+        // let countDuringService = totalTechnicians; // $table.children('tr:not(.no-records-found)').length;
+        // let $container = $('.preservice.collection-container');
+        // let $proto = $($container.data('prototype').replace(/__NAME__/g, count));
+        console.log('day: ', day);
+        let newDateAssignmentFrom = new Date(from.getTime() + (day * 24 * 60 * 60 * 1000));
+        // newDateAssignmentFrom.setHours(0, 0, 0, 0);
+        console.log('newDateAssignmentFrom: ', newDateAssignmentFrom);
 
+        // let newNow = new Date(now);
+        // newNow.setHours(0, 0, 0, 0);
+
+        let $row = $('<tr>');
+        // let $btnRemove = $(
+        //     '<button role="button" type="button" class="btn btn-falcon-danger text-danger remove-' + count + '"><i class="fad fa-trash"></i></button>');
+
+        let $elNo = $('<td class="text-center" style="vertical-align: middle">').html(count);
+        // let $selectTechnician = $proto.find('text.technician');
+        let $idTechnician = $('<td style="display: none;">').append(i.id)
+        let $assignmentDate = $('<td style="display: none;">').append(newDateAssignmentFrom.toISOString().split('T')[0]);
+        let $technician = $('<td>').append(i.text);
+
+        // let $checkIn = $('<input type="date" class="form-control" name="preservice['+count+'][checkIn]" size="8">');
+        let $breakfast = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][breakfast]" style="cursor: pointer; width: 25px; height: 25px;">');
+        // console.log('now:', now.toISOString().split('T')[0]);
+        // console.log('from:', new Date(from + day).toISOString().split('T')[0]);
+        // $breakfast.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
+
+        let $startJob = $('<input type="text" class="p-2 time24h text-center w-20" style="width: 80px;" placeholder="HH:MM" name="duringservice['+count+'][start_job]" style="cursor: pointer;" />');
+        // $startJob.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
+
+        let $lunch = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][lunch]" style="cursor: pointer; width: 25px; height: 25px;">');
+        // $lunch.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
+
+        let $finishJob = $('<input type="text" class="p-2 time24h text-center w-20" style="width: 80px;" placeholder="HH:MM" name="duringservice['+count+'][finish_job]" style="cursor: pointer;" />');
+        // $finishJob.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
+
+        let $dinner = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][dinner]" style="cursor: pointer; width: 25px; height: 25px;">');
+        // $dinner.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
+
+        let $elIdTechnician = $('<td style="vertical-align: middle; display: none;">').append($idTechnician);
+        let $elAssignmentDate = $('<td style="vertical-align: middle; display: none;">').append($assignmentDate);
+        let $elTechnician = $('<td style="vertical-align: middle">').append($technician);
+        // let $elCheckIn = $('<td>').append($checkIn);
+        let $elBreakfast = $('<td class="text-center" style="vertical-align: middle">').append($breakfast);
+        let $elStartJob = $('<td class="text-center" style="vertical-align: middle">').append($startJob);
+        let $elLunch = $('<td class="text-center my-auto" style="vertical-align: middle">').append($lunch);
+        let $elFinishJob = $('<td class="text-center" style="vertical-align: middle">').append($finishJob);
+        let $elDinner = $('<td class="text-center" style="vertical-align: middle">').append($dinner);
+
+        // $tableAccDuringServiceBody.append(
+            $row.append($elNo)
+                .append($elIdTechnician)
+                .append($elAssignmentDate)
+                .append($elTechnician)
+                // .append($elCheckIn)
+                .append($elBreakfast)
+                .append($elStartJob)
+                .append($elLunch)
+                .append($elFinishJob)
+                .append($elDinner)
+                // .append($elAction)
+        // );
+
+        // $tbody.append($row);
+        $b.append($row);
+        $t.append($b);
+        $accDuringServiceTableContainer.append($t);
+
+        let $time24h = $t.find('.time24h');
+
+        $time24h.mask('Hh:Mm', {
+            translation: {
+                'H': { pattern: /[0-2]/, optional: false },
+                'h': { pattern: /[0-9]/, optional: false },
+                'M': { pattern: /[0-5]/, optional: false },
+                'm': { pattern: /[0-9]/, optional: false }
+            },
+            placeholder: "HH:MM"
+        });
+
+        $time24h.on('blur', function(){
+            let timeVal = $time24h.val().split(':');
+            if(parseInt(timeVal[0]) > 23 || parseInt(timeVal[1]) > 59){
+                $time24h.val('');
+            }
+        });
+
+    }
 
     $accomodations.on('change', function(){
         let accVal = $accomodations.val();
@@ -229,7 +323,8 @@ $(function(){
             'assignment_no': $assignmentNo.val(),
             'letter_date': $letterDate.val(),
             'sr_no': $srNO.val(),
-            'assignment_date': $assignmentDate.val(),
+            'assignment_date_from': $assignmentDateFrom.val(),
+            'assignment_date_to': $assignmentDateTo.val(),
             'is_chargeable': $isChargeable.val(),
             'charge_price': $chargePrice.val(),
             'customer_id': $customer.val(),
@@ -356,7 +451,6 @@ $(function(){
 
             });
         });
-        console.log(dataPayload);
 
         // $.ajaxSetup({
         //     headers: {
@@ -368,10 +462,10 @@ $(function(){
             method: 'POST',
             data: {'data': dataPayload},
             url: '/api/v1/assignment-domestic-AddNew',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                // 'Accept': 'application/json',
-            },
+            // headers: {
+            //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //     // 'Accept': 'application/json',
+            // },
             cache: false
         }).done(function(dt){
             // console.log(dt);
@@ -379,7 +473,7 @@ $(function(){
                 Swal.fire({
                     title: 'Created Successfully',
                     text: 'Domestic Assignment has been created successfully.',
-                    iocn: 'success',
+                    icon: 'success',
                 })
                 window.location.href = '/assignment-domestic';
             }
@@ -464,96 +558,6 @@ $(function(){
                 .append($elSupper)
                 // .append($elAction)
         );
-    }
-
-    function addDuringService(i, day, $b, $t, now, from){
-        // let countDuringService = totalTechnicians; // $table.children('tr:not(.no-records-found)').length;
-        // let $container = $('.preservice.collection-container');
-        // let $proto = $($container.data('prototype').replace(/__NAME__/g, count));
-        let newDateAssignmentFrom = new Date(from.getTime() + (day * 24 * 60 * 60 * 1000));
-        newDateAssignmentFrom.setHours(0, 0, 0, 0);
-        console.log('newDateAssignmentFrom: ', newDateAssignmentFrom);
-
-        let newNow = new Date(now);
-        newNow.setHours(0, 0, 0, 0);
-        console.log('newNow: ', newNow);
-
-        let $row = $('<tr>');
-        // let $btnRemove = $(
-        //     '<button role="button" type="button" class="btn btn-falcon-danger text-danger remove-' + count + '"><i class="fad fa-trash"></i></button>');
-
-        let $elNo = $('<td class="text-center" style="vertical-align: middle">').html(count);
-        // let $selectTechnician = $proto.find('text.technician');
-        let $idTechnician = $('<td style="display: none;">').append(i.id)
-        let $assignmentDate = $('<td style="display: none;">').append(newDateAssignmentFrom.toISOString().split('T')[0]);
-        let $technician = $('<td>').append(i.text);
-
-        // let $checkIn = $('<input type="date" class="form-control" name="preservice['+count+'][checkIn]" size="8">');
-        let $breakfast = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][breakfast]" style="cursor: pointer; width: 25px; height: 25px;">');
-        // console.log('now:', now.toISOString().split('T')[0]);
-        // console.log('from:', new Date(from + day).toISOString().split('T')[0]);
-        // $breakfast.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
-
-        let $startJob = $('<input type="text" class="p-2 time24h text-center w-20" style="width: 80px;" placeholder="HH:MM" name="duringservice['+count+'][start_job]" style="cursor: pointer;" />');
-        // $startJob.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
-
-        let $lunch = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][lunch]" style="cursor: pointer; width: 25px; height: 25px;">');
-        // $lunch.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
-
-        let $finishJob = $('<input type="text" class="p-2 time24h text-center w-20" style="width: 80px;" placeholder="HH:MM" name="duringservice['+count+'][finish_job]" style="cursor: pointer;" />');
-        // $finishJob.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
-
-        let $dinner = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][dinner]" style="cursor: pointer; width: 25px; height: 25px;">');
-        $dinner.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
-
-        let $elIdTechnician = $('<td style="vertical-align: middle; display: none;">').append($idTechnician);
-        let $elAssignmentDate = $('<td style="vertical-align: middle; display: none;">').append($assignmentDate);
-        let $elTechnician = $('<td style="vertical-align: middle">').append($technician);
-        // let $elCheckIn = $('<td>').append($checkIn);
-        let $elBreakfast = $('<td class="text-center" style="vertical-align: middle">').append($breakfast);
-        let $elStartJob = $('<td class="text-center" style="vertical-align: middle">').append($startJob);
-        let $elLunch = $('<td class="text-center my-auto" style="vertical-align: middle">').append($lunch);
-        let $elFinishJob = $('<td class="text-center" style="vertical-align: middle">').append($finishJob);
-        let $elDinner = $('<td class="text-center" style="vertical-align: middle">').append($dinner);
-
-        // $tableAccDuringServiceBody.append(
-            $row.append($elNo)
-                .append($elIdTechnician)
-                .append($elAssignmentDate)
-                .append($elTechnician)
-                // .append($elCheckIn)
-                .append($elBreakfast)
-                .append($elStartJob)
-                .append($elLunch)
-                .append($elFinishJob)
-                .append($elDinner)
-                // .append($elAction)
-        // );
-
-        // $tbody.append($row);
-        $b.append($row);
-        $t.append($b);
-        $accDuringServiceTableContainer.append($t);
-
-        let $time24h = $t.find('.time24h');
-
-        $time24h.mask('Hh:Mm', {
-            translation: {
-                'H': { pattern: /[0-2]/, optional: false },
-                'h': { pattern: /[0-9]/, optional: false },
-                'M': { pattern: /[0-5]/, optional: false },
-                'm': { pattern: /[0-9]/, optional: false }
-            },
-            placeholder: "HH:MM"
-        });
-
-        $time24h.on('blur', function(){
-            let timeVal = $time24h.val().split(':');
-            if(parseInt(timeVal[0]) > 23 || parseInt(timeVal[1]) > 59){
-                $time24h.val('');
-            }
-        });
-
     }
 
 
