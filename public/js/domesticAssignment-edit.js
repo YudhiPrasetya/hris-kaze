@@ -5,6 +5,12 @@ $(function(){
         }
     });
 
+    $('.custom-control.custom-switch').closest('.form-group').addClass('mb-0');
+
+    let $assignmentType = $('#assignment_type').select2();
+
+
+    let $overseasTo = $('#overseas_to').select2();
     let $customer = $('#customer').select2();
     let $machine = $('#machine').select2();
     let $technicians = $('#technicians').select2();
@@ -22,38 +28,143 @@ $(function(){
     let $tablesDuringServiceContainer = $('#table-accduringservice-container');
     let $checkOutDate = $('#checkOut');
 
+    let $etaFlightDate = $('#eta_flight_date');
+    let $etaFlightTime = $('#eta_flight_time');
+    $etaFlightTime.mask('Hh:Mm', {
+        translation: {
+            'H': { pattern: /[0-2]/, optional: false },
+            'h': { pattern: /[0-9]/, optional: false },
+            'M': { pattern: /[0-5]/, optional: false },
+            'm': { pattern: /[0-9]/, optional: false }
+        },
+        placeholder: "HH:MM"
+    });
+
+    $etaFlightTime.on('blur', function(){
+        let timeVal = $etaFlightTime.val().split(':');
+        if(parseInt(timeVal[0]) > 23 || parseInt(timeVal[1]) > 59){
+            $etaFlightTime.val('');
+        }
+    });
+
+    let $tableArrivalBody = $('.table-arrival tbody');
+
     let $btnDomesticAssigment = $('.btnDomesticAssignment');
+
+    let accordionIcons = {
+        header: "ui-icon-circle-arrow-e",
+        activeHeader: "ui-icon-circle-arrow-s"
+    }
+    $('#accordion').accordion({
+        icons: accordionIcons,
+        collapsible: false,
+        active: false,
+        heightStyle: "content"
+    });
 
     function loadDataService(){
         $.when(
             $.ajax({
                 type: 'GET',
-                url: '/api/v1/domestic-assignment-preService/Id/' + id,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    // 'Accept': 'application/json',
-                },
+                url: '/api/v1/assignments-preService/Id/' + id,
                 cache: false
             }),
             $.ajax({
                 type: 'GET',
-                url: '/api/v1/domestic-assignment-duringService/Id/' + id,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    // 'Accept': 'application/json',
-                },
+                url: '/api/v1/assignments-duringService/Id/' + id,
                 cache: false
             })
-        ).done(function(preServiceResponse, duringServiceResponse){
+
+        ).done(function(preServiceResponse, duringServiceResponse, arrival){
             $checkInDate.val(preServiceResponse[0][0].check_in_date);
             $checkInAt.val(preServiceResponse[0][0].check_in_at);
             loadPreServiceData(preServiceResponse);
+            if($assignmentType.val() == "Overseas"){
+                loadArrival(id);
+            }else{
+                // $('#arrivalToggleShow').hide();
+                // $('#arrivalLabelHeader').hide()
+                $('#accordion h5').eq(2).addClass('ui-state-disabled');
+            }
 
             $checkOutDate.val(duringServiceResponse[0][0].check_out_date);
             loadDuringServiceData(duringServiceResponse);
+
+            // if($assignmentType.val() != "Overseas"){
+            //     // $('#arrivalLine').hide();
+            //     $('#arrivalToggleShow').hide();
+            // }else{
+            //     // $('#arrivalLine').show();
+            //     $('#arrivalToggleShow').show();
+            // }
+
+
         });
     }
     loadDataService();
+
+    function loadArrival(i){
+        $.ajax({
+            type: 'GET',
+            url: '/api/v1/assignments-getArrival/Id/' + i,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            cache: false,
+            success: function(data){
+                console.log('data: ', data);
+                loadDataArrival(data);
+            }
+        })
+    }
+
+    function loadDataArrival(dt){
+        console.log('dt: ', dt);
+        $etaFlightDate.val(dt[0].eta_flight_date);
+        $etaFlightTime.val(dt[0].eta_flight_time);
+
+        totalTechnicians = 0;
+        count = 0;
+
+        $.each(dt, function(i, d){
+            count = totalTechnicians + 1;
+            let $row = $('<tr>');
+
+            let $elNo = $('<td class="text-center" style="vertical-align: middle">').html(count);
+            let $idTechnician = $('<td>').append(d.employee_id)
+            let $technician = $('<td>').append(d.employee_name);
+
+            let $breakfast = $('<input type="checkbox" class="p-2" id="' + "breakfast" + i + '" style="cursor: pointer; width: 25px; height: 25px;">');
+            $breakfast.attr('checked', d.breakfast == 1);
+
+            let $lunch = $('<input type="checkbox" class="p-2" id="' + "lunch" + i + '" style="cursor: pointer; width: 25px; height: 25px;">');
+            $lunch.attr('checked', d.lunch == 1);
+
+            let $dinner = $('<input type="checkbox" class="p-2" id="' + "dinner" + i + '" style="cursor: pointer; width: 25px; height: 25px;">');
+            $dinner.attr('checked', d.dinner == 1);
+
+            let $supper = $('<input type="checkbox" class="p-2" id="' + "supper" + i + '" style="cursor: pointer; width: 25px; height: 25px;">');
+            $supper.attr('checked', d.supper == 1);
+
+            let $elIdTechnician = $('<td style="display: none; vertical-align: middle"">').append($idTechnician);
+            let $elTechnician = $('<td style="vertical-align: middle">').append($technician);
+            let $elBreakfast = $('<td class="text-center" style="vertical-align: middle">').append($breakfast);
+            let $elLunch = $('<td class="text-center my-auto" style="vertical-align: middle">').append($lunch);
+            let $elDinner = $('<td class="text-center" style="vertical-align: middle">').append($dinner);
+            let $elSupper = $('<td class="text-center" style="vertical-align: middle">').append($supper);
+
+            $tableArrivalBody.append(
+                $row.append($elNo)
+                    .append($elIdTechnician)
+                    .append($elTechnician)
+                    .append($elBreakfast)
+                    .append($elLunch)
+                    .append($elDinner)
+                    .append($elSupper)
+            );
+            totalTechnicians++;
+        });
+    }
 
     function loadPreServiceData(preServiceData){
         $.each(preServiceData[0], function(i, data){
@@ -161,18 +272,21 @@ $(function(){
 
         let $breakfast = $('<input type="checkbox" class="p-2" id="' + "ds_breakfast" + day + '" style="cursor: pointer; width: 25px; height: 25px;">');
         $breakfast.attr('checked', i.ds_breakfast > 0);
+        $breakfast.attr('disabled', $assignmentType.val() == "Overseas");
 
         let $startJob = $('<input type="text" id="' + "start_job" + day + '" class="p-2 time24h text-center w-20" style="width: 80px;" placeholder="HH:MM"  style="cursor: pointer;" />');
         $startJob.val(i.start_job);
 
         let $lunch = $('<input type="checkbox" id="' + "ds_lunch" + day + '" class="p-2" style="cursor: pointer; width: 25px; height: 25px;">');
         $lunch.attr('checked', i.ds_lunch > 0);
+        $lunch.attr('disabled', $assignmentType.val() == "Overseas");
 
         let $finishJob = $('<input type="text" id="' + "finish_job" + day + '" class="p-2 time24h text-center w-20" style="width: 80px;" placeholder="HH:MM" " style="cursor: pointer;" />');
         $finishJob.val(i.finish_job);
 
         let $dinner = $('<input type="checkbox" id="' + "dinner" + day + '" class="p-2" style="cursor: pointer; width: 25px; height: 25px;">');
         $dinner.attr('checked', i.ds_dinner > 0);
+        $dinner.attr('disabled', $assignmentType.val() == "Overseas");
 
         let $elIdTechnician = $('<td style="vertical-align: middle; display: none;">').append($idTechnician);
         let $elAssignmentDate = $('<td style="vertical-align: middle; display: none;">').append($assignmentDate);
@@ -219,11 +333,45 @@ $(function(){
         });
     }
 
+    $etaFlightTime.on('blur', function(){
+        if($assignmentType.val() === "Overseas"){
+            let etaFlightDateVal = $etaFlightDate.val();
+            let etaFlightTimeVal = $etaFlightTime.val();
+            let etaFlightDateTime = new Date(etaFlightDateVal + " " + etaFlightTimeVal);
+
+            let limit1 = new Date(etaFlightDateVal + " " + "13:00");
+            let limit2 = new Date(etaFlightDateVal + " " + "18:00");
+
+            if(etaFlightDateTime <= limit1){
+                $tableArrivalBody.children('tr').each(function(i, row){
+                    let $row = $(row);
+                    $row.find('td:nth-child(5) input[type="checkbox"]').attr('checked', 'checked');
+                })
+            }else if(etaFlightDateTime >= limit1 && etaFlightDateTime <= limit2){
+                $tableArrivalBody.children('tr').each(function(i, row){
+                    let $row = $(row);
+                    $row.find('td:nth-child(5) input[type="checkbox"]').attr('checked', 'checked');
+                    $row.find('td:nth-child(6) input[type="checkbox"]').attr('checked', 'checked');
+                });
+            }else if(etaFlightDateTime > limit2){
+                $tableArrivalBody.children('tr').each(function(i, row){
+                    let $row = $(row);
+                    $row.find('td:nth-child(5) input[type="checkbox"]').attr('checked', 'checked');
+                    $row.find('td:nth-child(6) input[type="checkbox"]').attr('checked', 'checked');
+                    $row.find('td:nth-child(7) input[type="checkbox"]').attr('checked', 'checked');
+                });
+            }
+
+        }
+    });
+
     $btnDomesticAssigment.on('click', function(){
         let dataPayload = {
             'assignment_id': id,
+            'assignment_type': $assignmentType.val(),
             'pre_service': [],
-            'during_service': []
+            'during_service': [],
+            'arrival': []
         };
 
         let $tablePreServiceBody = $('.table-accpreservice tbody');
@@ -274,25 +422,43 @@ $(function(){
             });
         });
 
+        if($assignmentType.val() == "Overseas"){
+            let $tableArrivalBody = $('.table-arrival tbody');
+            $tableArrivalBody.children('tr').each(function(i, row){
+                let $row = $(row);
+                let etaFlightDateVal = $etaFlightDate.val();
+                let etaFlightTimeVal = $etaFlightTime.val();
+                let employeeId = $row.find('td:nth-child(2)').text();
+                let breakfast = $row.find('td:nth-child(4) input[type="checkbox"]').is(':checked') ? 1 : 0;
+                let lunch = $row.find('td:nth-child(5) input[type="checkbox"]').is(':checked') ? 1 : 0;
+                let dinner = $row.find('td:nth-child(6) input[type="checkbox"]').is(':checked') ? 1 : 0;
+                let supper = $row.find('td:nth-child(7) input[type="checkbox"]').is(':checked') ? 1 : 0;
+
+                dataPayload.arrival.push({
+                    'eta_flight_date': etaFlightDateVal,
+                    'eta_flight_time': etaFlightTimeVal,
+                    'employee_id': employeeId,
+                    'breakfast': breakfast,
+                    'lunch': lunch,
+                    'dinner': dinner,
+                    'supper': supper
+                });
+            });
+        }
+
         $.ajax({
             type: 'POST',
-            data: {
-                // _token: $('meta[name="csrf-token"]').attr('token'),
-                'data': dataPayload
-            },
-            url: '/api/v1/assignment-domestic-update',
-            // headers: {
-            //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            // },
+            data: {'data': dataPayload},
+            url: '/api/v1/assignments-update',
             cache: false
         }).done(function(dt){
             if(dt){
                 Swal.fire({
                     title: 'Updated Successfully',
-                    text: 'Domestic Assignment has been updated successfully.',
+                    text: 'Assignment has been updated successfully.',
                     icon: 'success',
                 })
-                window.location.href = '/assignment-domestic';
+                window.location.href = '/assignments';
             }
         })
 

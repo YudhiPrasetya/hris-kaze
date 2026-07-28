@@ -163,8 +163,9 @@ Route::domain(config('app.domain'))->group(function () {
 
       Route::resource('assignment', AssignmentController::class);
 
-      // domestic assigment route
-      Route::resource('assignment-domestic', DomesticAssignmentController::class);
+      // assigment route
+    //   Route::resource('assignment-domestic', DomesticAssignmentController::class);
+      Route::resource('assignments', DomesticAssignmentController::class);
         // Route::get('/assignment-domestic/index', [DomesticAssignmentController::class, 'index'])->name('assignment-domestic.index');
 
       // overseas assignment route
@@ -247,11 +248,13 @@ Route::domain(config('app.domain'))->group(function () {
       Route::get('/api/v1/assignment/employee/{employee}', [AssignmentController::class, 'getByEmployee'])->name('api.assignment.employee');
 
       // Assigment domestic api routes
-      Route::get('/api/v1/assignment-domestic', [DomesticAssignmentController::class, 'list'])->name('api.assignment-domestic');
-      Route::post('/api/v1/assignment-domestic-AddNew',[DomesticAssignmentController::class, 'addNew'])->name('api.assignment-domestic-addNew');
-      Route::get('/api/v1/domestic-assignment-preService/Id/{id}', [DomesticAssignmentController::class, 'preServiceGetById'])->name('api.assignment-domestic-preSerice-getById');
-      Route::get('/api/v1/domestic-assignment-duringService/Id/{id}', [DomesticAssignmentController::class, 'duringServiceGetById'])->name('api.assignment-domestic-duringSerice-getById');
-      Route::post('/api/v1/assignment-domestic-update', [DomesticAssignmentController::class, 'domesticAssignmentUpdate'])->name('api.assignment-domestic-update');
+      Route::get('/api/v1/assignments', [DomesticAssignmentController::class, 'list'])->name('api.assignments');
+      Route::post('/api/v1/assignments-AddNew',[DomesticAssignmentController::class, 'addNew'])->name('api.assignments-addNew');
+      Route::get('/api/v1/assignments-preService/Id/{id}', [DomesticAssignmentController::class, 'preServiceGetById'])->name('api.assignments-preSerice-getById');
+      Route::get('/api/v1/assignments-duringService/Id/{id}', [DomesticAssignmentController::class, 'duringServiceGetById'])->name('api.assignments-duringSerice-getById');
+      Route::get('/api/v1/assignments-getArrival/Id/{id}', [DomesticAssignmentController::class, 'getArrival'])->name('api.assignments-getArrival');
+      Route::post('/api/v1/assignments-update', [DomesticAssignmentController::class, 'domesticAssignmentUpdate'])->name('api.assignments-update');
+      Route::get('/api/v1/overseasTo', [DomesticAssignmentController::class, 'overseasTo'])->name('api.overseasTo');
 
       Route::get('/api/v1/customer', [CustomerController::class, 'list'])->name('api.customer');
 

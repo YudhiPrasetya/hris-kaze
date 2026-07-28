@@ -12,10 +12,10 @@ class DomesticAssignment extends ModelBase{
     use HasTimestamps;
 
     protected $fillable = [
-        'assignment_no', 'letter_date',
+        'assignment_type', 'overseas_to', 'assignment_no', 'letter_date',
         'customer_id', 'is_chargeable','charge_price',
         'sr_no', 'machine_id', 'assignment_date_from',
-        'assignment_date_to'
+        'assignment_date_to', 'exchange_rate', 'exchange_rate_history'
     ];
 
     public function __construct(array $attributes = []){
@@ -39,6 +39,10 @@ class DomesticAssignment extends ModelBase{
 
     public function domesticAssignmentDuringServices(): HasMany{
         return $this->hasMany(DomesticAssignmentDuringService::class, 'assignment_id', 'id');
+    }
+
+    public function arrivalFromOverseasAssignment(): HasMany{
+        return $this->hasMany(ArrivalFromOverseasAssignment::class, 'assignment_id', 'id');
     }
 
     public function customer(): HasOne{

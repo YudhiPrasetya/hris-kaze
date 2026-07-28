@@ -2,13 +2,14 @@
 
 @section('title', 'Domestic Assignments')
 @section('subtitle')
-	<small class="fs-0 text-muted d-block">List of domestic assignment</small>
+	<small class="fs-0 text-muted d-block">List of assignments</small>
 @endsection
-@section('new_url', route('assignment-domestic.create'))
+@section('new_url', route('assignments.create'))
 {{-- @section('new_url', route('api.assignment-domestic-addNew')) --}}
-@section('api_list_url', route('api.assignment-domestic'))
+@section('api_list_url', route('api.assignments'))
 
 @section('columns')
+	<th scope="col" data-class="va-baseline" data-field="assignment_type" data-sortable="true">Assignment Type</th>
 	<th scope="col" data-class="va-baseline" data-field="assignment_no" data-sortable="true">No. Assignment</th>
 	<th scope="col" data-class="va-baseline" data-field="letter_date" data-sortable="true">Letter Date</th>
 	{{-- <th scope="col" data-class="va-baseline" data-field="assignment_date" data-sortable="true">Assignment Date</th> --}}

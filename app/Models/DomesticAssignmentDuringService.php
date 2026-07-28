@@ -19,7 +19,7 @@ class DomesticAssignmentDuringService extends Model
         'during_service_breakfast', 'during_service_lunch',
         'during_service_dinner', 'during_service_supper',
         'start_job', 'finish_job',
-        'overtime'
+        'overtime', 'overseas_meal'
     ];
 
     public function __construct(array $attributes = []){

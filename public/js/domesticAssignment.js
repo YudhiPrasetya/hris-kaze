@@ -1,3 +1,6 @@
+// const { fx } = require("jquery");
+
+// const { fx } = require("jquery");
 
 let totalTechnicians = 0;
 let count = 0;
@@ -85,6 +88,31 @@ $(function(){
         }
     });
 
+    $('.custom-control.custom-switch').closest('.form-group').addClass('mb-0');
+
+    $('#arrivalTimeTab').hide();
+
+    let $assignmentType = $('#assignment_type').select2();
+    let $overseasTo = $('#overseas_to').select2();
+    function loadOverseasTo($owner){
+        $.ajax({
+            type: 'GET',
+            url: '/api/v1/overseasTo',
+            cache: false,
+            success: function(data, textStatus, jqXHR){
+                $.each(data, function (idx, item) {
+                    let option = new Option(item.country + " - " + item.currency_code, item.id)
+                    $owner.append(option);
+                });
+
+                $owner.trigger('change');
+            }
+        });
+    }
+
+    loadOverseasTo($overseasTo);
+    $overseasTo.attr('disabled', true);
+
     let $assignmentNo = $('#assignment_no');
     let $letterDate = $('#letter_date');
     let $srNO = $('#sr_no');
@@ -112,6 +140,7 @@ $(function(){
     let $checkOut = $('#checkOut');
     let $preServiceToggleShow = $('#preServiceToggleShow');
     let $duringServiceToggleShow = $('#duringServiceToggleShow');
+    let $arrivalTimeToggleShow = $('#arrivalTimeToggleShow');
     let $tableAccPreService = $('.table-accpreservice');
     let $tableAccPreServiceBody = $('.table-accpreservice tbody');
 
@@ -119,12 +148,40 @@ $(function(){
     // let $tableAccDuringServiceBody = $('.table-accduringservice tbody');
     let $accDuringServiceTableContainer = $('#table-accduringservice-container');
 
-    // $tableAccPreService.hide();
-    // $checkIn.hide();
-    // $toggleShow.hide();
+    let $etaFlightDate = $('.etaFlightDate');
+    let $etaFlightTime = $('.etaFlightTime');
+    $etaFlightTime.mask('Hh:Mm', {
+        translation: {
+            'H': { pattern: /[0-2]/, optional: false },
+            'h': { pattern: /[0-9]/, optional: false },
+            'M': { pattern: /[0-5]/, optional: false },
+            'm': { pattern: /[0-9]/, optional: false }
+        },
+        placeholder: "HH:MM"
+    });
+
+    $etaFlightTime.on('blur', function(){
+        let timeVal = $etaFlightTime.val().split(':');
+        if(parseInt(timeVal[0]) > 23 || parseInt(timeVal[1]) > 59){
+            $etaFlightTime.val('');
+        }
+    });
+
+    let $tableArrivalTimeBody = $('.table-arrivaltime tbody');
+
+    $assignmentType.on('change', function(){
+        let assignmentTypeVal = $(this).val();
+        if(assignmentTypeVal == "Domestic"){
+            $overseasTo.val("0").trigger('change');
+        }
+        $overseasTo.attr('disabled', assignmentTypeVal !== 'Overseas');
+        $('#accomodations option[value="3"]').attr('disabled', assignmentTypeVal !== 'Overseas');
+
+    });
 
     $preServiceToggleShow.hide();
     $duringServiceToggleShow.hide();
+    $arrivalTimeToggleShow.hide();
 
     loadCustomer($customer);
     loadTechnisians($technicians);
@@ -146,7 +203,7 @@ $(function(){
     $technicians.select2().on('change', function(){
         let data = $technicians.select2('data');
         $tableAccPreServiceBody.empty();
-        // $tableAccDuringServiceBody.empty();
+        $tableArrivalTimeBody.empty();
         $accDuringServiceTableContainer.empty();
 
         totalTechnicians = 0;
@@ -154,6 +211,9 @@ $(function(){
 
         $.each(data, function(i, item){
             count = totalTechnicians + 1;
+            if($assignmentType.val() == 'Overseas'){
+                addArrivalTime(item);
+            }
             addPreService(item);
             totalTechnicians++;
         });
@@ -203,23 +263,19 @@ $(function(){
                 count = 0;
                 $.each(data, function(i, itm){
                     count = totalTechnicians + 1;
-                    addDuringService(itm, x, $tbody, $table, dateNow, dateAssignmentFrom);
+                    addDuringService(itm, x, $tbody, $table, dateNow, dateAssignmentFrom, $assignmentType.val());
                     totalTechnicians++;
                 });
             }
         }
-
     });
 
-    function addDuringService(i, day, $b, $t, now, from){
+    function addDuringService(i, day, $b, $t, now, from, assignmentType){
         // let countDuringService = totalTechnicians; // $table.children('tr:not(.no-records-found)').length;
         // let $container = $('.preservice.collection-container');
         // let $proto = $($container.data('prototype').replace(/__NAME__/g, count));
-        console.log('day: ', day);
         let newDateAssignmentFrom = new Date(from.getTime() + (day * 24 * 60 * 60 * 1000));
         // newDateAssignmentFrom.setHours(0, 0, 0, 0);
-        console.log('newDateAssignmentFrom: ', newDateAssignmentFrom);
-
         // let newNow = new Date(now);
         // newNow.setHours(0, 0, 0, 0);
 
@@ -235,6 +291,7 @@ $(function(){
 
         // let $checkIn = $('<input type="date" class="form-control" name="preservice['+count+'][checkIn]" size="8">');
         let $breakfast = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][breakfast]" style="cursor: pointer; width: 25px; height: 25px;">');
+        $breakfast.attr('disabled', assignmentType == 'Overseas');
         // console.log('now:', now.toISOString().split('T')[0]);
         // console.log('from:', new Date(from + day).toISOString().split('T')[0]);
         // $breakfast.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
@@ -243,12 +300,14 @@ $(function(){
         // $startJob.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
 
         let $lunch = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][lunch]" style="cursor: pointer; width: 25px; height: 25px;">');
+        $lunch.attr('disabled', assignmentType == 'Overseas');
         // $lunch.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
 
         let $finishJob = $('<input type="text" class="p-2 time24h text-center w-20" style="width: 80px;" placeholder="HH:MM" name="duringservice['+count+'][finish_job]" style="cursor: pointer;" />');
         // $finishJob.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
 
         let $dinner = $('<input type="checkbox" class="p-2" name="duringservice['+count+'][dinner]" style="cursor: pointer; width: 25px; height: 25px;">');
+        $dinner.attr('disabled', assignmentType == 'Overseas');
         // $dinner.attr('disabled', newNow.toISOString().split('T')[0] != newDateAssignmentFrom.toISOString().split('T')[0]);
 
         let $elIdTechnician = $('<td style="vertical-align: middle; display: none;">').append($idTechnician);
@@ -310,29 +369,174 @@ $(function(){
             case "2" :
                 toggleDuringService();
                 break;
+            case "3":
+                toggleArrivalTime();
+                break;
             default :
                 hideToggleService();
                 break;
         }
     });
 
+    $etaFlightTime.on('blur', function(){
+        if($assignmentType.val() === "Overseas"){
+            let etaFlightDateVal = $etaFlightDate.val();
+            let etaFlightTimeVal = $etaFlightTime.val();
+            let etaFlightDateTime = new Date(etaFlightDateVal + " " + etaFlightTimeVal);
+
+            let limit1 = new Date(etaFlightDateVal + " " + "13:00");
+            let limit2 = new Date(etaFlightDateVal + " " + "18:00");
+
+            if(etaFlightDateTime <= limit1){
+                $tableArrivalTimeBody.children('tr').each(function(i, row){
+                    let $row = $(row);
+                    $row.find('td:nth-child(5) input[type="checkbox"]').attr('checked', 'checked');
+                })
+            }else if(etaFlightDateTime >= limit1 && etaFlightDateTime <= limit2){
+                $tableArrivalTimeBody.children('tr').each(function(i, row){
+                    let $row = $(row);
+                    $row.find('td:nth-child(5) input[type="checkbox"]').attr('checked', 'checked');
+                    $row.find('td:nth-child(6) input[type="checkbox"]').attr('checked', 'checked');
+                });
+            }else if(etaFlightDateTime > limit2){
+                $tableArrivalTimeBody.children('tr').each(function(i, row){
+                    let $row = $(row);
+                    $row.find('td:nth-child(5) input[type="checkbox"]').attr('checked', 'checked');
+                    $row.find('td:nth-child(6) input[type="checkbox"]').attr('checked', 'checked');
+                    $row.find('td:nth-child(7) input[type="checkbox"]').attr('checked', 'checked');
+                });
+            }
+
+        }
+    });
+
     $btnDomesticAssignment.on('click', function(e){
         e.preventDefault();
 
-        let dataPayload = {
-            'assignment_no': $assignmentNo.val(),
-            'letter_date': $letterDate.val(),
-            'sr_no': $srNO.val(),
-            'assignment_date_from': $assignmentDateFrom.val(),
-            'assignment_date_to': $assignmentDateTo.val(),
-            'is_chargeable': $isChargeable.val(),
-            'charge_price': $chargePrice.val(),
-            'customer_id': $customer.val(),
-            'machine_id': $machine.val(),
-            'pre_service': [],
-            'during_service': []
-            // 'domestic_assignment_employee': []
-        };
+        updateAssignmentAccomodations();
+
+        // var dataPayload = {
+        //     'exchange_rate': 0,
+        //     'exchange_rate_history': '',
+        //     'assignment_type': $('#assignment_type option:selected').text(),
+        //     'overseas_to': $('#overseas_to option:selected').text(),
+        //     'assignment_no': $assignmentNo.val(),
+        //     'letter_date': $letterDate.val(),
+        //     'sr_no': $srNO.val(),
+        //     'assignment_date_from': $assignmentDateFrom.val(),
+        //     'assignment_date_to': $assignmentDateTo.val(),
+        //     'is_chargeable': $isChargeable.val(),
+        //     'charge_price': $chargePrice.val(),
+        //     'customer_id': $customer.val(),
+        //     'machine_id': $machine.val(),
+        //     'pre_service': [],
+        //     'during_service': [],
+        //     'arrival': []
+        // };
+
+        // $tableAccPreServiceBody.children('tr').each(function(i, row){
+        //     let $row = $(row);
+        //     let checkInDate = $checkIn.val();
+        //     let checkInAt = $checkInAt.val();
+        //     let employeeId = $row.find('td:nth-child(2)').text();
+        //     let breakfast = $row.find('td:nth-child(4) input[type="checkbox"]').is(':checked') ? 1 : 0;
+        //     let lunch = $row.find('td:nth-child(5) input[type="checkbox"]').is(':checked') ? 1 : 0;
+        //     let dinner = $row.find('td:nth-child(6) input[type="checkbox"]').is(':checked') ? 1 : 0;
+        //     let supper = $row.find('td:nth-child(7) input[type="checkbox"]').is(':checked') ? 1 : 0;
+
+        //     dataPayload.pre_service.push({
+        //         'employee_id': employeeId,
+        //         'check_in_date': checkInDate,
+        //         'check_in_at': checkInAt,
+        //         'pre_service_breakfast': breakfast,
+        //         'pre_service_lunch': lunch,
+        //         'pre_service_dinner': dinner,
+        //         'pre_service_supper': supper
+        //     });
+        // });
+
+        // let $tables = $accDuringServiceTableContainer.children('.table-accduringservice');
+
+        // $tables.children('tbody').children('tr').each(function(i, row){
+        //     // console.log('row: ', $row);
+        //     let $row = $(row);
+        //     let checkOutDate = $checkOut.val();
+        //     let employeeId = $row.find('td:nth-child(2)').text();
+        //     let assignmentDate = $row.find('td:nth-child(3)').text();
+        //     let breakfast = $row.find('td:nth-child(5) input[type="checkbox"]').is(':checked') ? 1 : 0;
+        //     let startJob = $row.find('td:nth-child(6) input[type="text"]').val();
+        //     let lunch = $row.find('td:nth-child(7) input[type="checkbox"]').is(':checked') ? 1 : 0;
+        //     let finishJob = $row.find('td:nth-child(8) input[type="text"]').val();
+        //     let dinner = $row.find('td:nth-child(9) input[type="checkbox"]').is(':checked') ? 1 : 0;
+
+        //     dataPayload.during_service.push({
+        //         'check_out_date': checkOutDate,
+        //         'assignment_date': assignmentDate,
+        //         'employee_id': employeeId,
+        //         'during_service_breakfast': breakfast,
+        //         'start_job': startJob,
+        //         'during_service_lunch': lunch,
+        //         'finish_job': finishJob,
+        //         'during_service_dinner': dinner,
+        //         'overtime': 0
+
+        //     });
+        // });
+
+        // if($assignmentType.val() === "Overseas"){
+        //     $tableArrivalTimeBody.children('tr').each(function(i, row){
+        //         let $row = $(row);
+        //         let employeeId = $row.find('td:nth-child(2)').text();
+        //         let breakfast = $row.find('td:nth-child(4) input[type="checkbox"]').is(':checked') ? 1 : 0;
+        //         let lunch = $row.find('td:nth-child(5) input[type="checkbox"]').is(':checked') ? 1 : 0;
+        //         let dinner = $row.find('td:nth-child(6) input[type="checkbox"]').is(':checked') ? 1 : 0;
+        //         let supper = $row.find('td:nth-child(7) input[type="checkbox"]').is(':checked') ? 1 : 0;
+
+        //         dataPayload.arrival.push({
+        //             'eta_flight_date': $etaFlightDate.val(),
+        //             'eta_flight_time': $etaFlightTime.val(),
+        //             'employee_id': employeeId,
+        //             'breakfast': breakfast,
+        //             'lunch': lunch,
+        //             'dinner': dinner,
+        //             'supper': supper
+        //         });
+        //     });
+
+        //     // dataPayload.exchange_rate = 109.8;
+        //     // dataPayload.exchange_rate_history = new Date().toISOString().replace('T', ' ').substring(0,19);
+
+        //     $.ajax({
+        //         method: 'GET',
+        //         url: 'https://openexchangerates.org/api/latest.json?app_id=3c4b169d8866440b96e606b6cd53bfe3',
+        //         dataType: 'jsonp',
+        //         error: function(xhr, status, error){
+        //             console.log('error details: ', error)
+        //         }
+        //     }).done(function(data){
+        //         if(typeof fx !== 'undefined' && fx.rates){
+        //             fx.rates = data.rates;
+        //             fx.base = data.base;
+        //             let overseasToArr = $('#overseas_to option:selected').text().split(' - ');
+        //             let exchangeRateFrom = overseasToArr[1];
+        //             let exchangeRateTo = 'IDR';
+        //             let fxVal = fx.convert(1, {from: exchangeRateFrom, to: exchangeRateTo});
+        //             let exchangeRate = Number(fxVal.toFixed(1));
+        //             let exchangeRateHistory = new Date().toISOString().replace('T', ' ').substring(0, 19);
+        //             dataPayload.exchange_rate = exchangeRate;
+        //             dataPayload.exchange_rate_history = exchangeRateHistory;
+
+        //             // changeExchangeRate(exchangeRate, exchangeRateHistory);
+        //         }
+        //     })
+        // }
+        // console.log(dataPayload);
+
+    });
+
+    function updateAssignmentAccomodations(){
+        let preService = [];
+        let duringService = [];
 
         $tableAccPreServiceBody.children('tr').each(function(i, row){
             let $row = $(row);
@@ -344,25 +548,7 @@ $(function(){
             let dinner = $row.find('td:nth-child(6) input[type="checkbox"]').is(':checked') ? 1 : 0;
             let supper = $row.find('td:nth-child(7) input[type="checkbox"]').is(':checked') ? 1 : 0;
 
-            // dataPayload['pre_service['+i+'][employee_id]'] = employeeId;
-            // dataPayload['pre_service['+i+'][check_in_date]'] = checkInDate;
-            // dataPayload['pre_service['+i+'][check_in_at]'] = checkInAt;
-            // dataPayload['pre_service['+i+'][pre_service_breakfast]'] = breakfast;
-            // dataPayload['pre_service['+i+'][pre_service_lunch]'] = lunch;
-            // dataPayload['pre_service['+i+'][pre_service_dinner]'] = dinner;
-            // dataPayload['pre_service['+i+'][pre_service_supper]'] = supper;
-
-            // dataPayload.domestic_assignment_employee.push({
-            //     'employee_id': employeeId,
-            //     'check_in_date': checkInDate,
-            //     'check_in_at': checkInAt,
-            //     'pre_service_breakfast': breakfast,
-            //     'pre_service_lunch': lunch,
-            //     'pre_service_dinner': dinner,
-            //     'pre_service_supper': supper
-            // });
-
-            dataPayload.pre_service.push({
+            preService.push({
                 'employee_id': employeeId,
                 'check_in_date': checkInDate,
                 'check_in_at': checkInAt,
@@ -373,28 +559,7 @@ $(function(){
             });
         });
 
-        // $tableAccDuringServiceBody.children('tr').each(function(i, row){
-        //     let $row = $(row);
-        //     let employeeId = $row.find('td:nth-child(2)').text();
-        //     let breakfast = $row.find('td:nth-child(4) input[type="checkbox"]').is(':checked') ? 1 : 0;
-        //     let startJob = $row.find('td:nth-child(5) input[type="text"]').val();
-        //     let lunch = $row.find('td:nth-child(6) input[type="checkbox"]').is(':checked') ? 1 : 0;
-        //     let finishJob = $row.find('td:nth-child(7) input[type="text"]').val();
-        //     let dinner = $row.find('td:nth-child(8) input[type="checkbox"]').is(':checked') ? 1 : 0;
-
-        //     dataPayload['during_service['+i+'][employee_id]'] = employeeId;
-        //     dataPayload['during_service['+i+'][breakfast]'] = breakfast;
-        //     dataPayload['during_service['+i+'][start_job]'] = startJob;
-        //     dataPayload['during_service['+i+'][lunch]'] = lunch;
-        //     dataPayload['during_service['+i+'][finish_job]'] = finishJob;
-        //     dataPayload['during_service['+i+'][dinner]'] = dinner;
-        // });
         let $tables = $accDuringServiceTableContainer.children('.table-accduringservice');
-        // console.log('tables: ',$tables);
-        // $tables.children('tbody').each(function(x, $tbody){
-        //     console.log('tbody: ', $tbody);
-
-        // })
         $tables.children('tbody').children('tr').each(function(i, row){
             // console.log('row: ', $row);
             let $row = $(row);
@@ -407,38 +572,7 @@ $(function(){
             let finishJob = $row.find('td:nth-child(8) input[type="text"]').val();
             let dinner = $row.find('td:nth-child(9) input[type="checkbox"]').is(':checked') ? 1 : 0;
 
-            // dataPayload['during_service['+i+'][check_out_date]'] = checkOutDate;
-            // dataPayload['during_service['+i+'][assignment_date]'] = assignmentDate;
-            // dataPayload['during_service['+i+'][employee_id]'] = employeeId;
-            // dataPayload['during_service['+i+'][during_service_breakfast]'] = breakfast;
-            // dataPayload['during_service['+i+'][start_assignment]'] = startJob;
-            // dataPayload['during_service['+i+'][during_service_lunch]'] = lunch;
-            // dataPayload['during_service['+i+'][end_assignment]'] = finishJob;
-            // dataPayload['during_service['+i+'][during_service_dinner]'] = dinner;
-
-            // dataPayload.during_service.push({
-            //     'check_out_date': checkOutDate,
-            //     'assignment_date': assignmentDate,
-            //     'employee_id': employeeId,
-            //     'during_service_breakfast': breakfast,
-            //     'start_assignment': startJob,
-            //     'during_service_lunch': lunch,
-            //     'end_assignment': finishJob,
-            //     'during_service_dinner': dinner
-            // });
-
-            // dataPayload.domestic_assignment_employee.push({
-            //     'check_out_date': checkOutDate,
-            //     'assignment_date': assignmentDate,
-            //     'employee_id': employeeId,
-            //     'during_service_breakfast': breakfast,
-            //     'start_assignment': startJob,
-            //     'during_service_lunch': lunch,
-            //     'end_assignment': finishJob,
-            //     'during_service_dinner': dinner
-            // });
-
-            dataPayload.during_service.push({
+            duringService.push({
                 'check_out_date': checkOutDate,
                 'assignment_date': assignmentDate,
                 'employee_id': employeeId,
@@ -452,48 +586,114 @@ $(function(){
             });
         });
 
-        // $.ajaxSetup({
-        //     headers: {
-        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //     }
-        // });
+        let dataPayload = {
+            'exchange_rate': 0,
+            'exchange_rate_history': '',
+            'assignment_type': $('#assignment_type option:selected').text(),
+            'overseas_to': $('#overseas_to option:selected').text(),
+            'assignment_no': $assignmentNo.val(),
+            'letter_date': $letterDate.val(),
+            'sr_no': $srNO.val(),
+            'assignment_date_from': $assignmentDateFrom.val(),
+            'assignment_date_to': $assignmentDateTo.val(),
+            'is_chargeable': $isChargeable.val(),
+            'charge_price': $chargePrice.val(),
+            'customer_id': $customer.val(),
+            'machine_id': $machine.val(),
+            'pre_service': preService,
+            'during_service': duringService,
+            'arrival': []
+        };
 
+        if($assignmentType.val() == "Overseas"){
+            $.ajax({
+                method: 'GET',
+                url: 'https://openexchangerates.org/api/latest.json?app_id=3c4b169d8866440b96e606b6cd53bfe3',
+                dataType: 'jsonp',
+                error: function(xhr, status, error){
+                    console.log('error details: ', error)
+                }
+            }).done(function(data){
+                if(typeof fx !== 'undefined' && fx.rates){
+                    fx.rates = data.rates;
+                    fx.base = data.base;
+                    let overseasToArr = $('#overseas_to option:selected').text().split(' - ');
+                    let exchangeRateFrom = overseasToArr[1];
+                    let exchangeRateTo = 'IDR';
+                    let fxVal = fx.convert(1, {from: exchangeRateFrom, to: exchangeRateTo});
+                    let exchangeRate = Number(fxVal.toFixed(1));
+                    let exchangeRateHistory = new Date().toISOString().replace('T', ' ').substring(0, 19);
+                    dataPayload.exchange_rate = exchangeRate;
+                    dataPayload.exchange_rate_history = exchangeRateHistory;
+
+                    $tableArrivalTimeBody.children('tr').each(function(i, row){
+                        let $row = $(row);
+                        let employeeId = $row.find('td:nth-child(2)').text();
+                        let breakfast = $row.find('td:nth-child(4) input[type="checkbox"]').is(':checked') ? 1 : 0;
+                        let lunch = $row.find('td:nth-child(5) input[type="checkbox"]').is(':checked') ? 1 : 0;
+                        let dinner = $row.find('td:nth-child(6) input[type="checkbox"]').is(':checked') ? 1 : 0;
+                        let supper = $row.find('td:nth-child(7) input[type="checkbox"]').is(':checked') ? 1 : 0;
+
+                        dataPayload.arrival.push({
+                            'eta_flight_date': $etaFlightDate.val(),
+                            'eta_flight_time': $etaFlightTime.val(),
+                            'employee_id': employeeId,
+                            'breakfast': breakfast,
+                            'lunch': lunch,
+                            'dinner': dinner,
+                            'supper': supper
+                        });
+                    });
+                    // console.log('dataPayload: ', dataPayload);
+                    updateAssignment(dataPayload);
+                }
+            })
+        }else{
+            updateAssignment(dataPayload);
+        }
+    }
+
+    function updateAssignment(dp){
         $.ajax({
             method: 'POST',
-            data: {'data': dataPayload},
-            url: '/api/v1/assignment-domestic-AddNew',
-            // headers: {
-            //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            //     // 'Accept': 'application/json',
-            // },
+            data: {'data': dp},
+            url: '/api/v1/assignments-AddNew',
             cache: false
         }).done(function(dt){
             // console.log(dt);
             if(dt){
                 Swal.fire({
                     title: 'Created Successfully',
-                    text: 'Domestic Assignment has been created successfully.',
+                    text: 'Assignment has been created successfully.',
                     icon: 'success',
                 })
-                window.location.href = '/assignment-domestic';
+                window.location.href = '/assignments';
             }
         });
-    });
-
+    }
 
     function hideToggleService(){
         $preServiceToggleShow.fadeOut(500, 'linear', fadeOutPreServiceComplete);
         $duringServiceToggleShow.fadeOut(500, 'linear', fadeOutDuringServiceComplete);
+        $arrivalTimeToggleShow.fadeOut(500, 'linear', fadeOutArrivalTimeComplete);
     }
 
     function togglePreService(){
         $preServiceToggleShow.fadeIn(500, 'linear', fadeInPreServiceComplete);
         $duringServiceToggleShow.fadeOut(500, 'linear', fadeOutDuringServiceComplete);
+        $arrivalTimeToggleShow.fadeOut(500, 'linear', fadeOutArrivalTimeComplete);
     }
 
     function toggleDuringService(){
         $duringServiceToggleShow.fadeIn(500, 'linear', fadeInDuringServiceComplete);
         $preServiceToggleShow.fadeOut(500, 'linear', fadeOutPreServiceComplete);
+        $arrivalTimeToggleShow.fadeOut(500, 'linear', fadeOutArrivalTimeComplete);
+    }
+
+    function toggleArrivalTime(){
+        $arrivalTimeToggleShow.fadeIn(500, 'linear', fadeInArrivalTimeComplete);
+        $preServiceToggleShow.fadeOut(500, 'linear', fadeOutPreServiceComplete);
+        $duringServiceToggleShow.fadeOut(500, 'linear', fadeOutDuringServiceComplete);
     }
 
     function fadeOutPreServiceComplete(){
@@ -512,8 +712,15 @@ $(function(){
         $duringServiceToggleShow.show();
     }
 
+    function fadeOutArrivalTimeComplete(){
+        $arrivalTimeToggleShow.hide();
+    }
+
+    function fadeInArrivalTimeComplete(){
+        $arrivalTimeToggleShow.show();
+    }
+
     function addPreService(i){
-        // let count = totalTechnicians; // $table.children('tr:not(.no-records-found)').length;
         let $container = $('.preservice.collection-container');
         let $proto = $($container.data('prototype').replace(/__NAME__/g, count));
 
@@ -524,7 +731,6 @@ $(function(){
         let $idTechnician = $('<td>').append(i.id)
         let $technician = $('<td>').append(i.text);
 
-        // let $checkIn = $('<input type="date" class="form-control" name="preservice['+count+'][checkIn]" size="8">');
         let $breakfast = $('<input type="checkbox" class="p-2" name="preservice['+count+'][breakfast]" style="cursor: pointer; width: 25px; height: 25px;">');
         let $lunch = $('<input type="checkbox" class="p-2" name="preservice['+count+'][lunch]" style="cursor: pointer; width: 25px; height: 25px;">');
         let $dinner = $('<input type="checkbox" class="p-2" name="preservice['+count+'][dinner]" style="cursor: pointer; width: 25px; height: 25px;">');
@@ -532,109 +738,50 @@ $(function(){
 
         let $elIdTechnician = $('<td style="display: none; vertical-align: middle"">').append($idTechnician);
         let $elTechnician = $('<td style="vertical-align: middle">').append($technician);
-        // let $elCheckIn = $('<td>').append($checkIn);
         let $elBreakfast = $('<td class="text-center" style="vertical-align: middle">').append($breakfast);
         let $elLunch = $('<td class="text-center my-auto" style="vertical-align: middle">').append($lunch);
         let $elDinner = $('<td class="text-center" style="vertical-align: middle">').append($dinner);
         let $elSupper = $('<td class="text-center" style="vertical-align: middle">').append($supper);
-        // let $elAction = $('<td class="text-center" style="vertical-align: middle">').append($btnRemove);
-
-        // $selectTechnician.select2({
-        //     ...defaultSelectOptions,
-        //     ajax: {
-        //         url: route('api.employee.select'),
-        //         ...defaultAjaxOptions
-        //     }
-        // });
 
         $tableAccPreServiceBody.append(
             $row.append($elNo)
                 .append($elIdTechnician)
                 .append($elTechnician)
-                // .append($elCheckIn)
                 .append($elBreakfast)
                 .append($elLunch)
                 .append($elDinner)
                 .append($elSupper)
-                // .append($elAction)
         );
     }
 
+    function addArrivalTime(i){
+        let $row = $('<tr>');
 
+        let $elNo = $('<td class="text-center" style="vertical-align: middle">').html(count);
+        let $idTechnician = $('<td>').append(i.id)
+        let $technician = $('<td>').append(i.text);
 
-    function removeRow() {
-        // $tableAccPreServiceBody.children()
+        let $breakfast = $('<input type="checkbox" class="p-2" name="arrivaltime['+count+'][breakfast]" style="cursor: pointer; width: 25px; height: 25px;">');
+        let $lunch = $('<input type="checkbox" class="p-2" name="arrivaltime['+count+'][lunch]" style="cursor: pointer; width: 25px; height: 25px;">');
+        let $dinner = $('<input type="checkbox" class="p-2" name="arrivaltime['+count+'][dinner]" style="cursor: pointer; width: 25px; height: 25px;">');
+        let $supper = $('<input type="checkbox" class="p-2" name="arrivaltime['+count+'][supper]" style="cursor: pointer; width: 25px; height: 25px;">');
 
-        let $parent = $(this).parent().parent();
-        let $tbody = $parent.parent();
+        let $elIdTechnician = $('<td style="display: none; vertical-align: middle"">').append($idTechnician);
+        let $elTechnician = $('<td style="vertical-align: middle">').append($technician);
+        let $elBreakfast = $('<td class="text-center" style="vertical-align: middle">').append($breakfast);
+        let $elLunch = $('<td class="text-center my-auto" style="vertical-align: middle">').append($lunch);
+        let $elDinner = $('<td class="text-center" style="vertical-align: middle">').append($dinner);
+        let $elSupper = $('<td class="text-center" style="vertical-align: middle">').append($supper);
 
-        // $parent.remove();
-        $tbody.children().each(function () {
-            let index = $(this).index();
-
-            $(this).children(':nth-child(1)').html(index + 1);
-            $(this).children().each(function () {
-                let $el = $(this).children(':first-child');
-                console.log($el.data());
-                let name = $el.attr('name');
-                // console.log(name);
-                // if (name !== undefined) {
-                //     $el.attr('name', name.replace(/\d+/g, index));
-                // }
-            });
-        });
-
-
-        // $tableAccPreServiceBody.removeAttr()
-
-        totalTechnicians--;
-        // $technisians.select2().trigger('change');
+        $tableArrivalTimeBody.append(
+            $row.append($elNo)
+                .append($elIdTechnician)
+                .append($elTechnician)
+                .append($elBreakfast)
+                .append($elLunch)
+                .append($elDinner)
+                .append($elSupper)
+        );
     }
-
-
-    // $('button.add-technician').on('click', function(e){
-    //     e.preventDefault();
-	// 	let $table = $('table.table-technicians tbody');
-	// 	let count = totalTechnicians; // $table.children('tr:not(.no-records-found)').length;
-	// 	let $container = $('.technician.collection-container');
-	// 	let $proto = $($container.data('prototype').replace(/__NAME__/g, count));
-
-	// 	let $row = $('<tr>');
-	// 	let $btnRemove = $(
-	// 		'<button role="button" type="button" class="btn btn-falcon-danger text-danger remove-' + count + '"><i class="fad fa-trash"></i></button>');
-	// 	let $elNo = $('<td class="text-center">').html(count + 1);
-	// 	let $selectTechnician = $proto.find('select.technician');
-	// 	let $elTechnician = $('<td>').append($selectTechnician);
-	// 	let $start = $('<input type="time" class="form-control" name="technicians['+count+'][start_job]" size="8">');
-	// 	let $finish = $('<input type="time" class="form-control" name="technicians['+count+'][finish_job]" size="8">');
-	// 	let $travel = $('<input type="time" class="form-control" name="technicians['+count+'][travel_time]" size="8">');
-	// 	let $overtime = $('<input type="time" class="form-control" name="technicians['+count+'][overtime]" size="8">');
-	// 	let $elStart = $('<td>').append($start);
-	// 	let $elFinish = $('<td>').append($finish);
-	// 	let $elTravel = $('<td>').append($travel);
-	// 	let $elOvertime = $('<td>').append($overtime);
-	// 	let $elAction = $('<td class="text-center">').append($btnRemove);
-
-	// 	$selectTechnician.select2({
-	// 		...defaultSelectOptions,
-	// 		ajax: {
-	// 			url: route('api.employee.select'),
-	// 			...defaultAjaxOptions
-	// 		}
-	// 	});
-
-	// 	$table.append(
-	// 		$row.append($elNo)
-	// 		    .append($elTechnician)
-	// 		    .append($elStart)
-	// 		    .append($elFinish)
-	// 		    .append($elTravel)
-	// 		    .append($elOvertime)
-	// 		    .append($elAction)
-	// 	);
-
-	// 	$btnRemove.on('click', removeRow);
-	// 	totalTechnicians++;
-    // });
 });
 

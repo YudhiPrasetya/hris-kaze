@@ -10,6 +10,7 @@
     <script src="{{ asset('js/select2.min.js') }}" defer></script>
     <script src="{{ asset('js/jquery.mask.min.js') }}" defer></script>
     <script src="{{ asset('js/sweetalert2.js') }}" defer></script>
+    <script src="{{ asset('js/jquery-ui.min.js') }}" defer></script>
     <script type="module" src="{{ asset('js/domesticAssignment-edit.js') }}" defer></script>
 @endsection
 
@@ -44,7 +45,20 @@
                             <div class="fancy-tab-contents mt-3 overflow-hidden">
                                 <div class="fancy-tab-content active">
                                     <x-bootstrap::row>
-                                        <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
+                                        <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6" class="mx-4">
+                                            <div class="form-group">
+                                                <label for="assignment_type" class="control-label">Assignment Type</label>
+                                                <select id="assignment_type" disabled>
+                                                    <option value="{{ $model->assignment_type }}">{{ $model->assignment_type }}</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="overseas_to" class="control-label">Overseas To</label>
+                                                <select id="overseas_to" disabled>
+                                                    <option value="{{ $model->overseas_to }}">{{ $model->overseas_to }}</option>
+                                                </select>
+                                            </div>
                                             {!! form_row($form->assignment_no, [
                                                 'attr' => [
                                                     'value' => $model->assignment_no,
@@ -63,7 +77,9 @@
                                                     'disabled' => 'disabled'
                                                 ],
                                             ]) !!}
+                                        </x-bootstrap::column>
 
+                                        <x-bootstrap::column class="mx-4">
                                             <x-bootstrap::row>
                                                 <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
                                                     {!! form_row($form->assignment_date_from, [
@@ -84,7 +100,7 @@
                                             </x-bootstrap::row>
 
                                             <x-bootstrap::row>
-                                                <x-bootstrap::column breakpoint="EXTRA_SMALL|3;MEDIUM|3" class="my-auto">
+                                                <x-bootstrap::column breakpoint="EXTRA_SMALL|3;MEDIUM|3" class="d-flex align-items-center px-0">
                                                     {!! form_row($form->is_chargeable, [
                                                         'attr' => [
                                                             'value' => $model->is_chargeable,
@@ -92,7 +108,7 @@
                                                         ]
                                                     ]) !!}
                                                 </x-bootstrap::column>
-                                                <x-bootstrap::column>
+                                                <x-bootstrap::column class="px-0">
                                                     {!! form_row($form->charge_price, [
                                                         'attr' => [
                                                             'value' => $model->charge_price,
@@ -101,78 +117,131 @@
                                                     ]) !!}
                                                 </x-bootstrap::column>
                                             </x-bootstrap::row>
-                                        </x-bootstrap::column>
 
-                                        <x-bootstrap::column>
-                                            <div class="form-group">
-                                                <label for="customer" class="control-label">Customer</label>
-                                                <select id="customer" disabled>
-                                                    <option value="{{ $model->customer_id }}">{{ $model->customer->name }}</option>
-                                                </select>
-                                            </div>
+                                            <x-bootstrap::row>
+                                                <x-bootstrap::column>
+                                                    <div class="form-group">
+                                                        <label for="customer" class="control-label">Customer</label>
+                                                        <select id="customer" disabled>
+                                                            <option value="{{ $model->customer_id }}">{{ $model->customer->name }}</option>
+                                                        </select>
+                                                    </div>
+                                                </x-bootstrap::column>
+                                            </x-bootstrap::row>
 
-                                            <div class="form-group">
-                                                <label for="machine" class="control-label">Machine</label>
-                                                <select id="machine" disabled>
-                                                    <option value="{{ $model->machine_id }}">{{ $model->machine->name }}</option>
-                                                </select>
-                                            </div>
+                                            <x-bootstrap::row>
+                                                <x-bootstrap::column>
+                                                    <div class="form-group">
+                                                        <label for="machine" class="control-label">Machine</label>
+                                                        <select id="machine" disabled>
+                                                            <option value="{{ $model->machine_id }}">{{ $model->machine->name }}</option>
+                                                        </select>
+                                                    </div>
 
-                                            <div class="form-group">
-                                                <label for="technicians" class="control-label">Technicians</label>
-                                                <select id="technicians" name="technicians[]" multiple disabled>
-                                                    @foreach ($model->domesticAssigmentPreServices as $technician)
-                                                        <option value="{{ $technician->employee_id }}" selected>{{ $technician->employee->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
+                                                </x-bootstrap::column>
+                                            </x-bootstrap::row>
+
+                                            <x-bootstrap::row>
+                                                <x-bootstrap::column>
+                                                    <div class="form-group">
+                                                        <label for="technicians" class="control-label">Technicians</label>
+                                                        <select id="technicians" name="technicians[]" multiple disabled>
+                                                            @foreach ($model->domesticAssigmentPreServices as $technician)
+                                                                <option value="{{ $technician->employee_id }}" selected>{{ $technician->employee->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </x-bootstrap::column>
+                                            </x-bootstrap::row>
+
                                         </x-bootstrap::column>
                                     </x-bootstrap::row>
                                 </div>
 
                                 <div class="fancy-tab-content">
-                                    <x-bootstrap::media variant="primary" class="mt-4 mb-1" icon="fad fa-info" title="Pre Service" subtitle="Pre service accomodations" />
-                                    <div id="preServiceToggleShow" style="margin-left: 44px; margin-right: 44px;">
-                                        <x-bootstrap::row>
-                                            <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
-                                                {!! form_row($form->checkIn, ['class' => 'checkInDate']) !!}
-                                            </x-bootstrap::column>
-                                            <x-bootstrap::column>
-                                                {!! form_row($form->checkInAt, ['class' => 'checkInAt']) !!}
-                                            </x-bootstrap::column>
-                                        </x-bootstrap::row>
-                                        <div class="table-responsive">
-                                            <table class="table table-hover bg-white table-accpreservice">
-                                                <thead class="thead-dark">
-                                                    <tr>
-                                                        <th class="va-baseline text-center fs-0">No.</th>
-                                                        <th class="va-baseline text-center fs-0" style="display: none;">Id</th>
-                                                        <th class="va-baseline fs-0" width="400">Name</th>
-                                                        <th class="text-center fs-0">Breakfast</th>
-                                                        <th class="text-center fs-0">Lunch</th>
-                                                        <th class="text-center fs-0">Dinner</th>
-                                                        <th class="text-center fs-0">Supper</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
+                                    <div id='accordion' style="cursor: pointer;">
+                                        {{-- <x-bootstrap::media variant="primary" class="mt-4 mb-1 accordion" icon="fad fa-info" title="Pre Service" subtitle="Pre service accomodations" /> --}}
+                                        <h5 style="margin-left: 44px; margin-right: 44px;">
+                                            Pre Service<br/>
+                                            <small>Pre service assigment accomodations</small>
+                                        </h5>
+                                        <div id="preServiceToggleShow" style="margin-left: 44px; margin-right: 44px;">
+                                            <x-bootstrap::row>
+                                                <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
+                                                    {!! form_row($form->checkIn, ['class' => 'checkInDate']) !!}
+                                                </x-bootstrap::column>
+                                                <x-bootstrap::column>
+                                                    {!! form_row($form->checkInAt, ['class' => 'checkInAt']) !!}
+                                                </x-bootstrap::column>
+                                            </x-bootstrap::row>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover bg-white table-accpreservice">
+                                                    <thead class="thead-dark">
+                                                        <tr>
+                                                            <th class="va-baseline text-center fs-0">No.</th>
+                                                            <th class="va-baseline text-center fs-0" style="display: none;">Id</th>
+                                                            <th class="va-baseline fs-0" width="400">Name</th>
+                                                            <th class="text-center fs-0">Breakfast</th>
+                                                            <th class="text-center fs-0">Lunch</th>
+                                                            <th class="text-center fs-0">Dinner</th>
+                                                            <th class="text-center fs-0">Supper</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        {{-- <x-bootstrap::media variant="primary" class="mt-4 mb-1" icon="fad fa-info" title="During Service" subtitle="During service accomodations" /> --}}
+                                        <h5 style="margin-left: 44px; margin-right: 44px;">
+                                            During Service<br/>
+                                            <small>During service assignment accomodations</small>
+                                        </h5>
+                                        <div id="duringServiceToggleShow" style="margin-left: 44px; margin-right: 44px;">
+                                            <x-bootstrap::row>
+                                                <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
+                                                    {!! form_row($form->checkOut) !!}
+                                                </x-bootstrap::column>
+                                            </x-bootstrap::row>
+                                            <div class="table-responsive" id="table-accduringservice-container"></div>
+                                        </div>
+
+                                        {{-- <x-bootstrap::media variant="primary" class="mt-4 mb-1" icon="fad fa-info" title="Arrival" subtitle="Arrival accomodations" /> --}}
+                                        <h5 id="arrivalLabelHeader" style="margin-left: 44px; margin-right: 44px;">
+                                            Arrival<br/>
+                                            <small>
+                                                Arrival from overseas assignment accomodations
+                                            </small>
+                                        </h5>
+                                        <div id="arrivalToggleShow" style="margin-left: 44px; margin-right: 44px;">
+                                            <x-bootstrap::row>
+                                                <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
+                                                    {!! form_row($form->eta_flight_date) !!}
+                                                </x-bootstrap::column>
+                                                <x-bootstrap::column>
+                                                    {!! form_row($form->eta_flight_time, ['attr' => ['class_append' => 'time24h']]) !!}
+                                                </x-bootstrap::column>
+                                            </x-bootstrap::row>
+                                            <div class="table-responsive" id="table-arrival-container">
+                                                <table class="table table-hover bg-white table-arrival">
+                                                    <thead class="thead-dark">
+                                                        <tr>
+                                                            <th class="va-baseline text-center fs-0">No.</th>
+                                                            <th class="va-baseline text-center fs-0" style="display: none;">Id</th>
+                                                            <th class="va-baseline fs-0" width="400">Name</th>
+                                                            <th class="text-center fs-0">Breakfast</th>
+                                                            <th class="text-center fs-0">Lunch</th>
+                                                            <th class="text-center fs-0">Dinner</th>
+                                                            <th class="text-center fs-0">Supper</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <x-bootstrap::media variant="primary" class="mt-4 mb-1" icon="fad fa-info" title="During Service" subtitle="During service accomodations" />
-
-
-                                    {{-- The problem.... --}}
-                                    <div id="duringServiceToggleShow" style="margin-left: 44px; margin-right: 44px;">
-                                        <x-bootstrap::row>
-                                            <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
-                                                {!! form_row($form->checkOut) !!}
-                                            </x-bootstrap::column>
-                                        </x-bootstrap::row>
-                                        <div class="table-responsive" id="table-accduringservice-container">
-                                        </div>
-                                    </div>
                                 </div>
 
                             </div>

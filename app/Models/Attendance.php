@@ -86,7 +86,4 @@ class Attendance extends ModelBase {
 		return $this->hasOne(AnnualLeave::class, 'id', 'annual_leave_id');
 	}
 
-	public function workDays(): int {
-
-	}
 }

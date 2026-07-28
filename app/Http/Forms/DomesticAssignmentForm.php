@@ -13,12 +13,21 @@ use App\Models\Machine;
 class DomesticAssignmentForm extends Form{
     public function buildForm(){
         $this
+            // ->add('assignment_type', Field::SELECT, [
+            //     'choices' => ['0' =>'Please select an assignment type', 'Domestic' => 'Domestic', 'Overseas' => 'Overseas'],
+            //     'label' => 'Assignment Type',
+            //     'attr' => ['class_append' => 'col-4 assignmentType', 'data-placeholder' => 'Please select an assignment type']
+            // ])
+            // ->add('overseas_to', Field::TEXT, [
+            //     'label' => 'Overseas To',
+            //     'attr' => ['class_append' => 'overseasTo']
+            // ])
             ->add('assignment_no', Field::TEXT, [
                 'label' => 'Letter No. (Nomor Surat)'
             ])
             ->add('letter_date', Field::DATE, [
                 'label' => 'Letter Date (Tanggal Surat)',
-                'attr' => ['class_append' => 'col-6, z-50']
+                'attr' => ['class_append' => 'col-6']
             ])
             ->add('sr_no', Field::TEXT, [
                 'label' => 'Service No. (No. Servis)'
@@ -120,11 +129,11 @@ class DomesticAssignmentForm extends Form{
 
             ->add('assignment_date_from', Field::DATE, [
                 'label' => 'Assign Date From',
-                'attr' => ['class_append' => 'col-8']
+                'attr' => ['class_append' => 'col-10']
             ])
             ->add('assignment_date_to', Field::DATE, [
                 'label' => 'To',
-                'attr' => ['class_append' => 'col-8']
+                'attr' => ['class_append' => 'col-9']
             ])
 
             // ->add('assignment_date', Field::DATE, [
@@ -141,6 +150,15 @@ class DomesticAssignmentForm extends Form{
             //     'label' => '<i class="fad fa-save mr-1"></i> Submit',
             //     'attr'  => ['class' => 'btn-falcon-danger btnDomesticAssignment'],
             // ]
+
+            ->add('eta_flight_date', Field::DATE, [
+                'label' => 'ETA Flight Date',
+                'attr' => ['class_append' => 'col-4 etaFlightDate']
+            ])
+            ->add('eta_flight_time', Field::TEXT, [
+                'label' => 'ETA Flight Time',
+                'attr' => ['class_append' => 'col-4 etaFlightTime']
+            ])
 
             ->add('btnDomesticAssignment', Field::BUTTON_BUTTON, [
                 'label' => '<i class="fad fa-save mr-1"></i> Submit',

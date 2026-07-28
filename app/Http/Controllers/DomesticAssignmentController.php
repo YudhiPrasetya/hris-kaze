@@ -52,7 +52,7 @@ class DomesticAssignmentController extends Controller
 	}
 
     public function create(){
-        return $this->viewModel->createForm('POST', 'assignment-domestic.store', new DomesticAssignment())
+        return $this->viewModel->createForm('POST', 'assignments.store', new DomesticAssignment())
                     ->view('pages.assignment.domestic.form');
     }
 
@@ -66,9 +66,9 @@ class DomesticAssignmentController extends Controller
 	public function edit(Request $request) {
         // dd($request->all());
         // $domesticAssignment = DomesticAssignment::where('id', $request->get('id'))->first();
-        $domesticAssignment = DomesticAssignment::find($request->assignment_domestic);
+        $domesticAssignment = DomesticAssignment::find($request->assignment);
         // dd($domesticAssignment);
-		return $this->viewModel->createForm('PUT', 'assignment-domestic.store', $domesticAssignment)
+		return $this->viewModel->createForm('PUT', 'assignments.store', $domesticAssignment)
 		                       ->view('pages.assignment.domestic.edit');
 	}
 
@@ -107,5 +107,13 @@ class DomesticAssignmentController extends Controller
     public function duringServiceGetById($id){
         // $id = $request->get('id');
         return $this->viewModel->duringServiceGetById($id);
+    }
+
+	public function getArrival($id){
+		return $this->viewModel->getArrival($id);
+	}
+
+    public function overseasTo(){
+        return $this->viewModel->overseasTo();
     }
 }

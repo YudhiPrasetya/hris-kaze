@@ -41,6 +41,7 @@
 	<link href="{{ themes('css/vendor.css') }}" rel="stylesheet">
 	<link href="{{ themes('css/phpdebugbar.css') }}" rel="stylesheet">
 	<link href="{{ themes('css/app.css') }}" rel="stylesheet">
+	<link href="{{ asset('css/jquery-ui.min.css') }}" rel="stylesheet">
 	@livewireStyles
 	@section('styles')
 	@show
