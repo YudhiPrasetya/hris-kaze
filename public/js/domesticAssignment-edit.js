@@ -9,7 +9,6 @@ $(function(){
 
     let $assignmentType = $('#assignment_type').select2();
 
-
     let $overseasTo = $('#overseas_to').select2();
     let $customer = $('#customer').select2();
     let $machine = $('#machine').select2();
@@ -23,7 +22,6 @@ $(function(){
     let $tableAccPreServiceBody = $('.table-accpreservice tbody');
     let $checkInDate = $('#checkIn');
     let $checkInAt = $('#checkInAt');
-
 
     let $tablesDuringServiceContainer = $('#table-accduringservice-container');
     let $checkOutDate = $('#checkOut');
@@ -232,6 +230,7 @@ $(function(){
             let $thLunch = $('<th class="text-center fs-0">').html('Lunch');
             let $thFinishJob = $('<th class="text-center fs-0">').html('Finish Job');
             let $thDinner = $('<th class="text-center fs-0">').html('Dinner');
+            let $thSupper = $('<th class="text-center fs-0">').html('Supper');
             let $tbody = $('<tbody class="tbody-accduringservice">');
 
             $trHeader
@@ -243,7 +242,8 @@ $(function(){
                 .append($thStartJob)
                 .append($thLunch)
                 .append($thFinishJob)
-                .append($thDinner);
+                .append($thDinner)
+                .append($thSupper);
 
             $thead.append($trHeader);
             $table.append($thead).append($tbody);
@@ -288,6 +288,10 @@ $(function(){
         $dinner.attr('checked', i.ds_dinner > 0);
         $dinner.attr('disabled', $assignmentType.val() == "Overseas");
 
+        let $supper = $('<input type="checkbox" id="' + "supper" + day + '" class="p-2" style="cursor: pointer; width: 25px; height: 25px;">');
+        $supper.attr('checked', i.ds_supper > 0);
+        $supper.attr('disabled', $assignmentType.val() == "Overseas");
+
         let $elIdTechnician = $('<td style="vertical-align: middle; display: none;">').append($idTechnician);
         let $elAssignmentDate = $('<td style="vertical-align: middle; display: none;">').append($assignmentDate);
         let $elTechnician = $('<td style="vertical-align: middle">').append($technician);
@@ -296,6 +300,7 @@ $(function(){
         let $elLunch = $('<td class="text-center my-auto" style="vertical-align: middle">').append($lunch);
         let $elFinishJob = $('<td class="text-center" style="vertical-align: middle">').append($finishJob);
         let $elDinner = $('<td class="text-center" style="vertical-align: middle">').append($dinner);
+        let $elSupper = $('<td class="text-center" style="vertical-align: middle">').append($supper);
 
         $row.append($elNo)
             .append($elIdTechnician)
@@ -306,7 +311,7 @@ $(function(){
             .append($elLunch)
             .append($elFinishJob)
             .append($elDinner)
-
+            .append($elSupper)
 
         $b.append($row);
         // $t.append($b);
@@ -407,6 +412,7 @@ $(function(){
             let lunch = $row.find('td:nth-child(7) input[type="checkbox"]').is(':checked') ? 1 : 0;
             let finishJob = $row.find('td:nth-child(8) input[type="text"]').val();
             let dinner = $row.find('td:nth-child(9) input[type="checkbox"]').is(':checked') ? 1 : 0;
+            let supper = $row.find('td:nth-child(10) input[type="checkbox"]').is(':checked') ? 1 : 0;
 
             dataPayload.during_service.push({
                 'check_out_date': checkOutDate,
@@ -417,6 +423,7 @@ $(function(){
                 'during_service_lunch': lunch,
                 'finish_job': finishJob,
                 'during_service_dinner': dinner,
+                'during_service_supper': supper,
                 'overtime': 0
 
             });

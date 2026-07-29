@@ -183,6 +183,14 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                     $duringServiceDinner = 0;
                 }
 
+                if($duringService['during_service_supper'] == 1 && $assignmentDate->isWeekend()){
+                    $duringServiceSupper = $assignmentMeal->night_weekend;
+                }else if($duringService['during_service_supper'] == 1 && $assignmentDate->isWeekday()){
+                    $duringServiceSupper = $assignmentMeal->night_weekday;
+                }elseif($duringService['during_service_supper'] == 0){
+                    $duringServiceSupper = 0;
+                }
+
                 $overseas_meal = 0;
             }else{
                 $duringServiceLunch = 0;
@@ -202,6 +210,7 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                 'during_service_breakfast' => 0,
                 'during_service_lunch' => $duringServiceLunch,
                 'during_service_dinner' => $duringServiceDinner,
+                'during_service_supper' => $duringServiceSupper,
                 'start_job' => $duringService['start_job'],
                 'finish_job' => $duringService['finish_job'],
                 'overseas_meal' => $overseas_meal
@@ -385,11 +394,21 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                 }elseif($duringService['during_service_dinner'] == 0){
                     $duringServiceDinner = 0;
                 }
+
+                if($duringService['during_service_supper'] == 1 && $assignmentDate->isWeekend()){
+                    $duringServiceSupper = $domesticAssignmentMeal1->night_weekend;
+                }else if($duringService['during_service_supper'] == 1 && $assignmentDate->isWeekday()){
+                    $duringServiceSupper = $domesticAssignmentMeal1->night_weekday;
+                }elseif($duringService['during_service_supper'] == 0){
+                    $duringServiceSupper = 0;
+                }
+
                 $overseas_meal = 0;
 
             }else{
                 $duringServiceLunch = 0;
                 $duringServiceDinner = 0;
+                $duringServiceSupper = 0;
                 if($duringService['start_job'] != ''){
                     $assignmentMeal = OverseasAssignmentMeal::where('position_id', '=', $dataEmployee1->position_id)->first();
                     $overseas_meal = (float)$assignmentMeal->amountJPY * (float)$exchangeRate;
@@ -405,6 +424,7 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                 'during_service_breakfast' => 0,
                 'during_service_lunch' => $duringServiceLunch,
                 'during_service_dinner' => $duringServiceDinner,
+                'during_service_supper' => $duringServiceSupper,
                 'start_job' => $duringService['start_job'],
                 'finish_job' => $duringService['finish_job'],
                 'overtime' => '00:00:00',
@@ -566,6 +586,7 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                 'ds_lunch' => $ds->during_service_lunch > 0 ? 1 : 0,
                 'finish_job' => $ds->finish_job,
                 'ds_dinner' => $ds->during_service_dinner > 0 ? 1 : 0,
+                'ds_supper' => $ds->during_service_supper > 0 ? 1 : 0,
                 'overtime' => $ds->overtime,
             ];
             array_push($dataDuringServices, $data);
