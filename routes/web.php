@@ -8,6 +8,7 @@ use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerMachineController;
 use App\Http\Controllers\DomesticAssignmentController;
+use App\Http\Controllers\DomesticAssignmentDuringServiceController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FingerPrintDeviceController;
 use App\Http\Controllers\FingerPrintDeviceDataController;
@@ -166,6 +167,10 @@ Route::domain(config('app.domain'))->group(function () {
       // assigment route
     //   Route::resource('assignment-domestic', DomesticAssignmentController::class);
       Route::resource('assignments', DomesticAssignmentController::class);
+    //   Route::match(['POST', 'GET'], '/report/assignment', [DomesticAssignmentController::class, 'report'])->name('report.assignment');
+      Route::match(['POST', 'GET'], '/report/assignment', [DomesticAssignmentDuringServiceController::class, 'report'])->name('report.assignment');
+
+      Route::match(['GET'], '/report/assignment/export', [DomesticAssignmentDuringServiceController::class, 'exportToExcel'])->name('report.assignment.export');
         // Route::get('/assignment-domestic/index', [DomesticAssignmentController::class, 'index'])->name('assignment-domestic.index');
 
       // overseas assignment route
@@ -255,6 +260,8 @@ Route::domain(config('app.domain'))->group(function () {
       Route::get('/api/v1/assignments-getArrival/Id/{id}', [DomesticAssignmentController::class, 'getArrival'])->name('api.assignments-getArrival');
       Route::post('/api/v1/assignments-update', [DomesticAssignmentController::class, 'domesticAssignmentUpdate'])->name('api.assignments-update');
       Route::get('/api/v1/overseasTo', [DomesticAssignmentController::class, 'overseasTo'])->name('api.overseasTo');
+    //   Route::get('/api/v1/assignment/reports', [DomesticAssignmentController::class, 'reports'])->name('api.assignment.report');
+      Route::get('/api/v1/assignment/reports', [DomesticAssignmentDuringServiceController::class, 'reports'])->name('api.assignment.report');
 
       Route::get('/api/v1/customer', [CustomerController::class, 'list'])->name('api.customer');
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DomesticAssignmentPreService extends Model
 {
@@ -24,8 +25,11 @@ class DomesticAssignmentPreService extends Model
 
         parent::__construct($attributes);
     }
+    public function domesticAssignment(): BelongsTo{
+        return $this->belongsTo(DomesticAssignment::class, 'assignment_id', 'id');
+    }
 
     public function employee(): \Illuminate\Database\Eloquent\Relations\HasOne{
-        return $this->hasOne(Employee::class, 'id', 'employee_id');
+        return $this->hasOne(Employee::class, 'id', 'employee_id')->without('attendance');
     }
 }

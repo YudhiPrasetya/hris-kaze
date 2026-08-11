@@ -23,6 +23,6 @@ class ArrivalFromOverseasAssignment extends ModelBase{
     }
 
     public function employee(): \Illuminate\Database\Eloquent\Relations\HasOne{
-        return $this->hasOne(Employee::class, 'id', 'employee_id');
+        return $this->hasOne(Employee::class, 'id', 'employee_id')->without('attendance');
     }
 }

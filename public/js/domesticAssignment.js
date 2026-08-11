@@ -542,8 +542,27 @@ $(function(){
     });
 
     function updateAssignmentAccomodations(){
-        let preService = [];
+        let dataPayload = {
+            'assignment_type': $('#assignment_type option:selected').text(),
+            'overseas_to': $('#overseas_to option:selected').text(),
+            'assignment_no': $assignmentNo.val(),
+            'letter_date': $letterDate.val(),
+            'sr_no': $srNO.val(),
+            'assignment_date_from': $assignmentDateFrom.val(),
+            'assignment_date_to': $assignmentDateTo.val(),
+            'is_chargeable': $isChargeable.val(),
+            'charge_price': $chargePrice.val(),
+            'customer_id': $customer.val(),
+            'machine_id': $machine.val(),
+            'pre_service': [],
+            'during_service': [],
+            'during_service_foreign': {},
+            'arrival': []
+        };
+
+        // let preService = [];
         let duringService = [];
+        let arrival = [];
 
         $tableAccPreServiceBody.children('tr').each(function(i, row){
             let $row = $(row);
@@ -555,7 +574,7 @@ $(function(){
             let dinner = $row.find('td:nth-child(6) input[type="checkbox"]').is(':checked') ? 1 : 0;
             let supper = $row.find('td:nth-child(7) input[type="checkbox"]').is(':checked') ? 1 : 0;
 
-            preService.push({
+            dataPayload.pre_service.push({
                 'employee_id': employeeId,
                 'check_in_date': checkInDate,
                 'check_in_at': checkInAt,
@@ -591,30 +610,15 @@ $(function(){
                 'during_service_dinner': dinner,
                 'during_service_supper': supper,
                 'overtime': 0
-
             });
         });
-
-        let dataPayload = {
-            'exchange_rate': 0,
-            'exchange_rate_history': '',
-            'assignment_type': $('#assignment_type option:selected').text(),
-            'overseas_to': $('#overseas_to option:selected').text(),
-            'assignment_no': $assignmentNo.val(),
-            'letter_date': $letterDate.val(),
-            'sr_no': $srNO.val(),
-            'assignment_date_from': $assignmentDateFrom.val(),
-            'assignment_date_to': $assignmentDateTo.val(),
-            'is_chargeable': $isChargeable.val(),
-            'charge_price': $chargePrice.val(),
-            'customer_id': $customer.val(),
-            'machine_id': $machine.val(),
-            'pre_service': preService,
-            'during_service': duringService,
-            'arrival': []
-        };
+        dataPayload.during_service = duringService;
 
         if($assignmentType.val() == "Overseas"){
+            const defaultCurrency = 'JPY';
+            const overseasToArr = $('#overseas_to option:selected').text().split(' - ');
+            const foreignCurrency = overseasToArr[1];
+
             $.ajax({
                 method: 'GET',
                 url: 'https://openexchangerates.org/api/latest.json?app_id=3c4b169d8866440b96e606b6cd53bfe3',
@@ -626,14 +630,24 @@ $(function(){
                 if(typeof fx !== 'undefined' && fx.rates){
                     fx.rates = data.rates;
                     fx.base = data.base;
-                    let overseasToArr = $('#overseas_to option:selected').text().split(' - ');
-                    let exchangeRateFrom = overseasToArr[1];
-                    let exchangeRateTo = 'IDR';
-                    let fxVal = fx.convert(1, {from: exchangeRateFrom, to: exchangeRateTo});
-                    let exchangeRate = Number(fxVal.toFixed(1));
+                    // let overseasToArr = $('#overseas_to option:selected').text().split(' - ');
+                    // let exchangeRateFrom = overseasToArr[1];
+                    // let exchangeRateTo = 'IDR';
+                    // let exchangeRateFrom = 'JPY';
+                    // let exchangeRateTo = overseasToArr[1];
+                    let fxValIDR = fx.convert(1, {from: defaultCurrency, to: 'IDR'});
+
+                    let currencyValueIDR = Number(fxValIDR.toFixed(1));
+                    let fxValForeign = fx.convert(1, {from: 'IDR', to: foreignCurrency});
+                    let currencyValForeign = Number(fxValForeign);
                     let exchangeRateHistory = new Date().toISOString().replace('T', ' ').substring(0, 19);
-                    dataPayload.exchange_rate = exchangeRate;
-                    dataPayload.exchange_rate_history = exchangeRateHistory;
+
+                    dataPayload.during_service_foreign = {
+                        'currency_value_idr': currencyValueIDR,
+                        'currency_foreign': foreignCurrency,
+                        'currency_value_foreign': currencyValForeign,
+                        'exchange_rate_history': exchangeRateHistory,
+                    };
 
                     $tableArrivalTimeBody.children('tr').each(function(i, row){
                         let $row = $(row);
@@ -653,7 +667,7 @@ $(function(){
                             'supper': supper
                         });
                     });
-                    // console.log('dataPayload: ', dataPayload);
+                    console.log('dataPayload: ', dataPayload);
                     updateAssignment(dataPayload);
                 }
             })

@@ -11,6 +11,7 @@
     <script src="{{ asset('js/jquery.mask.min.js') }}" defer></script>
     <script src="{{ asset('js/sweetalert2.js') }}" defer></script>
     <script src="{{ asset('js/jquery-ui.min.js') }}" defer></script>
+    <script src="{{ asset('js/money.js') }}" defer></script>
     <script type="module" src="{{ asset('js/domesticAssignment-edit.js') }}" defer></script>
 @endsection
 

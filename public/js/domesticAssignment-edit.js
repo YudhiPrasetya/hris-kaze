@@ -376,6 +376,7 @@ $(function(){
             'assignment_type': $assignmentType.val(),
             'pre_service': [],
             'during_service': [],
+            'during_service_foreign': {},
             'arrival': []
         };
 
@@ -430,6 +431,58 @@ $(function(){
         });
 
         if($assignmentType.val() == "Overseas"){
+            const defaultCurrency = 'JPY';
+            const overseasToArr = $('#overseas_to option:selected').text().split(' - ');
+            const foreignCurrency = overseasToArr[1];
+
+            $.ajax({
+                method: 'GET',
+                url: 'https://openexchangerates.org/api/latest.json?app_id=3c4b169d8866440b96e606b6cd53bfe3',
+                dataType: 'jsonp',
+                error: function(xhr, status, error){
+                    console.log('error details: ', error)
+                }
+            }).done(function(data){
+                if(typeof fx !== 'undefined' && fx.rates){
+                    fx.rates = data.rates;
+                    fx.base = data.base;
+                    let fxValIDR = fx.convert(1, {from: defaultCurrency, to: 'IDR'});
+
+                    let currencyValueIDR = Number(fxValIDR.toFixed(1));
+                    let fxValForeign = fx.convert(1, {from: 'IDR', to: foreignCurrency});
+                    let currencyValForeign = Number(fxValForeign);
+                    let exchangeRateHistory = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+                    dataPayload.during_service_foreign = {
+                        'currency_value_idr': currencyValueIDR,
+                        'currency_foreign': foreignCurrency,
+                        'currency_value_foreign': currencyValForeign,
+                        'exchange_rate_history': exchangeRateHistory,
+                    };
+                    let $tableArrivalTimeBody = $('.table-arrival tbody');
+                    $tableArrivalTimeBody.children('tr').each(function(i, row){
+                        let $row = $(row);
+                        let employeeId = $row.find('td:nth-child(2)').text();
+                        let breakfast = $row.find('td:nth-child(4) input[type="checkbox"]').is(':checked') ? 1 : 0;
+                        let lunch = $row.find('td:nth-child(5) input[type="checkbox"]').is(':checked') ? 1 : 0;
+                        let dinner = $row.find('td:nth-child(6) input[type="checkbox"]').is(':checked') ? 1 : 0;
+                        let supper = $row.find('td:nth-child(7) input[type="checkbox"]').is(':checked') ? 1 : 0;
+
+                        dataPayload.arrival.push({
+                            'eta_flight_date': $etaFlightDate.val(),
+                            'eta_flight_time': $etaFlightTime.val(),
+                            'employee_id': employeeId,
+                            'breakfast': breakfast,
+                            'lunch': lunch,
+                            'dinner': dinner,
+                            'supper': supper
+                        });
+                    });
+                    console.log('dataPayload: ', dataPayload);
+                    updateAssignment(dataPayload);
+                }
+            })
+
             let $tableArrivalBody = $('.table-arrival tbody');
             $tableArrivalBody.children('tr').each(function(i, row){
                 let $row = $(row);
@@ -451,11 +504,15 @@ $(function(){
                     'supper': supper
                 });
             });
+        }else{
+            updateAssignment(dataPayload);
         }
+    });
 
+    function updateAssignment(dp){
         $.ajax({
             type: 'POST',
-            data: {'data': dataPayload},
+            data: {'data': dp},
             url: '/api/v1/assignments-update',
             cache: false
         }).done(function(dt){
@@ -468,7 +525,6 @@ $(function(){
                 window.location.href = '/assignments';
             }
         })
-
-    });
+    }
 
 });

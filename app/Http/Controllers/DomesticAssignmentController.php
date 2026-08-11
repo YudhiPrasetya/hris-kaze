@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Forms\AssignmentReportForm;
+use App\Http\Requests\AssignmentReportFormRequest;
 use App\Http\Requests\DomesticAssignmentFormRequest;
 use App\Http\ViewModels\DomesticAssigmentViewModel;
+use App\Http\ViewModels\DomesticAssignmentDuringServiceViewModel;
 use App\Http\ViewModels\ViewModel;
 use App\Http\ViewModels\ViewModelBase;
 use App\Managers\Form\FormBuilder;
 use App\Models\DomesticAssignment;
+use App\Models\DomesticAssignmentDuringService;
 use App\Repositories\Eloquent\DomesticAssignmentRepository;
+use App\Repositories\Eloquent\SettingsRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,8 +26,14 @@ class DomesticAssignmentController extends Controller
 {
     private DomesticAssigmentViewModel $viewModel;
 
-    public function __construct(DomesticAssignmentRepository $repository, FormBuilder $builder){
+    private SettingsRepository $settingsRepository;
+
+    private DomesticAssignmentDuringServiceViewModel $duringServiceViewModel;
+
+    public function __construct(DomesticAssignmentRepository $repository, SettingsRepository $settingsRepository, FormBuilder $builder){
         $this->viewModel = new DomesticAssigmentViewModel($repository, $builder);
+        $this->duringServiceViewModel = new DomesticAssignmentDuringServiceViewModel($repository, $builder);
+        $this->settingsRepository = $settingsRepository;
     }
     public function index(){
         return $this->viewModel->view('pages.assignment.domestic.list');

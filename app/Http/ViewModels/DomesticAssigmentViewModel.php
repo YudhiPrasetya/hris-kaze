@@ -2,6 +2,7 @@
 
 namespace App\Http\ViewModels;
 
+use App\Http\Forms\AssignmentReportForm;
 use App\Http\Forms\DomesticAssignmentForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Http\ViewModels\ViewModelBase;
@@ -16,14 +17,18 @@ use App\Models\DomesticAssignmentPreService;
 use App\Models\Employee;
 use App\Models\ModelInterface;
 use App\Models\OverseasAssignmentMeal;
+use App\Repositories\Eloquent\SettingsRepository;
 use App\Repositories\EloquentRepositoryInterface;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 
 class DomesticAssigmentViewModel extends ViewModelBase{
+    private ?Request $request;
+
     public function __construct(EloquentRepositoryInterface $repository, ?FormBuilder $formBuilder = null)
     {
         parent::__construct($repository, $formBuilder);
@@ -32,7 +37,7 @@ class DomesticAssigmentViewModel extends ViewModelBase{
         $this->routeKey = 'assignment';
         $this->modelPrimaryKey = 'id';
         $this->form = $this->formBuilder->create(DomesticAssignmentForm::class);
-
+        $this->request = null;
     }
 
 	public function createForm(string $method, string $route, ?ModelInterface $model = null, ?string $formClass = null, array $options = []
@@ -61,8 +66,6 @@ class DomesticAssigmentViewModel extends ViewModelBase{
     public function addNew($method, Request $request, ?ModelInterface $model = null)    {
         // $this->form->setMethod($method);
         $data = $request->get('data');
-        $exchange_rate = $data['exchange_rate'];
-        $exchange_rate_history = $data['exchange_rate_history'];
         $assignment_type = $data['assignment_type'];
         $overseas_to = ($assignment_type == "Overseas" ? $data['overseas_to'] : '-');
         $assignment_no = $data['assignment_no'];
@@ -76,9 +79,8 @@ class DomesticAssigmentViewModel extends ViewModelBase{
         $assignment_date_to = $data['assignment_date_to'];
         // dd($data);
 
+        // Add new to domestic assignment
         $newAssignment = DomesticAssignment::create([
-            'exchange_rate' => $exchange_rate,
-            'exchange_rate_history' => $exchange_rate_history,
             'assignment_type'=> $assignment_type,
             'overseas_to'=> $overseas_to,
             'assignment_no' => $assignment_no,
@@ -133,7 +135,7 @@ class DomesticAssigmentViewModel extends ViewModelBase{
             }elseif($preService['pre_service_supper'] == 0){
                 $preServiceSupper = 0;
             }
-
+            // Add new to domestic assignment pre service
             DomesticAssignmentPreService::create([
                 'assignment_id' => $insertedId,
                 'employee_id' => $preService['employee_id'],
@@ -192,16 +194,27 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                 }
 
                 $overseas_meal = 0;
+                $overseasMealInForeignCurrency = 0;
             }else{
                 $duringServiceLunch = 0;
                 $duringServiceDinner = 0;
-                if($duringService['start_job'] != ''){
+                $duringServiceSupper = 0;
+                $duringServiceForeign = $data['during_service_foreign'];
+                $currencyValueIDR = $duringServiceForeign['currency_value_idr'];
+                $currencyForeign = $duringServiceForeign['currency_foreign'];
+                $currencyValueForeign = $duringServiceForeign['currency_value_foreign'];
+                $exchangeRateHistory = $duringServiceForeign['exchange_rate_history'];
+                if($duringService['start_job'] != NULL && $duringService['finish_job'] != NULL){
                     $assignmentMeal = OverseasAssignmentMeal::where('position_id', '=', $dataEmployee1->position_id)->first();
-                    $overseas_meal = (float)$assignmentMeal->amountJPY * (float)$exchange_rate;
+                    $overseas_meal = (float)$assignmentMeal->amountJPY * (float)$currencyValueIDR;
+                    $overseasMealInForeignCurrency = (float)$overseas_meal * (float)$currencyValueForeign;
+
                 }else{
                     $overseas_meal = 0;
+                    $overseasMealInForeignCurrency = 0;
                 }
             }
+            // Add new to domestic assignment during service
             DomesticAssignmentDuringService::create([
                 'assignment_id' => $insertedId,
                 'employee_id' => $duringService['employee_id'],
@@ -213,7 +226,10 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                 'during_service_supper' => $duringServiceSupper,
                 'start_job' => $duringService['start_job'],
                 'finish_job' => $duringService['finish_job'],
-                'overseas_meal' => $overseas_meal
+                'overseas_meal' => $overseas_meal,
+                'foreign_currency' => ($assignment_type == 'Overseas' ? $currencyForeign : NULL),
+                'overseas_meal_in_foreign_currency' => $overseasMealInForeignCurrency,
+                'exchange_rate_history' => ($assignment_type == 'Overseas' ? $exchangeRateHistory : NULL)
             ]);
 
             $finishJob = strtotime($duringService['finish_job']);
@@ -289,7 +305,7 @@ class DomesticAssigmentViewModel extends ViewModelBase{
         $data = $request->get('data');
         // dd($data);
         $assignmentId = $data['assignment_id'];
-        $exchangeRate = DomesticAssignment::where('id', $assignmentId)->value('exchange_rate');
+        // $exchangeRate = DomesticAssignment::where('id', $assignmentId)->value('exchange_rate');
         $assignmentType = $data['assignment_type'];
 
         // Remove pre service based on assignmentId
@@ -404,16 +420,23 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                 }
 
                 $overseas_meal = 0;
-
+                $overseasMealInForeignCurrency = 0;
             }else{
                 $duringServiceLunch = 0;
                 $duringServiceDinner = 0;
                 $duringServiceSupper = 0;
-                if($duringService['start_job'] != ''){
+                $duringServiceForeign = $data['during_service_foreign'];
+                $currencyValueIDR = $duringServiceForeign['currency_value_idr'];
+                $currencyForeign = $duringServiceForeign['currency_foreign'];
+                $currencyValueForeign = $duringServiceForeign['currency_value_foreign'];
+                $exchangeRateHistory = $duringServiceForeign['exchange_rate_history'];
+                if($duringService['start_job'] != NULL && $duringService['finish_job'] != NULL){
                     $assignmentMeal = OverseasAssignmentMeal::where('position_id', '=', $dataEmployee1->position_id)->first();
-                    $overseas_meal = (float)$assignmentMeal->amountJPY * (float)$exchangeRate;
+                    $overseas_meal = (float)$assignmentMeal->amountJPY * (float)$currencyValueIDR;
+                    $overseasMealInForeignCurrency = (float)$overseas_meal * (float)$currencyValueForeign;
                 }else{
                     $overseas_meal = 0;
+                    $overseasMealInForeignCurrency = 0;
                 }
             }
             DomesticAssignmentDuringService::create([
@@ -428,7 +451,10 @@ class DomesticAssigmentViewModel extends ViewModelBase{
                 'start_job' => $duringService['start_job'],
                 'finish_job' => $duringService['finish_job'],
                 'overtime' => '00:00:00',
-                'overseas_meal' => $overseas_meal
+                'overseas_meal' => $overseas_meal,
+                'foreign_currency' => ($assignmentType == 'Overseas' ? $currencyForeign : NULL),
+                'overseas_meal_in_foreign_currency' => $overseasMealInForeignCurrency,
+                'exchange_rate_history' => ($assignmentType == 'Overseas' ? $exchangeRateHistory : NULL)
             ]);
 
             $finishJob = strtotime($duringService['finish_job']);
@@ -615,4 +641,113 @@ class DomesticAssigmentViewModel extends ViewModelBase{
         // dd($arrival, $dataArrival);
         return $dataArrival;
     }
+
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    public function request()
+    {
+        return $this->request;
+    }
+
+    public function createReportForm(string $method, string $route, ?ModelInterface $model = null, array $options = []): ViewModelBase
+    {
+        // dd($model);
+        $this->setModel($model);
+        $this->form = $this->formBuilder->create(AssignmentReportForm::class, $options);
+        $this->form->setMethod($method);
+        $this->form->setUrl(route($route));
+
+        return $this;
+    }
+
+    // public function reports(Request $request, SettingsRepository $settingsRepository, ?ModelInterface $model = null){
+    //     $this->setModel($model);
+    //     $self = $this;
+    //     list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
+
+    //     $assignmentType = $request->get('assignment_type');
+    //     $startDate = new DateTime($request->get('start_date'));
+    //     $endDate = new DateTime($request->get('end_date'));
+    //     // dd($assignmentType, $startDate, $endDate);
+
+    //     $query = $this->getBaseQuery($request);
+
+    //     dd($query);
+    //     if($assignmentType == 'All'){
+    //         $results = $query->with(['customer:id,name', 'machine:id,name',
+    //                             'domesticAssigmentPreServices' => function($query){
+    //                                 return $query->with('employee:id,name');
+    //                             },
+    //                             'domesticAssignmentDuringServices' =>
+    //                                 function ($query) use ($startDate, $endDate) {
+    //                                     $duringService = $query->where('assignment_date', '>=', $startDate)
+    //                                                     ->where('assignment_date', '<=', $endDate);
+    //                                     if($duringService->count() >0){
+    //                                         return $duringService->with('employee:id,name');
+    //                                     }else{
+    //                                         return;
+    //                                     }
+
+    //                                 },
+    //                             'arrivalFromOverseasAssignment' => function($query){
+    //                                 return $query->with('employee:id,name');
+    //                             }
+    //                         ]
+    //                     )
+    //                     // ->with('employees')
+    //                     ->orderBy('id', 'DESC')
+    //                     ->paginate($limit, ['*'], 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+    //                     ->toArray();
+
+    //             }else{
+    //                 $results = $query->with(['customer:id,name', 'machine:id,name',
+    //                                     'domesticAssigmentPreServices' => function($query){
+    //                                         return $query->with('employee:id,name');
+    //                                     },
+    //                                     'domesticAssignmentDuringServices' =>
+    //                                         function ($query) use ($startDate, $endDate) {
+    //                                             $duringService = $query->where('assignment_date', '>=', $startDate)
+    //                                                             ->where('assignment_date', '<=', $endDate);
+    //                                             if($duringService->count() >0){
+    //                                                 return $duringService->with('employee:id,name');
+    //                                             }else{
+    //                                                 return;
+    //                                             }
+
+    //                                         },
+    //                                     'arrivalFromOverseasAssignment' => function($query){
+    //                                         return $query->with('employee:id,name');
+    //                                     }
+    //                                 ]
+    //                             )
+    //                             ->where('assignment_type', $assignmentType)
+    //                             ->orderBy('id', 'DESC')
+    //                             ->paginate($limit, ['*'], 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+    //                             ->toArray();
+
+    //     }
+    //     return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
+    //         if ($key == 'rows') {
+    //             return collect($item)->map(function ($result, $i) use ($self) {
+    //                 foreach($result['domestic_assignment_during_services'] as $ds){
+    //                     $result['assignment_date'] = $ds['assignment_date'] = Carbon::parse($ds['assignment_date'])->format('l, d F Y');
+    //                 }
+
+    //                 // $result['letter_date'] = $result['letter_date']?->format('l, d F Y');
+    //                 // $result['is_chargeable'] = '<span class="badge badge-pill badge-' . ($result['is_chargeable'] ? 'success' : 'danger') . '">' .
+    //                 //                            ($result['is_chargeable'] ? 'Yes' : 'No') . '</span>';
+
+    //                 // return $self->addDefaultListActions($result, 'show');
+    //                 // dd($result);
+    //                 return $result;
+    //             });
+    //         }
+    //         return $item;
+    //     });
+    // }
 }

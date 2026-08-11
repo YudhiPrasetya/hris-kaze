@@ -15,7 +15,7 @@ class DomesticAssignment extends ModelBase{
         'assignment_type', 'overseas_to', 'assignment_no', 'letter_date',
         'customer_id', 'is_chargeable','charge_price',
         'sr_no', 'machine_id', 'assignment_date_from',
-        'assignment_date_to', 'exchange_rate', 'exchange_rate_history'
+        'assignment_date_to'
     ];
 
     public function __construct(array $attributes = []){
@@ -52,4 +52,8 @@ class DomesticAssignment extends ModelBase{
     public function machine(): HasOne{
         return $this->hasOne(Machine::class, 'id', 'machine_id');
     }
+
+    // public function employees(){
+    //     return $this->hasManyThrough(Employee::class, DomesticAssignmentDuringService::class, 'assignment_id', 'id', 'id', 'employee_id');
+    // }
 }
