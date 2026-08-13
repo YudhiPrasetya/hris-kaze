@@ -181,7 +181,7 @@ class FingerPrintDeviceDataViewModel extends ViewModelBase{
             $this->sendNotification();
 
             return redirect(route('devicelog.create'));
-            return true;
+            // return true;
         }
 
         // $attendanceRecords = [

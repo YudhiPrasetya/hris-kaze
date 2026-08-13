@@ -683,14 +683,19 @@ $(function(){
             url: '/api/v1/assignments-AddNew',
             cache: false
         }).done(function(dt){
-            // console.log(dt);
+            console.log(dt);
             if(dt){
                 Swal.fire({
                     title: 'Created Successfully',
                     text: 'Assignment has been created successfully.',
                     icon: 'success',
+                    timer: 2000,
+                    timerProgressBar: true
+                }).then((result) => {
+                    if(result.dismiss === Swal.DismissReason.timer){
+                        window.location.href = '/assignments';
+                    }
                 })
-                window.location.href = '/assignments';
             }
         });
     }

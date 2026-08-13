@@ -521,8 +521,14 @@ $(function(){
                     title: 'Updated Successfully',
                     text: 'Assignment has been updated successfully.',
                     icon: 'success',
+                    timer: 2000,
+                    timerProgressBar: true
+                }).then((result) => {
+                    if(result.dismiss === Swal.DismissReason.timer){
+                        window.location.href = '/assignments';
+                    }
                 })
-                window.location.href = '/assignments';
+                // window.location.href = '/assignments';
             }
         })
     }
