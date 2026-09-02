@@ -262,6 +262,8 @@ Route::domain(config('app.domain'))->group(function () {
       Route::get('/api/v1/overseasTo', [DomesticAssignmentController::class, 'overseasTo'])->name('api.overseasTo');
     //   Route::get('/api/v1/assignment/reports', [DomesticAssignmentController::class, 'reports'])->name('api.assignment.report');
       Route::get('/api/v1/assignment/reports', [DomesticAssignmentDuringServiceController::class, 'reports'])->name('api.assignment.report');
+      Route::get('/api/v1/checkAvaibilityEmp', [DomesticAssignmentDuringServiceController::class, 'checkAvaibilityEmp'])->name('api.checkAvaibilityEmp');
+
 
       Route::get('/api/v1/customer', [CustomerController::class, 'list'])->name('api.customer');
 

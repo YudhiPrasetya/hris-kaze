@@ -146,6 +146,11 @@ $(function(){
 
     // let $tableAccDuringService = $('.table-accduringservice');
     // let $tableAccDuringServiceBody = $('.table-accduringservice tbody');
+
+    let preServiceContainer = $('#preServiceToggleShow');
+    let duringServiceContainer = $('#duringServiceToggleShow');
+    let arrivalServiceContainer = $('#arrivalTimeToggleShow');
+
     let $accDuringServiceTableContainer = $('#table-accduringservice-container');
 
     let $etaFlightDate = $('.etaFlightDate');
@@ -202,74 +207,32 @@ $(function(){
 
     $technicians.select2().on('change', function(){
         let data = $technicians.select2('data');
-        $tableAccPreServiceBody.empty();
-        $tableArrivalTimeBody.empty();
-        $accDuringServiceTableContainer.empty();
 
-        totalTechnicians = 0;
-        count = 0;
-
-        $.each(data, function(i, item){
-            count = totalTechnicians + 1;
-            if($assignmentType.val() == 'Overseas'){
-                addArrivalTime(item);
-            }
-            addPreService(item);
-            totalTechnicians++;
-        });
-
-        let dateAssignmentFrom = new Date($assignmentDateFrom.val());
-        let dateAssignmentTo = new Date($assignmentDateTo.val());
-        let diffAssignmentDateInDays = 0;
-
-        diffAssignmentDateInDays = Math.floor((dateAssignmentTo - dateAssignmentFrom) / (1000 * 60 * 60 * 24));
-        console.log('diffAssignmentDateInDays: ', diffAssignmentDateInDays);
-        if($assignmentDateTo.val() !== "" && dateAssignmentFrom <= dateAssignmentTo){
-            let dateNow = new Date();
-
-            for(let x = 0; x <= diffAssignmentDateInDays; x++){
-                let $p = $('<p style="font-weight: bold;">').html('Day ' + ' - ' + (x+1) + ' (' + ' Job Date: ' + new Date(dateAssignmentFrom.getTime() + (x * 24 * 60 * 60 * 1000)).toISOString().split('T')[0] + ')');
-                $accDuringServiceTableContainer.append($p);
-                let $table = $('<table class=" table table-hover bg-white table-accduringservice">');
-                let $thead = $('<thead class="thead-dark">');
-                let $trHeader = $('<tr>');
-
-                let $thNo = $('<th class="va-baseline text-center fs-0">').html('No.');
-                let thId = $('<th class="va-baseline text-center fs-0" style="display: none;">').html('Id');
-                let $thAssignmentDate = $('<th class="va-baseline text-center fs-0" style="display: none;">').html('Assignment Date');
-                let $thName = $('<th class="va-baseline fs-0" width="400">').html('Name');
-                let $thBreakfast = $('<th class="text-center fs-0">').html('Breakfast');
-                let $thStartJob = $('<th class="text-center fs-0">').html('Start Job');
-                let $thLunch = $('<th class="text-center fs-0">').html('Lunch');
-                let $thFinishJob = $('<th class="text-center fs-0">').html('Finish Job');
-                let $thDinner = $('<th class="text-center fs-0">').html('Dinner');
-                let $thSupper = $('<th class="text-center fs-0">').html('Supper');
-                let $tbody = $('<tbody class="tbody-accduringservice">');
-
-                $trHeader
-                    .append($thNo)
-                    .append(thId)
-                    .append($thAssignmentDate)
-                    .append($thName)
-                    .append($thBreakfast)
-                    .append($thStartJob)
-                    .append($thLunch)
-                    .append($thFinishJob)
-                    .append($thDinner)
-                    .append($thSupper);
-
-                $thead.append($trHeader);
-                $table.append($thead).append($tbody);
-
-                totalTechnicians = 0;
-                count = 0;
-                $.each(data, function(i, itm){
-                    count = totalTechnicians + 1;
-                    addDuringService(itm, x, $tbody, $table, dateNow, dateAssignmentFrom, $assignmentType.val());
-                    totalTechnicians++;
-                });
-            }
+        if(data.length > 0){
+            // console.log(data);
+            checkAvaibilityEmp(data, $assignmentDateFrom.val(), $assignmentDateTo.val()).then(function(dt){
+                if(dt.status == 'error'){
+                    Swal.fire({
+                        title: 'Not Available',
+                        text: dt.message,
+                        icon: 'error',
+                    }).then((result) => {
+                        // return false;
+                        $btnDomesticAssignment.attr('disabled', true);
+                    });
+                }else{
+                    initialService(data);
+                    $btnDomesticAssignment.attr('disabled', false);
+                }
+            });
+            // console.log('available-2:', available);
+        }else{
+            $tableAccPreServiceBody.empty();
+            $tableArrivalTimeBody.empty();
+            $accDuringServiceTableContainer.empty();
         }
+
+
     });
 
     function addDuringService(i, day, $b, $t, now, from, assignmentType){
@@ -667,7 +630,7 @@ $(function(){
                             'supper': supper
                         });
                     });
-                    console.log('dataPayload: ', dataPayload);
+                    // console.log('dataPayload: ', dataPayload);
                     updateAssignment(dataPayload);
                 }
             })
@@ -683,7 +646,7 @@ $(function(){
             url: '/api/v1/assignments-AddNew',
             cache: false
         }).done(function(dt){
-            console.log(dt);
+            // console.log(dt);
             if(dt){
                 Swal.fire({
                     title: 'Created Successfully',
@@ -749,6 +712,7 @@ $(function(){
     }
 
     function addPreService(i){
+
         let $container = $('.preservice.collection-container');
         let $proto = $($container.data('prototype').replace(/__NAME__/g, count));
 
@@ -810,6 +774,101 @@ $(function(){
                 .append($elDinner)
                 .append($elSupper)
         );
+    }
+
+    function checkAvaibilityEmp(dataEmps, strFrom, strTo){
+        // let available;
+
+        let idEmps = [];
+        $.each(dataEmps, function(i, item){
+            idEmps.push(item.id);
+        });
+
+        let dtFrom = new Date(strFrom).toISOString();
+        let dtTo = new Date(strTo).toISOString();
+        let dataPayload = {
+            'ids' : idEmps,
+            'dateFrom': dtFrom,
+            'dateTo': dtTo
+        };
+
+        return $.ajax({
+            method: 'GET',
+            data: dataPayload,
+            url: '/api/v1/checkAvaibilityEmp'
+        });
+
+    }
+
+    function initialService(data){
+        $tableAccPreServiceBody.empty();
+        $tableArrivalTimeBody.empty();
+        $accDuringServiceTableContainer.empty();
+
+        totalTechnicians = 0;
+        count = 0;
+
+        $.each(data, function(i, item){
+            count = totalTechnicians + 1;
+            if($assignmentType.val() == 'Overseas'){
+                addArrivalTime(item);
+            }
+            addPreService(item);
+            totalTechnicians++;
+        });
+
+        let dateAssignmentFrom = new Date($assignmentDateFrom.val());
+        let dateAssignmentTo = new Date($assignmentDateTo.val());
+        let diffAssignmentDateInDays = 0;
+
+        diffAssignmentDateInDays = Math.floor((dateAssignmentTo - dateAssignmentFrom) / (1000 * 60 * 60 * 24));
+        // console.log('diffAssignmentDateInDays: ', diffAssignmentDateInDays);
+        if($assignmentDateTo.val() !== "" && dateAssignmentFrom <= dateAssignmentTo){
+            let dateNow = new Date();
+
+            for(let x = 0; x <= diffAssignmentDateInDays; x++){
+                let $p = $('<p style="font-weight: bold;">').html('Day ' + ' - ' + (x+1) + ' (' + ' Job Date: ' + new Date(dateAssignmentFrom.getTime() + (x * 24 * 60 * 60 * 1000)).toISOString().split('T')[0] + ')');
+                $accDuringServiceTableContainer.append($p);
+                let $table = $('<table class=" table table-hover bg-white table-accduringservice">');
+                let $thead = $('<thead class="thead-dark">');
+                let $trHeader = $('<tr>');
+
+                let $thNo = $('<th class="va-baseline text-center fs-0">').html('No.');
+                let thId = $('<th class="va-baseline text-center fs-0" style="display: none;">').html('Id');
+                let $thAssignmentDate = $('<th class="va-baseline text-center fs-0" style="display: none;">').html('Assignment Date');
+                let $thName = $('<th class="va-baseline fs-0" width="400">').html('Name');
+                let $thBreakfast = $('<th class="text-center fs-0">').html('Breakfast');
+                let $thStartJob = $('<th class="text-center fs-0">').html('Start Job');
+                let $thLunch = $('<th class="text-center fs-0">').html('Lunch');
+                let $thFinishJob = $('<th class="text-center fs-0">').html('Finish Job');
+                let $thDinner = $('<th class="text-center fs-0">').html('Dinner');
+                let $thSupper = $('<th class="text-center fs-0">').html('Supper');
+                let $tbody = $('<tbody class="tbody-accduringservice">');
+
+                $trHeader
+                    .append($thNo)
+                    .append(thId)
+                    .append($thAssignmentDate)
+                    .append($thName)
+                    .append($thBreakfast)
+                    .append($thStartJob)
+                    .append($thLunch)
+                    .append($thFinishJob)
+                    .append($thDinner)
+                    .append($thSupper);
+
+                $thead.append($trHeader);
+                $table.append($thead).append($tbody);
+
+                totalTechnicians = 0;
+                count = 0;
+                $.each(data, function(i, itm){
+                    count = totalTechnicians + 1;
+                    addDuringService(itm, x, $tbody, $table, dateNow, dateAssignmentFrom, $assignmentType.val());
+                    totalTechnicians++;
+                });
+            }
+        }
     }
 });
 

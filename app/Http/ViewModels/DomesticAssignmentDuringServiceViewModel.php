@@ -5,6 +5,7 @@ use App\Http\Forms\AssignmentReportForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Managers\Form\FormBuilder;
 use App\Models\DomesticAssignmentDuringService;
+use App\Models\Employee;
 use App\Models\ModelInterface;
 use App\Repositories\EloquentRepositoryInterface;
 use Carbon\Carbon;
@@ -172,24 +173,24 @@ class DomesticAssignmentDuringServiceViewModel extends ViewModelBase
         // ];
 
         // Headers
-        $sheet->setCellValue('A4', 'No.'); 
-        $sheet->setCellValue('B4', 'Assignment Date'); 
-        $sheet->setCellValue('C4', 'SR NO'); 
-        $sheet->setCellValue('D4', 'Customer'); 
-        $sheet->setCellValue('E4', 'User'); 
-        $sheet->setCellValue('F4', 'Members'); 
-        $sheet->setCellValue('G4', 'Start'); 
-        $sheet->setCellValue('H4', 'Finish'); 
-        $sheet->setCellValue('I4', 'Hotel'); 
-        $sheet->setCellValue('J4', 'BF'); 
-        $sheet->setCellValue('K4', 'LC'); 
-        $sheet->setCellValue('L4', 'DN'); 
-        $sheet->setCellValue('M4', 'NT'); 
-        $sheet->setCellValue('N4', 'Total/Member'); 
-        $sheet->setCellValue('O4', 'Overseas Meal (IDR)'); 
-        $sheet->setCellValue('P4', 'Foreign Currency'); 
+        $sheet->setCellValue('A4', 'No.');
+        $sheet->setCellValue('B4', 'Assignment Date');
+        $sheet->setCellValue('C4', 'SR NO');
+        $sheet->setCellValue('D4', 'Customer');
+        $sheet->setCellValue('E4', 'User');
+        $sheet->setCellValue('F4', 'Members');
+        $sheet->setCellValue('G4', 'Start');
+        $sheet->setCellValue('H4', 'Finish');
+        $sheet->setCellValue('I4', 'Hotel');
+        $sheet->setCellValue('J4', 'BF');
+        $sheet->setCellValue('K4', 'LC');
+        $sheet->setCellValue('L4', 'DN');
+        $sheet->setCellValue('M4', 'NT');
+        $sheet->setCellValue('N4', 'Total/Member');
+        $sheet->setCellValue('O4', 'Overseas Meal (IDR)');
+        $sheet->setCellValue('P4', 'Foreign Currency');
         $sheet->setCellValue('Q4', 'Overseas Meal In Foreign Currency');
-        
+
         // Content
         $no = 1;
         $row = 5;
@@ -242,6 +243,31 @@ class DomesticAssignmentDuringServiceViewModel extends ViewModelBase
         $originalExtension = pathinfo($filename, PATHINFO_EXTENSION);
 
         return storage_path('app/public') . '/' . str_replace('.' . $originalExtension, '.' . $extension, basename($filename));
-    }    
+    }
+
+    public function checkAvaibilityEmp(Request $request){
+        $ids = $request->get('ids');
+        $dateFrom =  Carbon::parse($request->get('dateFrom'), 'Asia/Jakarta');
+        $dateTo = Carbon::parse($request->get('dateTo'), 'Asia/Jakarta');
+
+        // dump($ids, $dateFrom->toDate(), $dateTo->toDate());
+
+        foreach($ids as $id){
+            $empAvaibility = DomesticAssignmentDuringService::where('employee_id', $id)
+                                            ->whereBetween('assignment_date', [$dateFrom->toDate(), $dateTo->toDate()])
+                                            ->get()->count();
+            // dump($empAvaibility);
+
+            if($empAvaibility > 0){
+                $emp = Employee::find($id);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Technician: ' . $emp->name . ' is not available between ' . $dateFrom->toDateString() . ' and ' . $dateTo->toDateString(),
+                ]);
+            }
+
+
+        }
+    }
 
 }

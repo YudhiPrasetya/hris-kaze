@@ -36,4 +36,9 @@ class DomesticAssignmentDuringServiceController extends Controller
         return $this->duringServiceViewModel->setRequest($request)
             ->exportToExcel($request);
     }
+
+    function checkAvaibilityEmp(Request $request){
+        // dump($request);
+        return $this->duringServiceViewModel->checkAvaibilityEmp($request);
+    }
 }
