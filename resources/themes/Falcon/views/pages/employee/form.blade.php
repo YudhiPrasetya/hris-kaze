@@ -3,7 +3,7 @@
 @section('javascripts')
 	@parent
 	<script src="{{ themes('js/default-select.js') }}" defer></script>
-	<script src="{{ themes('js/employee.js') }}" defer></script>
+	{{-- <script src="{{ themes('js/employee.js') }}" defer></script> --}}
 	<script src="{{ asset('js/date.js') }}" defer></script>
 @endsection
 
@@ -97,15 +97,16 @@
 									{!! form_row($form->permanent_status, ['value' => $fields->get('permanent_status')]) !!}
 									{!! form_row($form->employee_guarantee, ['value' => $fields->get('employee_guarantee')]) !!}
 
-									<x-bootstrap::media variant="primary" class="mt-6 mb-4" icon="fad fa-info"
-										title="Address" subtitle="Employee address." />
-									{!! form_row($form->country_id, ['attr' => ['data-value' => $model->country_id ? $model->country_id : 'ID']]) !!}
-									{!! form_row($form->state_id, ['attr' => ['data-value' => $model->state_id]]) !!}
-									{!! form_row($form->city_id, ['attr' => ['data-value' => $model->city_id]]) !!}
-									{!! form_row($form->district_id, ['attr' => ['data-value' => $model->district_id]]) !!}
-									{!! form_row($form->village_id, ['attr' => ['data-value' => $model->village_id]]) !!}
+									{{-- <x-bootstrap::media variant="primary" class="mt-6 mb-4" icon="fad fa-info"
+										title="Address" subtitle="Employee address." /> --}}
+
+									{{-- {!! form_row($form->country_id, ['attr' => ['data-value' => $model->country_id ? $model->country_id : 'ID']]) !!} --}}
+									{{-- {!! form_row($form->state_id, ['attr' => ['data-value' => $model->state_id]]) !!} --}}
+									{{-- {!! form_row($form->city_id, ['attr' => ['data-value' => $model->city_id]]) !!} --}}
+									{{-- {!! form_row($form->district_id, ['attr' => ['data-value' => $model->district_id]]) !!} --}}
+									{{-- {!! form_row($form->village_id, ['attr' => ['data-value' => $model->village_id]]) !!} --}}
+									{!! form_row($form->street, ['label' => 'Address']) !!}
 									{!! form_row($form->postal_code) !!}
-									{!! form_row($form->street) !!}
 								</div>
 								<div class="tab-pane fade" id="v-pills-salary" role="tabpanel"
 									aria-labelledby="v-pills-salary-tab">

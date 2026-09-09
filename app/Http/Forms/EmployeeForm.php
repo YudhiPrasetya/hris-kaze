@@ -134,18 +134,18 @@ class EmployeeForm extends Form {
 					'label'      => 'Linked to user',
 					'help_block' => ['text' => 'If the employee has access to login.', 'attr' => ['class' => 'form-text text-nunito text-warning fs--1']],
 				])
-			->add('country_id',
-				'entity',
-				[
-					'class'    => Country::class,
-					'property' => 'name',
-					'label'    => 'Country',
-					'attr'     => ['data-placeholder' => "Select a country"],
-				])
-			->add('state_id', Field::SELECT, ['label' => 'State', 'attr' => ['data-placeholder' => "Select a state"]])
-			->add('city_id', Field::SELECT, ['label' => 'City', 'attr' => ['data-placeholder' => "Select a city"]])
-			->add('district_id', Field::SELECT, ['label' => 'District', 'attr' => ['data-placeholder' => "Select a district"]])
-			->add('village_id', Field::SELECT, ['label' => 'Village', 'attr' => ['data-placeholder' => "Select a village"]])
+			// ->add('country_id',
+			// 	'entity',
+			// 	[
+			// 		'class'    => Country::class,
+			// 		'property' => 'name',
+			// 		'label'    => 'Country',
+			// 		'attr'     => ['data-placeholder' => "Select a country"],
+			// 	])
+			// ->add('state_id', Field::SELECT, ['label' => 'State', 'attr' => ['data-placeholder' => "Select a state"]])
+			// ->add('city_id', Field::SELECT, ['label' => 'City', 'attr' => ['data-placeholder' => "Select a city"]])
+			// ->add('district_id', Field::SELECT, ['label' => 'District', 'attr' => ['data-placeholder' => "Select a district"]])
+			// ->add('village_id', Field::SELECT, ['label' => 'Village', 'attr' => ['data-placeholder' => "Select a village"]])
 			->add('basic_salary',
 				Field::INPUT_GROUP,
 				[
@@ -155,7 +155,7 @@ class EmployeeForm extends Form {
 				])
 			// ->add('adjustment_salary', Field::SWITCH, [
 			// 	'label' => 'Adjustment Salary (Cut Salary)'
-			// ])				
+			// ])
 			->add('functional_allowance',
 				Field::INPUT_GROUP,
 				[
