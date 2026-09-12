@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnauthorizedException;
 use App\Http\Requests\EmployeeFormRequest;
+use App\Http\ViewModels\AttendanceViewModel;
 use App\Http\ViewModels\EmployeeViewModel;
-use App\Http\ViewModels\ViewModel;
+use App\Http\ViewModels\LeaveViewModel;
 use App\Http\ViewModels\ViewModel as HttpViewModel;
+use App\Http\ViewModels\ViewModel;
 use App\Http\ViewModels\ViewModelBase;
+use App\Libraries\HttpStatusCodes;
+use App\Libraries\Payroll\PayrollCalculator;
 use App\Managers\Form\FormBuilder;
 use App\Models\CalendarEvent;
 use App\Models\Employee;
+use App\Models\Leave;
 use App\Repositories\Eloquent\AttendanceRepository;
 use App\Repositories\Eloquent\CalendarEventRepository;
 use App\Repositories\Eloquent\EmployeeRepository;
+use App\Repositories\Eloquent\LeaveRepository;
 use App\Repositories\Eloquent\SettingsRepository;
 use Faker\Factory;
 use Illuminate\Contracts\Foundation\Application;
@@ -21,13 +28,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
-
-use App\Http\ViewModels\LeaveViewModel;
-use App\Repositories\Eloquent\LeaveRepository;
-use App\Models\Leave;
-use App\Http\ViewModels\AttendanceViewModel;
-use App\Libraries\Payroll\PayrollCalculator;
+use Illuminate\Support\Facades\Auth;
 use PDF;
+
 
 class EmployeeController extends Controller {
 	private EmployeeViewModel $viewModel;
@@ -203,6 +206,12 @@ class EmployeeController extends Controller {
 	}
 
 	public function showPayrollForm(Request $request, Employee $employee){
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        $isUser = $employee->user_id == Auth::user()->id;
+        if(!$isAdmin && !$isUser){
+            throw UnauthorizedException::forPermissions(['employee.payroll']);
+        }
+
 		// Employee $employee = Employee::find($id);
 		$start = new \DateTime(sprintf("%d-%02d-%02d", $request->get('year'), $request->get('month'), date('d')));
 
@@ -222,6 +231,13 @@ class EmployeeController extends Controller {
 	}
 
 	public function addLeave(Request $request){
+        $employee = Employee::find($request->employee);
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        $isUser = $employee->user_id == Auth::user()->id;
+        if(!$isAdmin && !$isUser){
+            throw UnauthorizedException::forPermissions(['employee.leave']);
+        }
+
 		$employee = Employee::find($request->employee);
 		$leaveQuota = $this->viewModel->countRemainLeaveQuota($employee);
 		if(gettype($leaveQuota) === 'integer' && $leaveQuota <= 0){
@@ -259,9 +275,15 @@ class EmployeeController extends Controller {
 	 *
 	 * @param \App\Models\Employee $employee
 	 *
-	 * @return \App\Http\ViewModels\EmployeeViewModel|\App\Http\ViewModels\ViewModel|\Illuminate\Http\Response
+	 * @return \App\Http\ViewModels\EmployeeViewModel|\App\Http\ViewModels\ViewModel|\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
 	 */
 	public function show(Request $request, Employee $employee): HttpViewModel|Response|EmployeeViewModel {
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        $isUser = $employee->user_id == Auth::user()->id;
+        if(!$isAdmin && !$isUser){
+            throw UnauthorizedException::forPermissions(['employee.show']);
+        }
+
 		$this->viewModel->setModel($employee);
 		// $this->viewModel->countRemainLeaveQuota($employee->id);
 		$this->viewModel->payrollCalc($request, $this->settingsRepository, $this->attendanceRepository, $this->calendarEventRepository);
@@ -274,9 +296,16 @@ class EmployeeController extends Controller {
 	 *
 	 * @param \App\Models\Employee $employee
 	 *
-	 * @return HttpViewModel|ViewModelBase|Response
+	 * @return HttpViewModel|ViewModelBase|Response|RedirectResponse|Redirector
 	 */
 	public function edit(Employee $employee): HttpViewModel|Response|ViewModelBase {
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        $isUser = $employee->user_id == Auth::user()->id;
+        if(!$isAdmin && !$isUser){
+        if(!$isAdmin && !$isUser){
+            throw UnauthorizedException::forPermissions(['employee.edit']);
+        }
+        }
 		// dd($employee);
 		return $this->viewModel->createForm('PUT', 'employee.update', $employee)
 		                       ->view('pages.employee.form');
