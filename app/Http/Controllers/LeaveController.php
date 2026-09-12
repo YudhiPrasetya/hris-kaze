@@ -2,26 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnauthorizedException;
 use App\Http\Requests\LeaveFormRequest;
-
 use App\Http\ViewModels\LeaveViewModel;
 use App\Http\ViewModels\ViewModel as HttpViewModel;
 use App\Http\ViewModels\ViewModelBase;
-
 use App\Managers\Form\FormBuilder;
-
+use App\Models\Employee;
 use App\Models\Leave;
-
 use App\Repositories\Eloquent\LeaveRepository;
-
 use Illuminate\Contracts\Foundation\Application;
-
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveController extends Controller{
     private LeaveViewModel $leaveViewModel;
@@ -53,6 +49,13 @@ class LeaveController extends Controller{
     }
 
     public function cancelLeave(Request $request){
+        $employee = Employee::find($request->employee);
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        $isUser = $employee->user_id == Auth::user()->id;
+        if(!$isAdmin && !$isUser){
+            throw UnauthorizedException::forPermissions(['leave.cancel']);
+        }
+
         $this->leaveViewModel->cancelLeave($request);
     }
 
