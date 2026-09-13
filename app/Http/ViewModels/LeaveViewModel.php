@@ -41,7 +41,7 @@ class LeaveViewModel extends ViewModelBase{
 		$this->setModel($model);
 		$this->form->setMethod($method);
 		// $this->form->setUrl(route($route, ['leave' => $model->id]));
-		$this->form->setUrl(route($route, ['employee' => $model->id]));
+		$this->form->setUrl(route($route, ['leave' => $model->id]));
 
 		return $this;
 	}
@@ -106,6 +106,7 @@ class LeaveViewModel extends ViewModelBase{
     }
 
 	public function list(Request $request, ...$columns): Collection {
+        // dump($request->all());
 		$self = $this;
 		list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
 		$query = $this->getBaseQuery($request, ...$columns);
@@ -131,22 +132,29 @@ class LeaveViewModel extends ViewModelBase{
                             'target' => '_self',
                             'href' => route('leave.cancel', [
                                 'leave' => $result['id'],
-                                'employee' => $result['id_employee'],
-                                'start' => $result['start'],
-                                'end' =>  $result['end']
+                                // 'employee' => $result['id_employee'],
+                                // 'start' => $result['start'],
+                                // 'end' =>  $result['end']
                                 // 'params' => $params
                             ]),
                         ],
                         'type' => 'a',
-                        'tooltip' => 'Cancel leave'
-                    ]];
+                        'tooltip' => 'Cancel leave'],
+                    ];
 
 					// return $self->addDefaultListActions($result, 'edit', 'destroy');
 
-                    $result['actions'] = $action;
+                    // $result['actions'] = $action;
+                    // return $result;
+
+					// return $self->addDefaultListActions($result, 'edit', 'destroy');
+
+					$result = $self->addDefaultListActions($result);
+					$actions = $result->get('actions')->merge($action);
+					$result['actions'] = $actions;
+
                     return $result;
 
-					// return $self->addDefaultListActions($result, 'edit', 'destroy');
 				});
 			}
 
@@ -203,7 +211,7 @@ class LeaveViewModel extends ViewModelBase{
 		$dateEndLeave = new \DateTime($fields->get('end'));
 		// $eventCalendar = new \DateTime($eventsCalendar['start_date']);
         $isCutLeaveAllowance = ReasonForLeave::find($reasonForLeave);
-        
+
 		while($dateStartLeave <= $dateEndLeave){
 			$dayOfWeek = $dateStartLeave->format('w');
 			$checkNotInEventCalendar = in_array($dateStartLeave->format('Y-m-d'), $eventsCalendar->toArray());

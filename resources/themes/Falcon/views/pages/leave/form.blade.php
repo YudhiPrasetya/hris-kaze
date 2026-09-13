@@ -9,7 +9,7 @@
         // dd($data);
         $fields = collect($form->getFieldValues())
     @endphp
-    {!! form_start($form, ['attr' => ['autocomplete' => 'off']]) !!}
+    {!! form_start($form, ['attr' => ['autocomplete' => 'off', 'class' => 'leave']]) !!}
 
     <x-bootstrap::row class="justify-content-center">
         <x-bootstrap::column breakpoint="EXTRA_SMALL|12;MEDIUM|9">
@@ -33,30 +33,44 @@
                     <x-bootstrap::row>
                         <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
                             {{-- <input type="hidden" name="id_employee" value="{{ $data['employee_id'] }}" /> --}}
-                            {!! form_row($form->id_employee, ['value' => $data['employee_id']]) !!}
+                            @php
+                                $employee = App\Models\Employee::where('user_id', Auth::user()->id)->first();
+
+                                $leaveQuota = 0;
+                                $years = (new DateTime())->diff($employee->effective_since)->y;
+                                if($years >=1){
+                                    $year = date('Y');
+                                    $leaveQuota = App\Models\Attendance::where('employee_id', $employee->id)
+                                                            ->where('attendance_reason_id', '=', 6)
+                                                            ->whereYear('at', '=', (int)$year)->get()->count();
+
+                                    $leaveQuota = 12-$leaveQuota;
+                                }
+                            @endphp
+                            {!! form_row($form->id_employee, ['value' => $employee->id, 'attr' => ['disabled' => $leaveQuota == 0]]) !!}
                             <div class="mb-2">
                                 <h6 class="text-600 control-label mb-0">Employee Name</h6>
                                 <span id="leaveAllowance" class="form-control-plaintext text-1000 fs-0 pt-0">
-                                    <strong>{{ $data['employee_name'] }}</strong>
+                                    <strong>{{ $employee->name }}</strong>
                                 </span>
                             </div>
 
-                            {!! form_row($form->leave_date) !!}
-                            {!! form_row($form->id_reason_for_leave) !!}
-                            {!! form_row($form->cut_att_premium) !!}
+                            {!! form_row($form->leave_date, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
+                            {!! form_row($form->id_reason_for_leave, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
+                            {!! form_row($form->cut_att_premium, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
                         </x-bootstrap::column>
                         <x-bootstrap::column>
                             <div class="mb-2">
                                 <h6 class="text-600 control-label mb-0">Remaining leave quota (sisa jatah cuti)</h6>
                                 <span id="leaveAllowance" class="form-control-plaintext text-1000 fs-0 pt-0">
-                                    <strong>{{ $data['LeaveQuota'] }}</strong>
+                                    <strong>{{ $leaveQuota }}</strong>
                                 </span>
 
                             </div>
-                            {!! form_row($form->start) !!}
-                            {!! form_row($form->end) !!}
-                            {!! form_row($form->note) !!}
-                            {!! form_row($form->attachment_path) !!}
+                            {!! form_row($form->start, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
+                            {!! form_row($form->end, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
+                            {!! form_row($form->note, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
+                            {!! form_row($form->attachment_path, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
                         </x-bootstrap::column>
                     </x-bootstrap::row>
                 </x-bootstrap::card.body>

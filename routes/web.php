@@ -206,7 +206,8 @@ Route::domain(config('app.domain'))->group(function () {
 
       // Leave
       Route::resource('leave', LeaveController::class);
-      Route::get('/leave/{leave}/{employee}/{start}/{end}/cancel', [LeaveController::class, 'cancelLeave'])->name('leave.cancel');
+    //   Route::get('/leave/{leave}/{employee}/{start}/{end}/cancel', [LeaveController::class, 'cancelLeave'])->name('leave.cancel');
+      Route::get('/leave/{leave}/cancel', [LeaveController::class, 'cancelLeave'])->name('leave.cancel');
 
       // Overtime
       Route::resource('ot', OvertimeController::class);
@@ -225,7 +226,7 @@ Route::domain(config('app.domain'))->group(function () {
       Route::post('/employee/{employee}/payroll', [EmployeeController::class, 'showPayroll'])->name('employee.payroll');
 
       // Employee leave
-      Route::match(['GET', 'POST'], '/employee/{employee}/leave', [EmployeeController::class, 'addLeave'])->name('employee.leave');
+    //   Route::match(['GET', 'POST'], '/employee/{employee}/leave', [EmployeeController::class, 'addLeave'])->name('employee.leave');
 
       // API that used for web only.
       // You have to access from web to be able to access this API

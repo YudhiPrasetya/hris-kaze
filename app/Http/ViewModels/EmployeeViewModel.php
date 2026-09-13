@@ -93,16 +93,16 @@ class EmployeeViewModel extends ViewModelBase {
 					$result['effective_since'] = $result['effective_since'] != null ? $result['effective_since']->format('Y-m-d') : "No data";
 
 					$action = [
-						'leave' => [
-							'icon'    => 'fad fa-plane',
-							'attr'    => [
-								'class' => 'btn btn-sm btn-falcon-info',
-								'href'  => route('employee.leave', ['employee' => $result['id']]),
-								// 'href' => '#',
-							],
-							'type'    => 'a',
-							'tooltip' => 'Add Leave',
-						],
+						// 'leave' => [
+						// 	'icon'    => 'fad fa-plane',
+						// 	'attr'    => [
+						// 		'class' => 'btn btn-sm btn-falcon-info',
+						// 		'href'  => route('employee.leave', ['employee' => $result['id']]),
+						// 		// 'href' => '#',
+						// 	],
+						// 	'type'    => 'a',
+						// 	'tooltip' => 'Add Leave',
+						// ],
 						'payroll' => [
 							'icon'    => 'fad fa-credit-card',
 							'attr'    => [

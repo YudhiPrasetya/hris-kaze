@@ -230,45 +230,45 @@ class EmployeeController extends Controller {
 
 	}
 
-	public function addLeave(Request $request){
-        $employee = Employee::find($request->employee);
-        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
-        $isUser = $employee->user_id == Auth::user()->id;
-        if(!$isAdmin && !$isUser){
-            throw UnauthorizedException::forPermissions(['employee.leave']);
-        }
+	// public function addLeave(Request $request){
+    //     $employee = Employee::find($request->employee);
+    //     $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+    //     $isUser = $employee->user_id == Auth::user()->id;
+    //     if(!$isAdmin && !$isUser){
+    //         throw UnauthorizedException::forPermissions(['employee.leave']);
+    //     }
 
-		$employee = Employee::find($request->employee);
-		$leaveQuota = $this->viewModel->countRemainLeaveQuota($employee);
-		if(gettype($leaveQuota) === 'integer' && $leaveQuota <= 0){
-			$request->session()->flash('message', "Employee <strong>{$employee->name}</strong> has no remaining leave quota.");
-			$request->session()->flash('alert', "danger");
-			return redirect(route('employee.show', ['employee' => $employee->id]));
-		}else if(gettype($leaveQuota) === 'string'){
-			$request->session()->flash('message', $leaveQuota);
-			$request->session()->flash('alert', "danger");
-			return redirect(route('employee.show', ['employee' => $employee->id]));
-		}else if(gettype($leaveQuota) === 'integer' && $leaveQuota > 0){
-			$data = [
-				'employee_id' => $employee->id,
-				'employee_name' => $employee->name,
-				'LeaveQuota' => $leaveQuota,
-			];
-			// $leaveModel = new Leave();
+	// 	$employee = Employee::find($request->employee);
+	// 	$leaveQuota = $this->viewModel->countRemainLeaveQuota($employee);
+	// 	if(gettype($leaveQuota) === 'integer' && $leaveQuota <= 0){
+	// 		$request->session()->flash('message', "Employee <strong>{$employee->name}</strong> has no remaining leave quota.");
+	// 		$request->session()->flash('alert', "danger");
+	// 		return redirect(route('employee.show', ['employee' => $employee->id]));
+	// 	}else if(gettype($leaveQuota) === 'string'){
+	// 		$request->session()->flash('message', $leaveQuota);
+	// 		$request->session()->flash('alert', "danger");
+	// 		return redirect(route('employee.show', ['employee' => $employee->id]));
+	// 	}else if(gettype($leaveQuota) === 'integer' && $leaveQuota > 0){
+	// 		$data = [
+	// 			'employee_id' => $employee->id,
+	// 			'employee_name' => $employee->name,
+	// 			'LeaveQuota' => $leaveQuota,
+	// 		];
+	// 		// $leaveModel = new Leave();
 
-			// $this->leaveViewModel->setModel($leaveModel);
-			$this->leaveViewModel->setData($data);
+	// 		// $this->leaveViewModel->setModel($leaveModel);
+	// 		$this->leaveViewModel->setData($data);
 
-			// return $this->leaveViewModel->createForm('POST', 'employee.leave', $employee, null, ['employee' => $employee->id])->view('pages.leave.form');
-			return $this->leaveViewModel->createForm('POST', 'leave.store', new Leave())->view('pages.leave.form');
+	// 		// return $this->leaveViewModel->createForm('POST', 'employee.leave', $employee, null, ['employee' => $employee->id])->view('pages.leave.form');
+	// 		return $this->leaveViewModel->createForm('POST', 'leave.store', new Leave())->view('pages.leave.form');
 
-		}
+	// 	}
 
 		// return $this->viewModel->createForm('POST', 'employee.leave.store', null, ['employee' => $employee->id])
 		//                        ->view('pages.employee.leave_form');
 
 		// return $this->viewModel->view('pages.leave.form');
-	}
+	// }
 
 	/**
 	 * Display the specified resource.
@@ -302,9 +302,7 @@ class EmployeeController extends Controller {
         $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
         $isUser = $employee->user_id == Auth::user()->id;
         if(!$isAdmin && !$isUser){
-        if(!$isAdmin && !$isUser){
             throw UnauthorizedException::forPermissions(['employee.edit']);
-        }
         }
 		// dd($employee);
 		return $this->viewModel->createForm('PUT', 'employee.update', $employee)

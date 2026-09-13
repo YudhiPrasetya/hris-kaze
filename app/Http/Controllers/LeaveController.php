@@ -49,7 +49,8 @@ class LeaveController extends Controller{
     }
 
     public function cancelLeave(Request $request){
-        $employee = Employee::find($request->employee);
+        $leave = Leave::find($request->leave);
+        $employee = Employee::find($leave->id_employee);
         $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
         $isUser = $employee->user_id == Auth::user()->id;
         if(!$isAdmin && !$isUser){
@@ -95,6 +96,7 @@ class LeaveController extends Controller{
      * @return \App\Http\ViewModels\ViewModel|\App\Http\ViewModels\ViewModelBase
      */
     public function create(): HttpViewModel|ViewModelBase{
+
         return $this->leaveViewModel->createForm('POST', 'leave.store', new Leave())->view('pages.leave.form');
     }
 
@@ -106,6 +108,12 @@ class LeaveController extends Controller{
      * @return HttpViewModel|ViewModelBase
      */
     public function edit(Leave $leave): HttpViewModel|ViewModelBase {
+        $employee = Employee::find($leave->id_employee);
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        $isUser = $employee->user_id == Auth::user()->id;
+        if(!$isAdmin && !$isUser){
+            throw UnauthorizedException::forPermissions(['leave.edit']);
+        }
 	    return $this->leaveViewModel->createForm('PUT', 'leave.update', $leave)->view('pages.leave.form');
     }
 
@@ -132,6 +140,12 @@ class LeaveController extends Controller{
      * @return \App\Http\ViewModels\LeaveViewModel|\App\Http\ViewModels\ViewModel|\Illuminate\Http\Response
      */
     public function show(Leave $leave): HttpViewModel|Response|LeaveViewModel{
+        $employee = Employee::find($leave->id_employee);
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        $isUser = $employee->user_id == Auth::user()->id;
+        if(!$isAdmin && !$isUser){
+            throw UnauthorizedException::forPermissions(['leave.edit']);
+        }
 
         $this->leaveViewModel->setModel($leave);
 
@@ -146,6 +160,12 @@ class LeaveController extends Controller{
      */
     public function destroy(Request $request, Leave $leave)
     {
+        $employee = Employee::find($leave->id_employee);
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        $isUser = $employee->user_id == Auth::user()->id;
+        if(!$isAdmin && !$isUser){
+            throw UnauthorizedException::forPermissions(['leave.edit']);
+        }
 	    return $this->leaveViewModel->delete($request, $leave);
     }
 }
