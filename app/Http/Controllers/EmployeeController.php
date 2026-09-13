@@ -335,6 +335,11 @@ class EmployeeController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy(Request $request, Employee $employee) {
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        // $isUser = $employee->user_id == Auth::user()->id;
+        if(!$isAdmin){
+            throw UnauthorizedException::forPermissions(['employee.destroy']);
+        }
         return $this->viewModel->delete($request, $employee);
 	}
 
