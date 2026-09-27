@@ -25,6 +25,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class DomesticAssigmentViewModel extends ViewModelBase{
     private ?Request $request;
@@ -550,6 +552,21 @@ class DomesticAssigmentViewModel extends ViewModelBase{
 					$result['is_chargeable'] = '<span class="badge badge-pill badge-' . ($result['is_chargeable'] ? 'success' : 'danger') . '">' .
 					                           ($result['is_chargeable'] ? 'Yes' : 'No') . '</span>';
 
+                    $isAdmin = Auth::user()->hasAnyRole(['super-admin', 'admin']);
+
+                    $actionAdmin = [
+						'assignment_approve' => [
+							'icon'    => 'fad fa-check',
+							'attr'    => [
+								'class' => 'btn btn-md btn-falcon-success',
+								'href'  => route('assignments.approve', ['assignment' => $result['id']]),
+								// 'href' => '#',
+							],
+							'type'    => 'a',
+							'tooltip' => 'Approve',
+						],
+                    ];
+
 					$action = [
 						'assignment_edit' => [
 							'icon'    => 'fad fa-business-time',
@@ -563,8 +580,12 @@ class DomesticAssigmentViewModel extends ViewModelBase{
 						],
 
 					];
-                    $result['actions'] = $action;
 
+                    if($isAdmin){
+                        $result['actions'] = array_merge($action, $actionAdmin);
+                    }else{
+                        $result['actions'] = $action;
+                    }
 					// return $self->addDefaultListActions($result, 'show');
                     return $result;
 				});
@@ -663,6 +684,14 @@ class DomesticAssigmentViewModel extends ViewModelBase{
         $this->form->setUrl(route($route));
 
         return $this;
+    }
+
+    public function approveAssignment(Request $request){
+        $assignmentUpdated = DomesticAssignment::find($request->assignment)->update(['status' => 'Approved']);
+        if($assignmentUpdated){
+            Session::flash('message', 'The selected assignment is approved');
+            Session::flash('alert', 'success');
+        }
     }
 
     // public function reports(Request $request, SettingsRepository $settingsRepository, ?ModelInterface $model = null){

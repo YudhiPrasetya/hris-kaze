@@ -15,7 +15,7 @@ class DomesticAssignment extends ModelBase{
         'assignment_type', 'overseas_to', 'assignment_no', 'letter_date',
         'customer_id', 'is_chargeable','charge_price',
         'sr_no', 'machine_id', 'assignment_date_from',
-        'assignment_date_to'
+        'assignment_date_to', 'status'
     ];
 
     public function __construct(array $attributes = []){

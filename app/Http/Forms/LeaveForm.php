@@ -4,8 +4,8 @@ namespace App\Http\Forms;
 
 use App\Managers\Form\Field;
 use App\Managers\Form\Form;
-use App\Models\Employee;
 use App\Models\ReasonForLeave;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveForm extends Form{
     public function buildForm()
@@ -49,9 +49,9 @@ class LeaveForm extends Form{
 						'data-target' => 'targetPreview',
 						'onchange'    => 'javascript: previewImage(event);',
 					],
-            ])
-            ->add('cut_att_premium', Field::SWITCH, ['label' => 'Potong Premi'])
-            ->add('submit', Field::BUTTON_SUBMIT, [
+            ])->add('cut_att_premium', Field::SWITCH, ['label' => 'Potong Premi']);
+
+            $this->add('submit', Field::BUTTON_SUBMIT, [
 					'label' => '<i class="fad fa-save mr-1"></i> Submit',
 					'attr'  => ['class' => 'btn-falcon-success', 'id' => 'leave-permit'],
             ]);

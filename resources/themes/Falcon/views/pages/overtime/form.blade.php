@@ -39,9 +39,10 @@
                             {!! form_row($form->start, ['value' => $model->start, 'attr' => ['readonly' => true]]) !!}
                             {!! form_row($form->overtime, ['value' => $model->overtime, 'attr' => ['readonly' => true]]) !!}
                             @php
-                                $start = new DateTime($model->at->format('Y-m-d') . " " . $model->start);
+                                // $start = new DateTime($model->at->format('Y-m-d') . " " . $model->start);
                                 $end = new DateTime($model->at->format('Y-m-d') . " " . $model->end);
-                                $overtimeDuration = $start->diff($end);
+                                $overtime = new DateTime($model->at->format('Y-m-d' . " " . $model->overtime));
+                                $overtimeDuration = $end->diff($overtime);
                                 $overtimeDurationHour = $overtimeDuration->h;
                                 if ($overtimeDurationHour > 8) {
                                     $overtimeDurationHour = 8;

@@ -166,6 +166,10 @@ class Employee extends ModelBase {
 		return $this->hasMany(AnnualLeave::class, 'employee_id', 'id');
 	}
 
+    public function leaves(): HasMany{
+        return $this->hasMany(Leave::class, 'id_employee', 'id');
+    }
+
 	public function attendance(): HasMany {
 		return $this->hasMany(Attendance::class, 'employee_id', 'id');
 	}

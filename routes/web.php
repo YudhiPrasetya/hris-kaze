@@ -172,6 +172,7 @@ Route::domain(config('app.domain'))->group(function () {
 
       Route::match(['GET'], '/report/assignment/export', [DomesticAssignmentDuringServiceController::class, 'exportToExcel'])->name('report.assignment.export');
         // Route::get('/assignment-domestic/index', [DomesticAssignmentController::class, 'index'])->name('assignment-domestic.index');
+      Route::get('/assignments/{assignment}/approve', [DomesticAssignmentController::class, 'approveAssignment'])->name('assignments.approve');
 
       // overseas assignment route
       Route::resource('assignment-overseas', OverseasAssignmentController::class);
@@ -202,12 +203,14 @@ Route::domain(config('app.domain'))->group(function () {
       // Permit
       Route::resource('permit', PermitController::class);
     //   Route::get('/permit/{ids}/{dateRange}/cancel', [PermitController::class, 'cancelPermit'])->name('permit.cancel');
+      Route::get('/permit/{permit}/{employee}/{start}/{end}/approve', [PermitController::class, 'approvePermit'])->name('permit.approve');
       Route::get('/permit/{permit}/{employee}/{start}/{end}/cancel', [PermitController::class, 'cancelPermit'])->name('permit.cancel');
 
       // Leave
       Route::resource('leave', LeaveController::class);
     //   Route::get('/leave/{leave}/{employee}/{start}/{end}/cancel', [LeaveController::class, 'cancelLeave'])->name('leave.cancel');
-      Route::get('/leave/{leave}/cancel', [LeaveController::class, 'cancelLeave'])->name('leave.cancel');
+      Route::get('/leave/{leave}/{employee}/{start}/{end}/cancel', [LeaveController::class, 'cancelLeave'])->name('leave.cancel');
+      Route::get('/leave/{leave}/{employee}/{start}/{end}/approve', [LeaveController::class, 'approveLeave'])->name('leave.approve');
 
       // Overtime
       Route::resource('ot', OvertimeController::class);
@@ -241,8 +244,7 @@ Route::domain(config('app.domain'))->group(function () {
       Route::get('/api/v1/employee/forSelect', [EmployeeController::class, 'forSelect'])->name('api.employee.forSelect');
 
       Route::get('/api/v1/employee/select', [EmployeeController::class, 'select2List'])->name('api.employee.select');
-      Route::get('/api/v1/employee/attendance/available', [EmployeeController::class, 'selectAvailableEmployee'])
-         ->name('api.employee.attendance.available');
+      Route::get('/api/v1/employee/attendance/available', [EmployeeController::class, 'selectAvailableEmployee'])->name('api.employee.attendance.available');
       Route::get('/api/v1/employee/{employee}/payroll', [EmployeeController::class, 'getpayroll'])->name('api.employee.payroll');
 
       Route::get('/api/v1/task', [TaskController::class, 'list'])->name('api.task');

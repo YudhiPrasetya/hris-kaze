@@ -25,7 +25,9 @@ use Illuminate\Http\Response;
 
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
-
+use Illuminate\Support\Facades\Auth;
+use App\Exceptions\UnauthorizedException;
+use Illuminate\Support\Facades\Session;
 class PermitController extends Controller{
     private PermitViewModel $permitViewModel;
 
@@ -55,9 +57,23 @@ class PermitController extends Controller{
         return $this->permitViewModel->list($request);
     }
 
+    public function approvePermit(Request $request){
+        // $this->permitViewModel->setRequest($request);
+        // dd($request->permit);
+        // $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        // if(!$isAdmin){
+        //     throw UnauthorizedException::forPermissions(['permit.approve']);
+        // }
+        return $this->permitViewModel->approvePermit($request);
+    }
+
     public function cancelPermit(Request $request){
         // $this->permitViewModel->setRequest($request);
         // dd($request->permit);
+        // $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        // if(!$isAdmin){
+        //     throw UnauthorizedException::forPermissions(['permit.cancel']);
+        // }
         $this->permitViewModel->cancelPermit($request);
     }
 
@@ -87,8 +103,17 @@ class PermitController extends Controller{
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse:\Illuminate\Routing\Redirector
      */
-    public function show(Permit $permit){
-        return redirect(route('permit.index'));
+    public function show(Permit $permit): PermitViewModel|RedirectResponse{
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        $employee = Employee::find($permit->id_employee);
+        $isUser = Auth::user()->id === $employee->user_id;
+        if(!$isAdmin && !$isUser){
+            throw UnauthorizedException::forPermissions(['permit.show']);
+        }
+        $this->permitViewModel->setModel($permit);
+
+        // return redirect(route('permit.index'));
+        return $this->permitViewModel->view('pages.permit.show');
     }
 
     /**
@@ -107,8 +132,14 @@ class PermitController extends Controller{
      *
      * @return HttpViewModel|ViewModelBase
      */
-    public function edit(Permit $permit): HttpViewModel|ViewModelBase {
-	    return $this->permitViewModel->createForm('PUT', 'permit.update', $permit)->view('pages.permit.form');
+    public function edit(Permit $permit): HttpViewModel|ViewModelBase|Redirector|RedirectResponse {
+        if($permit->status == 'Approved'){
+            $employee = Employee::find($permit->id_employee);
+            Session::flash('message', "Permit for <strong>{$employee->name}</strong> from <strong>{$permit->start->format('Y-m-d')}</strong> to <strong>{$permit->end->format('Y-m-d')}</strong> cannot be edited because allready approved.");
+            Session::flash('alert', 'warning');
+            redirect('/permit')->send();
+        }
+        return $this->permitViewModel->createForm('PUT', 'permit.update', $permit)->view('pages.permit.form');
     }
 
     /**

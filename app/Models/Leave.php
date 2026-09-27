@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\ReasonForLeave;
 
 use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -20,7 +21,8 @@ class Leave extends ModelBase{
         'id_employee',
         'id_reason_for_leave',
         'start', 'end', 'note',
-        'attachment_path', 'cut_att_premium'
+        'attachment_path', 'cut_att_premium',
+        'status'
     ];
 
     protected $casts = [
@@ -53,6 +55,10 @@ class Leave extends ModelBase{
     public function employee(): HasOne{
         return $this->hasOne(Employee::class, 'id', 'id_employee');
     }
+
+    // public function employee(): BelongsTo{
+    //     return $this->belongsTo(Employee::class);
+    // }
 
     public function reasonForLeave(): HasOne{
         return $this->hasOne(ReasonForLeave::class, 'id', 'id_reason_for_leave');

@@ -5,10 +5,12 @@ namespace App\Http\ViewModels;
 use App\Http\Forms\PermitForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Managers\Form\FormBuilder;
-use App\Models\Permit;
 use App\Models\Attendance;
-use App\Models\ReasonForLeave;
+use App\Models\CalendarEvent;
+use App\Models\Employee;
 use App\Models\ModelInterface;
+use App\Models\Permit;
+use App\Models\ReasonForLeave;
 use App\Repositories\Eloquent\PermitRepository;
 use App\Repositories\Eloquent\ReasonForLEaveRepository;
 use App\Repositories\EloquentRepositoryInterface;
@@ -19,9 +21,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+// use Symfony\Component\HttpFoundation\Session\Session;
 
-use App\Models\CalendarEvent;
 class PermitViewModel extends ViewModelBase{
     private ?Request $request;
 
@@ -91,23 +95,30 @@ class PermitViewModel extends ViewModelBase{
     public function cancelPermit(Request $request){
         $permitId = (int)$request->permit;
         $employeeId = (int)$request->employee;
+        $employee = Employee::find($employeeId);
         $start = new DateTime($request->start);
         $end = new DateTime($request->end);
+        $permit = Permit::find($permitId);
 
-        if(Permit::find($permitId)->forceDelete()){
-            while($start <= $end){
-                $att = Attendance::where('employee_id', '=', $employeeId)->where('at', '=', $start);
-                if($att){
-                    $att->forceDelete();
-                }
-                $start->modify('+ 1 day');
-            }
-            $request->session()->flash('message', "Successfully cancel <strong>Permit</strong>.");
-            $request->session()->flash('alert', "success");
+        if($permit->forceDelete()){
+            // while($start <= $end){
+            //     $att = Attendance::where('employee_id', '=', $employeeId)->where('at', '=', $start);
+            //     if($att){
+            //         $att->forceDelete();
+            //     }
+            //     $start->modify('+ 1 day');
+            // }
+            // $request->session()->flash('message', "Successfully cancel <strong>Permit</strong>.");
+            // $request->session()->flash('alert', "success");
             // return redirect(route('permit.index'));
+
+            Session::flash('message', "Permit for <strong>{$employee->name}</strong> from <strong>{$start->format('Y-m-d')}</strong> to <strong>{$end->format('Y-m-d')}</strong> is not approved.");
+            Session::flash('alert', "success");
         }else{
-            $request->session()->flash('message', "Failed to cancel permit with id <strong>{$permitId}</strong>");
-            $request->session()->flash('alert', "danger");
+            // $request->session()->flash('message', "Failed to cancel permit with id <strong>{$permitId}</strong>");
+            // $request->session()->flash('alert', "danger");
+            Session::flash('message', 'Failed to find permit with id=' . $permitId . '!!');
+            Session::flash('alert', "warning");
         }
         redirect('/permit')->send();
         // exit();
@@ -117,14 +128,58 @@ class PermitViewModel extends ViewModelBase{
 
     }
 
+    public function approvePermit(Request $request){
+        $permitId = (int)$request->permit;
+        $employeeId = (int)$request->employee;
+        $start = new DateTime($request->start);
+        $end = new DateTime($request->end);
+
+        if(Permit::find($permitId)->update(['status' => 'Approved'])){
+            while($start <= $end){
+                // $att = Attendance::where('employee_id', '=', $employeeId)->where('at', '=', $start);
+                // if($att){
+                //     $att->update(['attendance_reason_id' => 4]);
+                // }
+                Attendance::create([
+                    'employee_id' => $employeeId,
+                    'attendance_reason_id' => 4,
+                    'at' => $start,
+                    'start' => '08:00:00',
+                    'end' => '17:00:00',
+                ]);
+                $start->modify('+ 1 day');
+            }
+            // $request->session()->flash('message', "Successfully approved <strong>Permit</strong>.");
+            // $request->session()->flash('alert', "success");
+            Session::flash('message', "<strong>Permit</strong> successfully approved.");
+            Session::flash('alert', "success");
+        }else{
+            // $request->session()->flash('message', "Failed to approve permit with id <strong>{$permitId}</strong>");
+            // $request->session()->flash('alert', "danger");
+            Session::flash('message', "Failed to approve permit with id <strong>{$permitId}</strong>");
+            Session::flash('alert', "danger");
+        }
+        // redirect('/permit')->send();
+        return redirect(route('permit.index'));
+    }
+
 	public function list(Request $request, ...$columns): Collection {
 		$self = $this;
 		list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
 		$query = $this->getBaseQuery($request, ...$columns);
 		$columns = $this->getDefaultColumns(...$columns);
-		$results = $query->with(['employee:id,name'])
-		                 ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
-		                 ->toArray();
+
+        if(Auth::user()->hasAnyRole(['super-admin', 'admin'])){
+            $results = $query->with(['employee:id,name'])
+                            ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+                            ->toArray();
+        }else{
+            $employee = Employee::where('user_id', '=', Auth::user()->id)->first();
+            $results = $query->with(['employee:id,name'])
+                                ->where('id_employee', '=', $employee->id)
+                                ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+                                ->toArray();
+        }
 
 		return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
 			if ($key == 'rows') {
@@ -153,28 +208,56 @@ class PermitViewModel extends ViewModelBase{
                     // ];
                     // dump($result);
                     // $params = (string)$result['id'] . "-" . (string)$result['id_employee'] . "-" . (new DateTime($result['start']))->format('Y/m/d') . "-". (new DateTime($result['end']))->format('Y/m/d');
+                    $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+                    if($isAdmin){
+                        $action = [
+                            'approvePermit' => [
+                                'icon' => 'fad fa-check',
+                                'attr' => [
+                                    'class' => 'btn btn-sm btn-falcon-success',
+                                    'target' => '_self',
+                                    'href' => route('permit.approve', [
+                                        'permit' => $result['id'],
+                                        'employee' => $result['id_employee'],
+                                        'start' => $result['start'],
+                                        'end' =>  $result['end']
+                                        // 'params' => $params
+                                        ]
+                                    ),
+                                    // 'href' => '#'
+                                ],
+                                'type' => 'a',
+                                'tooltip' => 'Approved'
+                            ],
+                            'cancelPermit' => [
+                                'icon' => 'fad fa-ban',
+                                'attr' => [
+                                    'class' => 'btn btn-sm btn-falcon-warning',
+                                    'target' => '_self',
+                                    'href' => route('permit.cancel', [
+                                        'permit' => $result['id'],
+                                        'employee' => $result['id_employee'],
+                                        'start' => $result['start'],
+                                        'end' =>  $result['end']
+                                        // 'params' => $params
+                                        ]
+                                    ),
+                                ],
+                                'type' => 'a',
+                                'tooltip' => 'Not Approved'
+                            ]
+                        ];
 
-                    $action = [
-                        'cancelPermit' => [
-                        'icon' => 'fad fa-ban',
-                        'attr' => [
-                            'class' => 'btn btn-sm btn-falcon-warning',
-                            'target' => '_self',
-                            'href' => route('permit.cancel', [
-                                'permit' => $result['id'],
-                                'employee' => $result['id_employee'],
-                                'start' => $result['start'],
-                                'end' =>  $result['end']
-                                // 'params' => $params
-                            ]),
-                        ],
-                        'type' => 'a',
-                        'tooltip' => 'Cancel permit'
-                    ]];
+                        $result = $self->addDefaultListActions($result);
+                        $actions = $result->get('actions')->merge($action);
+                        $result['actions'] = $actions;
 
-					// return $self->addDefaultListActions($result, 'edit', 'destroy');
-                    $result['actions'] = $action;
-                    return $result;
+                        return $result;
+                    }else{
+                        return $self->addDefaultListActions($result);
+                    }
+                    // $result['actions'] = $action;
+                    // return $result;
 				});
 			}
 
@@ -197,39 +280,42 @@ class PermitViewModel extends ViewModelBase{
 		$fields->offsetSet('cut_att_salary', $this->toBool($fields->get('cut_att_salary')));
 
 		$p = $fields->toArray();
+        $p['status'] = 'Not approved yet';
 		// dd($p);
 		$permit = new Permit($p);
 		$ret = $permit->save();
 
 		// Add sick, businnes trip or permit attendances
-		$employeeId = $fields->get('id_employee');
-		$permitType = $fields->get('permit_type');
-		$dateStartPermit = new DateTime($fields->get('start'));
-		$dateEndPermit = new DateTime($fields->get('end'));
-		// $yearNow = new DateTime()->format('Y');
+		// $employeeId = $fields->get('id_employee');
+		// $permitType = $fields->get('permit_type');
+		// $dateStartPermit = new DateTime($fields->get('start'));
+		// $dateEndPermit = new DateTime($fields->get('end'));
+		// // $yearNow = new DateTime()->format('Y');
 
-		// $eventsCalendar = CalendarEvent::where('start_date', '>=', $dateStartPermit)
-		// 	->where('start_date', '<=', $dateEndPermit)
-		// 	->where('recurring', '=', 0)
-		// 	->get()->pluck('start_date')->toArray();
+		// // $eventsCalendar = CalendarEvent::where('start_date', '>=', $dateStartPermit)
+		// // 	->where('start_date', '<=', $dateEndPermit)
+		// // 	->where('recurring', '=', 0)
+		// // 	->get()->pluck('start_date')->toArray();
 
-		$eventsCalendar = $this->nationalEvents($dateStartPermit, $dateEndPermit);
+		// $eventsCalendar = $this->nationalEvents($dateStartPermit, $dateEndPermit);
 
-		while($dateStartPermit <= $dateEndPermit){
-			$dayOfWeek = $dateStartPermit->format('w');
-			$checkNotInEventCalendar = in_array($dateStartPermit->format('Y-m-d'), $eventsCalendar);
-			if($checkNotInEventCalendar === false && ($dayOfWeek != "0" && $dayOfWeek != "6")){
-				$attPermit = new Attendance([
-					'employee_id' => $employeeId,
-					'attendance_reason_id' => $permitType,
-					'at' => $dateStartPermit,
-					'cut_att_premium' => $fields->get('cut_att_premium'),
-					'cut_att_salary' => $fields->get('cut_att_salary')
-				]);
-				$attPermit->save();
-			}
-			$dateStartPermit->modify('+1 day');
-		}
+		// while($dateStartPermit <= $dateEndPermit){
+		// 	$dayOfWeek = $dateStartPermit->format('w');
+		// 	$checkNotInEventCalendar = in_array($dateStartPermit->format('Y-m-d'), $eventsCalendar);
+		// 	if($checkNotInEventCalendar === false && ($dayOfWeek != "0" && $dayOfWeek != "6")){
+		// 		$attPermit = new Attendance([
+		// 			'employee_id' => $employeeId,
+		// 			'attendance_reason_id' => $permitType,
+		// 			'at' => $dateStartPermit,
+		// 			'cut_att_premium' => $fields->get('cut_att_premium'),
+		// 			'cut_att_salary' => $fields->get('cut_att_salary')
+		// 		]);
+		// 		$attPermit->save();
+		// 	}
+		// 	$dateStartPermit->modify('+1 day');
+		// }
+
+
 		// $permitDays = (new DateTime($dateStartPermit))->diff(new DateTime($dateEndPermit))->d + 1;
 
 		// for($x = 0; $x < $permitDays; $x++){

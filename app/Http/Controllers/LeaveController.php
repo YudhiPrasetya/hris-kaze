@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\UnauthorizedException;
 use App\Http\Requests\LeaveFormRequest;
+use App\Http\ViewModels\EmployeeViewModel;
 use App\Http\ViewModels\LeaveViewModel;
 use App\Http\ViewModels\ViewModel as HttpViewModel;
 use App\Http\ViewModels\ViewModelBase;
 use App\Managers\Form\FormBuilder;
 use App\Models\Employee;
 use App\Models\Leave;
+use App\Repositories\Eloquent\EmployeeRepository;
 use App\Repositories\Eloquent\LeaveRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
@@ -18,9 +20,11 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class LeaveController extends Controller{
     private LeaveViewModel $leaveViewModel;
+    private EmployeeViewModel $employeeViewModel;
 
     /**
      * LeaveController constructor
@@ -30,9 +34,10 @@ class LeaveController extends Controller{
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function __construct(LeaveRepository $repository, FormBuilder $builder)
+    public function __construct(LeaveRepository $repository, EmployeeRepository $employeeRepository, FormBuilder $builder)
     {
         $this->leaveViewModel = new LeaveViewModel($repository, $builder);
+        $this->employeeViewModel = new EmployeeViewModel($employeeRepository, $builder);
     }
 
     /**
@@ -40,12 +45,24 @@ class LeaveController extends Controller{
      *
      * @return Response|LeaveViewModel
      */
-    public function index(): Response|LeaveViewModel{
+    public function index(): Response|LeaveViewModel|EmployeeViewModel{
         return $this->leaveViewModel->view('pages.leave.list');
     }
 
     public function list(Request $request): Collection{
         return $this->leaveViewModel->list($request);
+    }
+
+    public function approveLeave(Request $request){
+        $leave = Leave::find($request->leave);
+        $employee = Employee::find($leave->id_employee);
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        $isUser = $employee->user_id == Auth::user()->id;
+        if(!$isAdmin && !$isUser){
+            throw UnauthorizedException::forPermissions(['leave.approve']);
+        }
+
+        $this->leaveViewModel->approveLeave($request);
     }
 
     public function cancelLeave(Request $request){
@@ -108,11 +125,17 @@ class LeaveController extends Controller{
      * @return HttpViewModel|ViewModelBase
      */
     public function edit(Leave $leave): HttpViewModel|ViewModelBase {
-        $employee = Employee::find($leave->id_employee);
-        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
-        $isUser = $employee->user_id == Auth::user()->id;
-        if(!$isAdmin && !$isUser){
-            throw UnauthorizedException::forPermissions(['leave.edit']);
+
+        // $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        // $isUser = $employee->user_id == Auth::user()->id;
+        // if(!$isAdmin && !$isUser){
+        //     throw UnauthorizedException::forPermissions(['leave.edit']);
+        // }
+        if($leave->status == 'Approved'){
+            $employee = Employee::find($leave->id_employee);
+            Session::flash('message', "Leave for <strong>{$employee->name}</strong> from <strong>{$leave->start->format('Y-m-d')}</strong> to <strong>{$leave->end->format('Y-m-d')}</strong> cannot be edited because allready approved.");
+            Session::flash('alert', 'warning');
+            redirect('/leave')->send();
         }
 	    return $this->leaveViewModel->createForm('PUT', 'leave.update', $leave)->view('pages.leave.form');
     }

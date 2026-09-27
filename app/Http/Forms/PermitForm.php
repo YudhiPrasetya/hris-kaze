@@ -6,10 +6,16 @@ use App\Managers\Form\Field;
 use App\Managers\Form\Form;
 use App\Models\Employee;
 use App\Models\ReasonForLeave;
+use Illuminate\Support\Facades\Auth;
 
 class PermitForm extends Form{
+
+    // public $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+
     public function buildForm()
     {
+        // dd(Auth::user());
+
         $permitTypes = [
             "2" => "Sick (Sakit)",
             "3" => "Business Trip (Perjalanan Bisnis)",
@@ -23,6 +29,10 @@ class PermitForm extends Form{
                 'property' => 'name',
                 'label' => 'Employee',
                 'query_builder' => function(Employee $employee){
+                    // $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+                    // if(!$isAdmin){
+                    //     return $employee->where('user_id', Auth::user()->id)->select(['id', 'name'])->selectRaw('CONCAT("{\"key\":\"", id, "\",\"labelWithKey\": false, \"value\":\"", name, "\"}") as name');
+                    // }
                     return $employee->select(['id', 'name'])->selectRaw('CONCAT("{\"key\":\"", id, "\",\"labelWithKey\": false, \"value\":\"", name, "\"}") as name');
                 }
             ])

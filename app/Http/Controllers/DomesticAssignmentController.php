@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Session;
 
 class DomesticAssignmentController extends Controller
 {
@@ -75,10 +76,12 @@ class DomesticAssignmentController extends Controller
 	 * @return ViewModel|ViewModelBase
 	 */
 	public function edit(Request $request) {
-        // dd($request->all());
-        // $domesticAssignment = DomesticAssignment::where('id', $request->get('id'))->first();
         $domesticAssignment = DomesticAssignment::find($request->assignment);
-        // dd($domesticAssignment);
+        if($domesticAssignment->status == 'Not approved yet'){
+            Session::flash('message', "Selected assignment cannot be edited because not approved yet.");
+            Session::flash('alert', 'warning');
+            redirect('/assignments')->send();
+        }
 		return $this->viewModel->createForm('PUT', 'assignments.store', $domesticAssignment)
 		                       ->view('pages.assignment.domestic.edit');
 	}
@@ -126,5 +129,9 @@ class DomesticAssignmentController extends Controller
 
     public function overseasTo(){
         return $this->viewModel->overseasTo();
+    }
+
+    public function approveAssignment(Request $request){
+        return $this->viewModel->approveAssignment($request);
     }
 }

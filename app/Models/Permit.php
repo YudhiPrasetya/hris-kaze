@@ -22,7 +22,8 @@ class Permit extends ModelBase{
         'permit_date', 'id_employee',
         'permit_type',
         'start', 'end', 'note',
-        'attachment_path', 'cut_att_premium', 'cut_att_salary'
+        'attachment_path', 'cut_att_premium', 'cut_att_salary',
+        'status'
     ];
 
     /**

@@ -6,14 +6,16 @@ use App\Http\Forms\OvertimeForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Managers\Form\FormBuilder;
 use App\Models\Attendance;
-use App\Models\Overtime;
+use App\Models\Employee;
 use App\Models\ModelInterface;
-use App\Repositories\EloquentRepositoryInterface;
+use App\Models\Overtime;
 use App\Repositories\Eloquent\SettingsRepository;
+use App\Repositories\EloquentRepositoryInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class OvertimeViewModel extends ViewModelBase{
     /**
@@ -81,19 +83,69 @@ class OvertimeViewModel extends ViewModelBase{
 		list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
 		$query = $this->getBaseQuery($request, ...$columns);
 		$columns = $this->getDefaultColumns(...$columns);
-		$results = $query->with(['employee:id,name'])
-		                 ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
-		                 ->toArray();
+
+        if(Auth::user()->hasAnyRole(['super-admin', 'admin'])){
+            $results = $query->with(['employee:id,name'])
+                             ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+                             ->toArray();
+        }else{
+            $employee = Employee::where('user_id', '=', Auth::user()->id)->first();
+            $results = $query->with(['employee:id,name'])->where('id_employee', '=', $employee->id)
+                             ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+                             ->toArray();
+        }
 
 		return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
 			if ($key == 'rows') {
+                dd($item);
 				return collect($item)->map(function ($result, $i) use ($self) {
-                    $result['overtime_date'] = $result['overtime_date']->format('Y-m-d');
-                    // $result['start'] = $result['start']->format('H:i:s');
-                    // $result['end'] = $result['end']->format('H:i:s');
-                    // $result['overtime'] = $result['end']->format('H:i:s');
+                    // $result['overtime_date'] = $result['overtime_date']->format('Y-m-d');
+                    // if(Auth::user()->hasAnyRole(['super-admin', 'admin'])){
+                    //     $action = [
+                    //         'approvedOvertime' => [
+                    //             'icon' => 'fad fa-check',
+                    //             'attr' => [
+                    //                 'class' => 'btn btn-sm btn-falcon-success',
+                    //                 'target' => '_self',
+                    //                 'href' => route('overtime.approve', [
+                    //                     'overtime' => $result['id'],
+                    //                     'employee' => $result['id_employee'],
+                    //                     'start' => $result['start'],
+                    //                     'end' =>  $result['end']
+                    //                     // 'params' => $params
+                    //                 ]),
+                    //             ],
+                    //             'type' => 'a',
+                    //             'tooltip' => 'Approve',
+                    //         ],
+                    //         'cancelLeave' => [
+                    //             'icon' => 'fad fa-ban',
+                    //             'attr' => [
+                    //                 'class' => 'btn btn-sm btn-falcon-warning',
+                    //                 'target' => '_self',
+                    //                 'href' => route('overtime.cancel', [
+                    //                     'overtime' => $result['id'],
+                    //                     // 'employee' => $result['id_employee'],
+                    //                     // 'start' => $result['start'],
+                    //                     // 'end' =>  $result['end']
+                    //                     // 'params' => $params
+                    //                 ]),
+                    //             ],
+                    //             'type' => 'a',
+                    //             'tooltip' => 'Not approve',
+                    //         ],
+                    //     ];
 
-					return $self->addDefaultListActions($result, 'edit', 'destroy');
+                    //     $result = $self->addDefaultListActions($result);
+                    //     $actions = $result->get('actions')->merge($action);
+                    //     $result['actions'] = $actions;
+
+                    //     // $result['actions'] = $action;
+                    //     return $result;
+                    // }else{
+                    //     return $self->addDefaultListActions($result);
+                    // }
+                    return $self->addDefaultListActions($result);
 				});
 			}
 			return $item;
@@ -129,7 +181,7 @@ class OvertimeViewModel extends ViewModelBase{
 		$att->update([
 			'overtime_confirmed' => 1
 		]);
-	
+
 		$o = $fields->toArray();
 		$ot = new Overtime($o);
 		$ret = $ot->save();

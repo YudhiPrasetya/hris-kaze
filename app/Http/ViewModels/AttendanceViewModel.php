@@ -18,6 +18,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -156,49 +157,68 @@ class AttendanceViewModel extends ViewModelBase
       });
    }
 
-   public function listOvertime(Request $request, ...$columns): Collection{
-      $self = $this;
-      list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
-      $query = $this->getBaseQuery($request, ...$columns);
-      $columns = $this->getDefaultColumns(...$columns);
-      $results = $query->with(['employee:id,name'])->whereNotNull('overtime')->whereYear('at', date('Y'))
-            ->orWhereRaw('DAYOFWEEK(at) = 1')->orWhereRaw('DAYOFWEEK(at) = 7')
-            ->orderBy('at', 'DESC')
-            ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
-            ->toArray();
+    public function listOvertime(Request $request, ...$columns): Collection{
+        $self = $this;
+        list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
+        $query = $this->getBaseQuery($request, ...$columns);
+        $columns = $this->getDefaultColumns(...$columns);
+    //   $results = $query->with(['employee:id,name'])->whereNotNull('overtime')->whereYear('at', date('Y'))
+    //         ->orWhereRaw('DAYOFWEEK(at) = 1')->orWhereRaw('DAYOFWEEK(at) = 7')
+    //         ->orderBy('at', 'DESC')
+    //         ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+    //         ->toArray();
 
-      return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
-         if ($key == 'rows') {
-            return collect($item)->map(function ($result, $i) use ($self) {
-               $result['employee']['name'] =
-                  $self->createLink($result['employee']['name'], route('employee.show', ['employee' => $result['employee']['id']]));
-               $result['overtime_date'] = $result['at']->format('Y-m-d');
-               $result['overtime_confirmed'] = $result['overtime_confirmed'] ? 'Confirmed' : 'Pending';
+        if(Auth::user()->hasAnyRole(['super-admin', 'admin'])){
+            $results = $query->with(['employee:id,name'])->whereYear('at', date('Y'))
+                ->WhereRaw('TIMESTAMPDIFF(HOUR, end, overtime) >= ?', [1])
+                ->orderBy('at', 'DESC')
+                ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+                ->toArray();
 
-					$action = [
-						'overtime_confirmation' => [
-							'icon'    => 'fad fa-business-time',
-							'attr'    => [
-								'class' => 'btn btn-md btn-falcon-success',
-								'href'  => route('ot.create', ['attendance' => $result['id']]),
-								// 'href' => '#',
-							],
-							'type'    => 'a',
-							'tooltip' => 'Overtime Confirmation',
-						],
+        }else{
+            $employee = Employee::where('user_id', '=', Auth::user()->id)->first();
+            $results = $query->with(['employee:id,name'])->whereYear('at', date('Y'))
+                ->where('id_employee', '=', $employee->id)
+                ->WhereRaw('TIMESTAMPDIFF(HOUR, end, overtime) >= ?', [1])
+                ->orderBy('at', 'DESC')
+                ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+                ->toArray();
+        }
 
-					];
 
-               $result['actions'] = $result['overtime_confirmed']  == 'Pending' ? $action : '';
-               $result['overtime_confirmed'] = $self->getConfirmedColor($result['overtime_confirmed']);
+        return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
+            if ($key == 'rows') {
+                return collect($item)->map(function ($result, $i) use ($self) {
+                    $result['employee']['name'] =
+                        $self->createLink($result['employee']['name'], route('employee.show', ['employee' => $result['employee']['id']]));
+                    $result['overtime_date'] = $result['at']->format('Y-m-d');
+                    $result['overtime_confirmed'] = $result['overtime_confirmed'] ? 'Confirmed' : 'Pending';
 
-               return $result;
-            });
-         }
+                    if(Auth::user()->hasAnyRole(['super-admin'])){
+                        $action = [
+                            'overtime_confirmation' => [
+                                'icon'    => 'fad fa-business-time',
+                                'attr'    => [
+                                    'class' => 'btn btn-md btn-falcon-success',
+                                    'href'  => route('ot.create', ['attendance' => $result['id']]),
+                                    // 'href' => '#',
+                                ],
+                                'type'    => 'a',
+                                'tooltip' => 'Overtime Confirmation',
+                            ],
 
-         return $item;
-      });
-   }
+                        ];
+                        $result['actions'] = $result['overtime_confirmed']  == 'Pending' ? $action : '';
+                    }
+                    $result['overtime_confirmed'] = $self->getConfirmedColor($result['overtime_confirmed']);
+
+                    return $result;
+                });
+            }
+
+            return $item;
+         });
+    }
 
 	private function getConfirmedColor(string $isConfirmed) {
 		$color = '';

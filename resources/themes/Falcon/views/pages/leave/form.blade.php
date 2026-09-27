@@ -7,7 +7,11 @@
 @section('content')
     @php
         // dd($data);
-        $fields = collect($form->getFieldValues())
+        $fields = collect($form->getFieldValues());
+        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+        if(!$isAdmin){
+            $employee = App\Models\Employee::where('user_id', Auth::user()->id)->first();
+        }
     @endphp
     {!! form_start($form, ['attr' => ['autocomplete' => 'off', 'class' => 'leave']]) !!}
 
@@ -57,11 +61,17 @@
 
                             {!! form_row($form->leave_date, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
                             {!! form_row($form->id_reason_for_leave, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
-                            {!! form_row($form->cut_att_premium, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
+                            @if(!$isAdmin)
+                                <div class="d-none">
+                                    {!! form_row($form->cut_att_premium, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
+                                </div>
+                            @else
+                               {!! form_row($form->cut_att_premium, ['attr' => ['disabled' => $leaveQuota == 0]]) !!}
+                            @endif
                         </x-bootstrap::column>
                         <x-bootstrap::column>
                             <div class="mb-2">
-                                <h6 class="text-600 control-label mb-0">Remaining leave quota (sisa jatah cuti)</h6>
+                                <h6 class="text-600 control-label mb-0">Remaining leave quota this year (sisa jatah cuti tahun ini)</h6>
                                 <span id="leaveAllowance" class="form-control-plaintext text-1000 fs-0 pt-0">
                                     <strong>{{ $leaveQuota }}</strong>
                                 </span>

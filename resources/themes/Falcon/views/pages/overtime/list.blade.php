@@ -7,8 +7,8 @@
 @section('api_list_url', route('api.attendance.overtime'))
 
 @section('columns')
+<th scope="col" data-class="va-baseline" data-field="employee.name" data-sortable="true">Employee</th>
 	<th scope="col" data-class="va-baseline" data-field="overtime_date" data-sortable="true">Date</th>
-	<th scope="col" data-class="va-baseline" data-field="employee.name" data-sortable="true">Employee</th>
 	<th scope="col" data-class="va-baseline" data-field="start" data-sortable="true">Start</th>
 	<th scope="col" data-class="va-baseline" data-field="end" data-sortable="true">End</th>
 	<th scope="col" data-class="va-baseline" data-field="overtime" data-sortable="true">Overtime</th>

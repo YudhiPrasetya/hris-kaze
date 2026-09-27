@@ -38,10 +38,34 @@
                     <x-bootstrap::row>
                         <x-bootstrap::column breakpoint="EXTRA_SMALL|6;MEDIUM|6">
                             {!! form_row($form->permit_date) !!}
-                            {!! form_row($form->id_employee) !!}
+                            @php
+                                $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
+                                if(!$isAdmin){
+                                    $employee = App\Models\Employee::where('user_id', Auth::user()->id)->first();
+                                }
+                            @endphp
+                            @if(!$isAdmin)
+                                <div class="flex flex-col gap-0 mb-4">
+                                    <input ty="hidden" style="display: none;" id="id_employee" name="id_employee" value="{{ $employee->id }}">
+                                    <label for="id_employee" class="form-label">Employee</label>
+                                    <input type="text" class="form-control" value="{{ $employee->name }}" disabled>
+                                </div>
+                                <div class="d-none">
+                                    {!! form_row($form->id_employee) !!}
+                                </div>
+                            @else
+                                {!! form_row($form->id_employee) !!}
+                            @endif
+
+                            {{-- {!! form_row($form->id_employee) !!} --}}
                             {!! form_row($form->permit_type) !!}
-                            {!! form_row($form->cut_att_premium) !!}
-                            {!! form_row($form->cut_att_salary) !!}
+                            @if(!$isAdmin)
+                                <div class="d-none">{!! form_row($form->cut_att_premium) !!}</div>
+                                <div class="d-none">{!! form_row($form->cut_att_salary) !!}</div>
+                            @else
+                                {!! form_row($form->cut_att_premium) !!}
+                                {!! form_row($form->cut_att_salary) !!}
+                            @endif
                         </x-bootstrap::column>
                         <x-bootstrap::column>
                             {!! form_row($form->start) !!}

@@ -15,16 +15,18 @@
 namespace App\Http\ViewModels;
 
 use App\Http\Forms\EmployeeForm;
+use App\Http\Forms\ShowPayrollForm;
 use App\Http\Requests\FormRequestInterface;
 use App\Libraries\Payroll\PayrollCalculator;
 use App\Managers\Form\FormBuilder;
 use App\Models\Attendance;
 use App\Models\CalendarEvent;
 use App\Models\Employee;
-use App\Models\Permit;
-use App\Models\Leave;
 use App\Models\Fingerprint;
+use App\Models\Leave;
 use App\Models\ModelInterface;
+use App\Models\Permit;
+use App\Models\ReasonForLeave;
 use App\Repositories\Eloquent\AttendanceRepository;
 use App\Repositories\Eloquent\CalendarEventRepository;
 use App\Repositories\Eloquent\EmployeeRepository;
@@ -37,8 +39,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Http\Forms\ShowPayrollForm;
 
 class EmployeeViewModel extends ViewModelBase {
 	public $payroll;
@@ -79,9 +81,11 @@ class EmployeeViewModel extends ViewModelBase {
 		list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
 		$query = $this->getBaseQuery($request, ...$columns);
 		$columns = $this->getDefaultColumns(...$columns);
-		$results = $query->with(['country:iso,name', 'state:id,name', 'city:id,name', 'district:id,name', 'village:id,name', 'position:id,name'])
-		                 ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
-		                 ->toArray();
+
+        $results = $query->with(['country:iso,name', 'state:id,name', 'city:id,name', 'district:id,name', 'village:id,name', 'position:id,name'])
+                            ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+                            ->toArray();
+
 
 		return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
 			if ($key == 'rows') {
@@ -983,4 +987,5 @@ class EmployeeViewModel extends ViewModelBase {
 
 	  return $this;
    }
+
 }

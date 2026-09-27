@@ -14,5 +14,5 @@
 	<th scope="col" data-class="va-baseline" data-field="note" data-sortable="true">Reason</th>
 	<th scope="col" data-class="va-baseline" data-field="start" data-sortable="true">From</th>
 	<th scope="col" data-class="va-baseline" data-field="end" data-sortable="true">To</th>
-	<th scope="col" data-class="va-baseline" data-field="attachment_path" data-sortable="true">Attachment</th>
+	<th scope="col" data-class="va-baseline" data-field="status" data-sortable="true">Status</th>
 @endsection

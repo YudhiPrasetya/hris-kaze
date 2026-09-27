@@ -302,11 +302,9 @@ class EmployeeController extends Controller {
         $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
         $isUser = $employee->user_id == Auth::user()->id;
         if(!$isAdmin && !$isUser){
-            throw UnauthorizedException::forPermissions(['employee.edit']);
+            throw UnauthorizedException::forPermissions(['employee.show']);
         }
-		// dd($employee);
-		return $this->viewModel->createForm('PUT', 'employee.update', $employee)
-		                       ->view('pages.employee.form');
+		return $this->viewModel->createForm('PUT', 'employee.update', $employee)->view('pages.employee.form');
 	}
 
 	/**
@@ -335,11 +333,6 @@ class EmployeeController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy(Request $request, Employee $employee) {
-        $isAdmin = Auth::user()->hasAnyRole(['super-admin','admin']);
-        // $isUser = $employee->user_id == Auth::user()->id;
-        if(!$isAdmin){
-            throw UnauthorizedException::forPermissions(['employee.destroy']);
-        }
         return $this->viewModel->delete($request, $employee);
 	}
 

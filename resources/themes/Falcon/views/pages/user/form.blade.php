@@ -82,7 +82,7 @@
 												$desc = str_replace('crypto', 'cryptography', $desc);
 												$desc = str_replace('show', 'view', $desc);
 												$desc = str_replace('audit', 'audit trail', $desc);
-												$desc = str_replace('app', 'application', $desc);
+												// $desc = str_replace('app', 'application', $desc);
 
 												if (!in_array($sub, ['index', 'create', 'destroy', 'show', 'edit'])) {
 													if (!$g->has($sub)) {
@@ -143,7 +143,7 @@
 																			$part = str_replace('cp', 'card present', $part);
 																			$part = str_replace('crypto', 'cryptography', $part);
 																			$part = str_replace('show', 'show/view', $part);
-																			$part = str_replace('app', 'application', $part);
+																			// $part = str_replace('app', 'application', $part);
 																			$part = Str::title($part);
 																			$part = str_replace('Qr', 'QR', $part);
 

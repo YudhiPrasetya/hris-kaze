@@ -68,9 +68,19 @@ class TaskViewModel extends ViewModelBase {
 		list($offset, $limit, $sort, $order, $search) = $this->getDefaultRequestParam($request);
 		$query = $this->getBaseQuery($request, ...$columns);
 		$columns = $this->getDefaultColumns(...$columns);
-		$results = $query->with(['employee:id,name,profile_photo_path', 'priority:id,name,level', 'currentStatus:id,name,reason,model_id'])
-		                 ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
-		                 ->toArray();
+
+        if(Auth::user()->hasAnyRole(['super-admin', 'admin'])){
+            $results = $query->with(['employee:id,name,profile_photo_path', 'priority:id,name,level', 'currentStatus:id,name,reason,model_id'])
+                             ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+                             ->toArray();
+
+        }else{
+            $employee = Employee::where('user_id', '=', Auth::user()->id)->first();
+            $results = $query->with(['employee:id,name,profile_photo_path', 'priority:id,name,level', 'currentStatus:id,name,reason,model_id'])
+                             ->where('employee_id', '=', $employee->id)
+                             ->paginate($limit, $columns->toArray(), 'offset', $offset == 0 ? $offset + 1 : ($offset / $limit) + 1)
+                             ->toArray();
+        }
 
 		return $this->prepareForResponse($results, $offset)->map(function ($item, $key) use ($self) {
 			if ($key == 'rows') {
@@ -84,13 +94,15 @@ class TaskViewModel extends ViewModelBase {
                     $userRole = $user->roles->pluck('name')->first();
                     if($userRole == 'super-admin' || $userRole == 'admin' || $userRole == 'manager') {
                         $result = $self->addDefaultListActions($result);
-                    } elseif($userRole == 'operator') {
-                        // Employees can only confirm or mark tasks as done
-                        $actions = $self->getButton($result['current_status'], $result['id']);
-                        $result['actions'] = $actions;
+                    // } elseif($userRole == 'operator') {
+                    //     // Employees can only confirm or mark tasks as done
+                    //     $actions = $self->getButton($result['current_status'], $result['id']);
+                    //     $result['actions'] = $actions;
                     } else {
                         // Other roles have no actions
-                        $result['actions'] = collect([]);
+                        // $result['actions'] = collect([]);
+                        $actions = $self->getButton($result['current_status'], $result['id']);
+                        $result['actions'] = $actions;
                     }
                     return $result;
                     // switch($userRole) {
