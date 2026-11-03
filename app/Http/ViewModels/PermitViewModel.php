@@ -134,7 +134,8 @@ class PermitViewModel extends ViewModelBase{
         $start = new DateTime($request->start);
         $end = new DateTime($request->end);
 
-        if(Permit::find($permitId)->update(['status' => 'Approved'])){
+        $permit = Permit::find($permitId);
+        if($permit->update(['status' => 'Approved'])){
             while($start <= $end){
                 // $att = Attendance::where('employee_id', '=', $employeeId)->where('at', '=', $start);
                 // if($att){
@@ -146,6 +147,8 @@ class PermitViewModel extends ViewModelBase{
                     'at' => $start,
                     'start' => '08:00:00',
                     'end' => '17:00:00',
+                    'cut_att_premium' => $permit->cut_att_premium,
+                    'cut_att_salary' => $permit->cut_att_salary,
                 ]);
                 $start->modify('+ 1 day');
             }

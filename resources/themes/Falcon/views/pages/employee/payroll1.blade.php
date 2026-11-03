@@ -80,7 +80,10 @@
                                 </tr>
                                 <tr>
                                     <td class="text-md-right px-1 py-0 border-left">Collective Leave:</td>
-                                    <td class="text-md-left px-1 py-0 border-right font-weight-bold">{{ $leaves }}</td>
+                                    {{-- <td class="text-md-right px-1 py-0 border-left">Collective Permit:</td> --}}
+                                    {{-- <td class="text-md-left px-1 py-0 border-right font-weight-bold">{{ $leaves }}</td> --}}
+                                    {{-- <td class="text-md-left px-1 py-0 border-right font-weight-bold">{{ $leaves }}</td> --}}
+                                    <td class="text-md-left px-1 py-0 border-right font-weight-bold">{{ $permits }}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-md-right px-1 py-0 border-left border-bottom">Sick Leave:</td>

@@ -161,6 +161,7 @@ class EmployeeController extends Controller {
 			'holidayDays' => $payrollCalc->employee->presences->holidayDays,
 			'remainingQuotaLeave' => gettype($payrollCalc->remainingLeaveQuota) === 'integer' ? $payrollCalc->remainingLeaveQuota : "-",
 			'leaves' => $payrollCalc->employee->presences->leaveDays,
+			'permits' => $payrollCalc->employee->presences->permits,
 			'sicks' => $payrollCalc->employee->presences->sickDays,
 			// 'jobTitle' => $employee->jobTitle()->first()->name,
 			// 'position' => $employee->position()->first()->name,

@@ -116,12 +116,19 @@ class CalendarEventViewModel extends ViewModelBase {
 			return $event;
 		};
 
+        // dump($start, $end);
+
 		$event = CalendarEvent::whereDate('start_date', '>=', $start)
 		                      ->whereDate('start_date', '<=', $end)
 		                      ->where('recurring', '=', false)
 		                      ->get()->map($map);
+
+        // dump($event);
+
 		$recurring = CalendarEvent::whereRaw(sprintf('MONTH(start_date) IN (%s)', implode(',', $months)))
 		                          ->where('recurring', '=', true);
+
+        // dump($recurring->get()->map($map));
 
 		return $event->merge($recurring->get()->map($map));
 	}
