@@ -1,0 +1,50 @@
+name: Deploy hris-kaze to production (hosting) server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@2
+        with:
+          php-version: 8.1
+
+      - name: Install Composer Dependencies
+        run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with: node-version:'20'
+
+      - name: Install NPM Dependencies
+        run: npm install
+
+      - name: Build NPM Assets
+        run: npm run build
+
+      - name: Synchronize Files To Server (Hosting)
+        uses: easingthemes/ssh-deploy@v2.1.5
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: "."
+          REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+          REMOTE_USER: ${{ secrets.SERVER_USER_NAME }}
+          TARGET: "/home/k7380702/hris.app.cleanvyasalta.co.id"
+
+      - name: Run Remote/Artisan Commands
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER_NAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            php artisan optimize
