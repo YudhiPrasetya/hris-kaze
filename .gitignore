@@ -132,7 +132,7 @@ public/storage
 public/hot
 storage/framework/cache
 storage/framework/views
-vendor/
+# vendor/
 /public/.htaccess.env
 .env.production
 bootstrap/cache/*
