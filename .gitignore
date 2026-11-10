@@ -149,4 +149,4 @@ docker-compose.override.yml
 *.lock
 
 # .env
-.env*
+# .env*
